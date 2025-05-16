@@ -1,0 +1,35 @@
+[0.812s] Invoking command in '/home/hiep0247/hiep_ros2/src/hiep_robot2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --single-version-externally-managed install_data
+[1.070s] running egg_info
+[1.070s] creating ../../build/hiep_robot2/hiep_robot2.egg-info
+[1.090s] writing ../../build/hiep_robot2/hiep_robot2.egg-info/PKG-INFO
+[1.090s] writing dependency_links to ../../build/hiep_robot2/hiep_robot2.egg-info/dependency_links.txt
+[1.090s] writing entry points to ../../build/hiep_robot2/hiep_robot2.egg-info/entry_points.txt
+[1.090s] writing requirements to ../../build/hiep_robot2/hiep_robot2.egg-info/requires.txt
+[1.090s] writing top-level names to ../../build/hiep_robot2/hiep_robot2.egg-info/top_level.txt
+[1.090s] writing manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[1.129s] reading manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[1.130s] writing manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[1.130s] running build
+[1.130s] running build_py
+[1.130s] creating /home/hiep0247/hiep_ros2/build/hiep_robot2/build
+[1.130s] creating /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib
+[1.130s] creating /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[1.130s] copying hiep_robot2/__init__.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[1.130s] copying hiep_robot2/serial_comm_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[1.130s] running install
+[1.137s] running install_lib
+[1.153s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[1.153s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/__init__.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[1.153s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/serial_comm_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[1.154s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/__init__.py to __init__.cpython-312.pyc
+[1.154s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/serial_comm_node.py to serial_comm_node.cpython-312.pyc
+[1.155s] running install_data
+[1.155s] copying package.xml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2
+[1.155s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[1.155s] copying launch/serial_comm_launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[1.155s] running install_egg_info
+[1.172s] Copying ../../build/hiep_robot2/hiep_robot2.egg-info to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2-0.0.0-py3.12.egg-info
+[1.173s] running install_scripts
+[1.322s] Installing serial_comm_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[1.322s] writing list of installed files to '/home/hiep0247/hiep_ros2/build/hiep_robot2/install.log'
+[1.356s] Invoked command in '/home/hiep0247/hiep_ros2/src/hiep_robot2' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --single-version-externally-managed install_data

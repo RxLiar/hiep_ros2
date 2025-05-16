@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: hiep-robot2
+Version: 0.0.0
+Summary: ROS2 ESP32 Serial Communication Package
+Maintainer: hiep0247
+Maintainer-email: gaphan247@gmail.com
+License: Apache License 2.0

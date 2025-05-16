@@ -1,0 +1,2 @@
+[console_scripts]
+serial_comm_node = hiep_robot2.serial_comm_node:main
