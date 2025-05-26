@@ -1,6 +1,6 @@
 set(_AMENT_PACKAGE_NAME "mec_mobile_gazebo")
 set(mec_mobile_gazebo_VERSION "0.0.0")
-set(mec_mobile_gazebo_MAINTAINER "robotlabs <robotlabsnz@gmail.com>")
+set(mec_mobile_gazebo_MAINTAINER "hiep0247 <gaphan247@gmail.com>")
 set(mec_mobile_gazebo_BUILD_DEPENDS "ros_gz_sim")
 set(mec_mobile_gazebo_BUILDTOOL_DEPENDS "ament_cmake")
 set(mec_mobile_gazebo_BUILD_EXPORT_DEPENDS "ros_gz_sim")

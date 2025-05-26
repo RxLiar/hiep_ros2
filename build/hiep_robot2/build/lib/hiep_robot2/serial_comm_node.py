@@ -1,22 +1,35 @@
+#!/usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 import serial
 import threading
+import serial.tools.list_ports
 
+def find_esp32_port():
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        if ("CP210" in port.description or "CH340" in port.description or "Silicon" in port.description):
+            return port.device
+    return None
 
 class SerialCommNode(Node):
     def __init__(self):
         super().__init__('serial_comm_node')
 
-        # Serial Port Configuration
-        self.port = '/dev/ttyUSB0'  # Điều chỉnh lại nếu cần
+        self.port = find_esp32_port()
         self.baudrate = 115200
+
+        if not self.port:
+            self.get_logger().error("Không tìm thấy ESP32 trên bất kỳ cổng USB nào.")
+            raise RuntimeError("ESP32 not found")
+
         try:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=0.1)
         except serial.SerialException as e:
-            self.get_logger().error(f"Không mở được cổng serial: {e}")
+            self.get_logger().error(f"Không mở được cổng serial {self.port}: {e}")
             raise
 
         # ROS2 Communication

@@ -4,7 +4,7 @@
   <name>mec_mobile_description</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="robotlabsnz@gmail.com">robotlabs</maintainer>
+  <maintainer email="gaphan247@gmail.com">hiep0247</maintainer>
   <license>BSD-3-Clause</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 
 // --- ENCODER PINS ---
@@ -23,8 +24,8 @@ float target_speed_L = 0;
 float target_speed_R = 0;
 
 // --- PID GAINS (separated) ---
-float Kp_L = 1.2, Ki_L = 0.4, Kd_L = 0.01;
-float Kp_R = 1.0, Ki_R = 0.3, Kd_R = 0.01;
+float Kp_L = 0.964, Ki_L = 0.05, Kd_L = 0.05;
+float Kp_R = 1.0, Ki_R = 0.05, Kd_R = 0.05;
 
 // --- PID State ---
 float error_L = 0, prev_error_L = 0, integral_L = 0;
@@ -146,8 +147,8 @@ void loop() {
     prev_error_R = error_R;
 
     // Convert output speed to PWM
-    float pwm_L = output_L / 0.5 * 255.0;
-    float pwm_R = output_R / 0.5 * 255.0;
+    int16_t pwm_L = output_L / 0.5 * 255.0;
+    int16_t pwm_R = output_R / 0.5 * 255.0;
 
     setMotor(IN1, IN2, EN_A, pwm_L);
     setMotor(IN3, IN4, EN_B, pwm_R);

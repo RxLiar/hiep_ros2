@@ -1,6 +1,6 @@
 set(_AMENT_PACKAGE_NAME "mec_mobile_description")
 set(mec_mobile_description_VERSION "0.0.0")
-set(mec_mobile_description_MAINTAINER "robotlabs <robotlabsnz@gmail.com>")
+set(mec_mobile_description_MAINTAINER "hiep0247 <gaphan247@gmail.com>")
 set(mec_mobile_description_BUILD_DEPENDS "urdf_tutorial")
 set(mec_mobile_description_BUILDTOOL_DEPENDS "ament_cmake")
 set(mec_mobile_description_BUILD_EXPORT_DEPENDS "urdf_tutorial")
