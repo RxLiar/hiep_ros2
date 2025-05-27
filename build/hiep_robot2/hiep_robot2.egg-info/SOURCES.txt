@@ -11,3 +11,4 @@ setup.py
 hiep_robot2/__init__.py
 hiep_robot2/serial_comm_node.py
 launch/serial_comm_launch.py
+resource/hiep_robot2

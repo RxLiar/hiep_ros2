@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: serial-comm
+Version: 0.0.0
+Summary: Package đọc Serial từ ESP32
+Maintainer: hiep0247
+Maintainer-email: gaphan247@gmail.com
+License: Apache License 2.0

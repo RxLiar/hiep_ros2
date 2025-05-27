@@ -1,0 +1,9 @@
+running egg_info
+creating ../../build/serial_comm/serial_comm.egg-info
+writing ../../build/serial_comm/serial_comm.egg-info/PKG-INFO
+writing dependency_links to ../../build/serial_comm/serial_comm.egg-info/dependency_links.txt
+writing entry points to ../../build/serial_comm/serial_comm.egg-info/entry_points.txt
+writing requirements to ../../build/serial_comm/serial_comm.egg-info/requires.txt
+writing top-level names to ../../build/serial_comm/serial_comm.egg-info/top_level.txt
+writing manifest file '../../build/serial_comm/serial_comm.egg-info/SOURCES.txt'
+error: package directory 'serial_comm' does not exist

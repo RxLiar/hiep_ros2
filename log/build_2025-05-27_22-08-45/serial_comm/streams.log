@@ -1,0 +1,11 @@
+[0.973s] Invoking command in '/home/hiep0247/hiep_ros2/src/serial_comm': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/serial_comm/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/serial_comm/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/serial_comm build --build-base /home/hiep0247/hiep_ros2/build/serial_comm/build install --record /home/hiep0247/hiep_ros2/build/serial_comm/install.log --single-version-externally-managed
+[1.146s] running egg_info
+[1.146s] creating ../../build/serial_comm/serial_comm.egg-info
+[1.160s] writing ../../build/serial_comm/serial_comm.egg-info/PKG-INFO
+[1.160s] writing dependency_links to ../../build/serial_comm/serial_comm.egg-info/dependency_links.txt
+[1.160s] writing entry points to ../../build/serial_comm/serial_comm.egg-info/entry_points.txt
+[1.160s] writing requirements to ../../build/serial_comm/serial_comm.egg-info/requires.txt
+[1.160s] writing top-level names to ../../build/serial_comm/serial_comm.egg-info/top_level.txt
+[1.160s] writing manifest file '../../build/serial_comm/serial_comm.egg-info/SOURCES.txt'
+[1.175s] error: package directory 'serial_comm' does not exist
+[1.190s] Invoked command in '/home/hiep0247/hiep_ros2/src/serial_comm' returned '1': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/serial_comm/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/serial_comm/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/serial_comm build --build-base /home/hiep0247/hiep_ros2/build/serial_comm/build install --record /home/hiep0247/hiep_ros2/build/serial_comm/install.log --single-version-externally-managed

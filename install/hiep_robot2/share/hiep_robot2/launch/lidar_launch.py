@@ -17,7 +17,11 @@ def generate_launch_description():
             os.path.join(pkg_sllidar, 'launch', 'view_sllidar_a1_launch.py')
         ),
         # nếu view_sllidar_a1_launch có arg, bạn có thể ném launch_arguments vào đây
-        # launch_arguments={'serial_port':'/dev/ttyUSB0'}.items()
+        launch_arguments={
+            # nếu launch LiDAR cần tham số, ví dụ:
+            'serial_port': '/dev/ttyUSB0',
+            'frame_id': 'laser'
+        }.items()
     )
 
     return LaunchDescription([

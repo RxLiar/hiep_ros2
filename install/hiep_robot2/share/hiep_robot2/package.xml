@@ -2,16 +2,17 @@
 <package format="3">
   <name>hiep_robot2</name>
   <version>0.0.1</version>
-  <description>ESP32 serial communication for diff drive robot</description>
-  <maintainer email="hiep@example.com">hiep0247</maintainer>
+  <description>ROS2 communication node for ESP32</description>
+
+  <maintainer email="gaphan247@gmail.com">hiep0247</maintainer>
   <license>MIT</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_python</buildtool_depend>
 
   <exec_depend>rclpy</exec_depend>
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>nav_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>  
 
   <export>
     <build_type>ament_python</build_type>
