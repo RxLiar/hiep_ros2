@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'serial_comm_node = hiep_robot2.serial_comm_node:main',
+            'odometry_publisher = hiep_robot2.odometry_publisher:main',
         ],
     },
 )

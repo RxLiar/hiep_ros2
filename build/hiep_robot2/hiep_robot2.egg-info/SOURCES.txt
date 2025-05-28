@@ -9,6 +9,7 @@ setup.py
 ../../build/hiep_robot2/hiep_robot2.egg-info/top_level.txt
 ../../build/hiep_robot2/hiep_robot2.egg-info/zip-safe
 hiep_robot2/__init__.py
+hiep_robot2/odometry_publisher.py
 hiep_robot2/serial_comm_node.py
 launch/serial_comm_launch.py
 resource/hiep_robot2

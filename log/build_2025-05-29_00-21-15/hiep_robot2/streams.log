@@ -1,0 +1,25 @@
+[0.597s] Invoking command in '/home/hiep0247/hiep_ros2/src/hiep_robot2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --single-version-externally-managed install_data
+[0.782s] running egg_info
+[0.796s] writing ../../build/hiep_robot2/hiep_robot2.egg-info/PKG-INFO
+[0.796s] writing dependency_links to ../../build/hiep_robot2/hiep_robot2.egg-info/dependency_links.txt
+[0.796s] writing entry points to ../../build/hiep_robot2/hiep_robot2.egg-info/entry_points.txt
+[0.796s] writing requirements to ../../build/hiep_robot2/hiep_robot2.egg-info/requires.txt
+[0.796s] writing top-level names to ../../build/hiep_robot2/hiep_robot2.egg-info/top_level.txt
+[0.824s] reading manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[0.824s] writing manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[0.824s] running build
+[0.824s] running build_py
+[0.824s] copying hiep_robot2/odometry_publisher.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.825s] running install
+[0.829s] running install_lib
+[0.843s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/odometry_publisher.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.844s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/odometry_publisher.py to odometry_publisher.cpython-312.pyc
+[0.845s] running install_data
+[0.845s] running install_egg_info
+[0.859s] removing '/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2-0.0.0-py3.12.egg-info' (and everything under it)
+[0.860s] Copying ../../build/hiep_robot2/hiep_robot2.egg-info to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2-0.0.0-py3.12.egg-info
+[0.860s] running install_scripts
+[0.950s] Installing odometry_publisher script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.951s] Installing serial_comm_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.951s] writing list of installed files to '/home/hiep0247/hiep_ros2/build/hiep_robot2/install.log'
+[0.971s] Invoked command in '/home/hiep0247/hiep_ros2/src/hiep_robot2' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --single-version-externally-managed install_data

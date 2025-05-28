@@ -1,2 +1,3 @@
 [console_scripts]
+odometry_publisher = hiep_robot2.odometry_publisher:main
 serial_comm_node = hiep_robot2.serial_comm_node:main

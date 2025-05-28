@@ -1,4 +1,3 @@
-# esp32_lidar_rviz_launch.py
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription

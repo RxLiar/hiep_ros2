@@ -8,12 +8,14 @@ import serial
 import threading
 import serial.tools.list_ports
 
+
 def find_esp32_port():
     ports = serial.tools.list_ports.comports()
     for port in ports:
         if ("CP210" in port.description or "CH340" in port.description or "Silicon" in port.description):
             return port.device
     return None
+
 
 class SerialCommNode(Node):
     def __init__(self):
@@ -27,37 +29,42 @@ class SerialCommNode(Node):
             raise RuntimeError("ESP32 not found")
 
         try:
-            self.ser = serial.Serial(self.port, self.baudrate, timeout=0.1)
+            self.ser = serial.Serial(self.port, self.baudrate, timeout=0.05)
         except serial.SerialException as e:
             self.get_logger().error(f"Không mở được cổng serial {self.port}: {e}")
             raise
 
-        # ROS2 Communication
+        # ROS 2: Sub/Pub
         self.subscription = self.create_subscription(
             Twist,
-            'cmd_vel',
+            '/cmd_vel',
             self.cmd_vel_callback,
             10
         )
         self.encoder_pub = self.create_publisher(String, 'encoder_data', 10)
 
-        # Thread to read from serial
+        # Luồng đọc dữ liệu từ serial
         self.read_thread = threading.Thread(target=self.read_from_serial)
         self.read_thread.daemon = True
         self.read_thread.start()
 
-        self.get_logger().info('SerialCommNode started')
+        self.get_logger().info(f"SerialCommNode đã kết nối ESP32 tại {self.port}")
 
     def cmd_vel_callback(self, msg):
         v = msg.linear.x
         w = msg.angular.z
-        L = 0.2  # khoảng cách giữa hai bánh xe
+        L = 0.2  # khoảng cách hai bánh xe
+        WHEEL_MAX = 0.5  # tốc độ max (m/s) khi = 255 PWM
 
-        # Chuyển đổi sang tốc độ cho động cơ trái và phải
-        v_l = int((v - w * L / 2.0) / 0.5 * 255)
-        v_r = int((v + w * L / 2.0) / 0.5 * 255)
+        v_l = int((v - w * L / 2.0) / WHEEL_MAX * 255)
+        v_r = int((v + w * L / 2.0) / WHEEL_MAX * 255)
+
+        # Giới hạn để không vượt PWM cho phép
+        v_l = max(min(v_l, 255), -255)
+        v_r = max(min(v_r, 255), -255)
 
         command = f"{v_l},{v_r}\n"
+
         try:
             self.ser.write(command.encode('utf-8'))
         except serial.SerialException as e:
@@ -66,13 +73,14 @@ class SerialCommNode(Node):
     def read_from_serial(self):
         while rclpy.ok():
             try:
-                line = self.ser.readline().decode('utf-8').strip()
-                if line:
-                    msg = String()
-                    msg.data = line
-                    self.encoder_pub.publish(msg)
+                if self.ser.in_waiting:
+                    line = self.ser.readline().decode('utf-8').strip()
+                    if line:
+                        msg = String()
+                        msg.data = line
+                        self.encoder_pub.publish(msg)
             except Exception as e:
-                self.get_logger().error(f"Serial error: {e}")
+                self.get_logger().error(f"Lỗi đọc serial: {e}")
 
 
 def main(args=None):

@@ -62,8 +62,8 @@ def generate_launch_description():
         ),
         launch_arguments={
             # nếu launch LiDAR cần tham số, ví dụ:
-            # 'serial_port': '/dev/ttyUSB0',
-            'serial_port': '/dev/serial/by-id/usb-SLLIDAR_LiDAR_A1_XXXXXX-if00',
+            'serial_port': '/dev/ttyUSB0',
+            # 'serial_port': '/dev/serial/by-id/usb-SLLIDAR_LiDAR_A1_XXXXXX-if00',
             'baud_rate': '115200',
 
             'frame_id': 'laser'
@@ -99,7 +99,14 @@ def generate_launch_description():
         arguments=['0', '0', '0.1', '0', '0', '0', 'base_link', 'laser'],
         output='screen'
     )
-
+    # --- Node odometry_publisher ---
+    odometry_publisher_node = Node(
+        package='hiep_robot2',
+        executable='odometry_publisher',
+        name='odometry_publisher',
+        output='screen'
+    )
+    
     return LaunchDescription([
         rviz_arg,
         rviz_config,
@@ -110,5 +117,6 @@ def generate_launch_description():
         lidar_launch,
         slam_launch,
         rviz_node,
-        static_tf_laser
+        static_tf_laser,
+        odometry_publisher_node
     ])

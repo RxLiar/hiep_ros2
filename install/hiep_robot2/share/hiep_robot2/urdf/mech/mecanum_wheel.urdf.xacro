@@ -13,7 +13,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
         <geometry>
-          <mesh filename="file://$(find mec_mobile_description)/meshes/robot_3d/visual/${side}_wheel_X3.STL"/>
+          <mesh filename="file://$(find hiep_robot2)/meshes/robot_3d/visual/${side}_wheel_X3.STL"/>
         </geometry>
         <material name="dark_gray">
           <color rgba="0.2 0.2 0.2 1.0"/>
