@@ -1,0 +1,7 @@
+[0.000000] (-) TimerEvent: {}
+[0.000189] (-) JobUnselected: {'identifier': 'hiep_robot2'}
+[0.000210] (-) JobUnselected: {'identifier': 'mec_mobile'}
+[0.000223] (-) JobUnselected: {'identifier': 'mec_mobile_description'}
+[0.000233] (-) JobUnselected: {'identifier': 'mec_mobile_gazebo'}
+[0.000242] (-) JobUnselected: {'identifier': 'mec_mobile_navigation'}
+[0.000426] (-) EventReactorShutdown: {}
