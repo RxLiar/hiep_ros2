@@ -1,6 +1,7 @@
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/spawn_robot.launch.py
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/world.launch.py
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/empty.sdf
+/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_1.sdf
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world.sdf
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/package_run_dependencies/mec_mobile_gazebo
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/parent_prefix_path/mec_mobile_gazebo

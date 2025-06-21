@@ -130,14 +130,14 @@ def generate_launch_description():
     )
 
     # === Teleop Keyboard (để test robot) ===
-    teleop_node = Node(
-        package='teleop_twist_keyboard',
-        executable='teleop_twist_keyboard',
-        name='teleop_twist_keyboard',
-        output='screen',
-        prefix='xterm -e',  # Chạy trong terminal riêng
-        remappings=[('cmd_vel', '/cmd_vel')]
-    )
+    # teleop_node = Node(
+    #     package='teleop_twist_keyboard',
+    #     executable='teleop_twist_keyboard',
+    #     name='teleop_twist_keyboard',
+    #     output='screen',
+    #     prefix='xterm -e',  # Chạy trong terminal riêng
+    #     remappings=[('cmd_vel', '/cmd_vel')]
+    # )
 
     # === Robot Localization (EKF) - Tùy chọn để fusion odometry ===
     ekf_node = Node(
@@ -179,7 +179,7 @@ def generate_launch_description():
         
         # Visualization and control
         rviz_node,
-        teleop_node,
+        # teleop_node,
         
         # Optional: EKF for sensor fusion
         # ekf_node,  # Uncomment nếu muốn dùng EKF
