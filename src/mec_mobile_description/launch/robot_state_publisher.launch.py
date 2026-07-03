@@ -22,8 +22,8 @@ ARGUMENTS = [
 def generate_launch_description():
     # Define filenames
     urdf_package = 'mec_mobile_description'
-    urdf_filename = 'robot_3d.urdf.xacro'
-    rviz_config_filename = 'mec_mobile_description.rviz'
+    urdf_filename = 'robot_3d_agv.urdf.xacro'
+    rviz_config_filename = 'mec_mobile_description_agv.rviz'
  
     # Set paths to important files
     pkg_share_description = FindPackageShare(urdf_package)

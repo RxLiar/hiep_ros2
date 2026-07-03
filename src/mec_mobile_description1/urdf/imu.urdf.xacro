@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:macro name="imu_link"
+              params="x y z">
+
+  <link name="imu_link">
+
+    <visual>
+
+      <geometry>
+
+        <mesh filename="package://mec_mobile_description1/meshes/imu.stl"
+              scale="0.001 0.001 0.001"/>
+
+      </geometry>
+
+      <material name="blue">
+        <color rgba="0.2 0.2 1.0 1.0"/>
+      </material>
+
+    </visual>
+
+  </link>
+
+  <joint name="imu_joint"
+         type="fixed">
+
+    <parent link="base_link"/>
+
+    <child link="imu_link"/>
+
+    <origin xyz="${x} ${y} ${z}"/>
+
+  </joint>
+
+</xacro:macro>
+
+</robot>

@@ -1,0 +1,85 @@
+amcl:
+  ros__parameters:
+    use_sim_time: true
+
+    # ========================
+    # TOPICS & FRAMES
+    # ========================
+    scan_topic: /scan
+    map_topic: /map
+    odom_topic: /odometry/filtered 
+
+    base_frame_id: base_footprint
+    odom_frame_id: odom
+    global_frame_id: map
+
+    # ========================
+    # PARTICLE FILTER
+    # ========================
+    min_particles: 1000       # tang len de dinh vi chinh xac hon
+    max_particles: 3000       # tang len cho moi truong phuc tap
+    pf_err: 0.05
+    pf_z: 0.99
+    resample_interval: 1
+
+    # ========================
+    # MOTION MODEL - differential drive
+    # ========================
+    robot_model_type: nav2_amcl::DifferentialMotionModel
+    alpha1: 0.25    # giam de tin tuong odom hon
+    alpha2: 0.25
+    alpha3: 0.25
+    alpha4: 0.25
+    alpha5: 0.25
+
+    # ========================
+    # LASER MODEL
+    # ========================
+    laser_model_type: likelihood_field
+    laser_max_range: 20.0     # khop voi lidar thuc te
+    laser_min_range: 0.1      # khop voi lidar thuc te
+    laser_likelihood_max_dist: 0.5
+    max_beams: 100            # tang len de dung nhieu tia hon
+
+    # Trong so cac thanh phan
+    z_hit: 0.8                # tang - tin scan match chinh xac
+    z_rand: 0.15              # giam - it nhieu ngau nhien hon
+    z_max: 0.05
+    z_short: 0.0
+    sigma_hit: 0.2
+    lambda_short: 0.1
+
+    # Beam skip
+    do_beamskip: true
+    beam_skip_distance: 0.5
+    beam_skip_error_threshold: 0.9
+    beam_skip_threshold: 0.3
+
+    # ========================
+    # UPDATE RATE
+    # ========================
+    update_min_d: 0.05         # cap nhat khi di 0.2m
+    update_min_a: 0.05        # cap nhat khi xoay 0.15 rad (~8 do)
+    save_pose_rate: 0.5
+
+    # ========================
+    # TRANSFORM
+    # ========================
+    tf_broadcast: true
+    transform_tolerance: 0.2
+
+    # Recovery
+    recovery_alpha_fast: 0.2  # bat recovery khi bi lac
+    recovery_alpha_slow: 0.01
+
+    # ========================
+    # INITIAL POSE
+    # ========================
+    set_initial_pose: true
+    always_reset_initial_pose: false
+    first_map_only: false
+    initial_pose:
+      x: -3.0
+      y: 0.0
+      z: 0.0
+      yaw: 3.14159

@@ -1,0 +1,1 @@
+/home/hiep0247/hiep_ros2/src/mec_mobile_navigation/launch/spawn_robot_navigation.launch.py

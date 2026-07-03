@@ -1,5 +1,5 @@
 <sdf version='1.10'>
-  <world name='empty'>
+  <world name='warehouse_test'>
     <physics name='1ms' type='ignored'>
       <max_step_size>0.001</max_step_size>
       <real_time_factor>1</real_time_factor>
@@ -13,14 +13,15 @@
       <render_engine>ogre2</render_engine>
     </plugin>
     <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
-    <gravity>0 0 -9.8000000000000007</gravity>
-    <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
+    <gravity>0 0 -9.8</gravity>
     <atmosphere type='adiabatic'/>
     <scene>
-      <ambient>0.400000006 0.400000006 0.400000006 1</ambient>
-      <background>0.699999988 0.699999988 0.699999988 1</background>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
       <shadows>true</shadows>
     </scene>
+
+    <!-- GROUND PLANE -->
     <model name='ground_plane'>
       <static>true</static>
       <link name='link'>
@@ -32,13 +33,7 @@
             </plane>
           </geometry>
           <surface>
-            <friction>
-              <ode>
-                <mu>50</mu>
-              </ode>
-            </friction>
-            <bounce/>
-            <contact/>
+            <friction><ode><mu>50</mu></ode></friction>
           </surface>
         </collision>
         <visual name='visual'>
@@ -49,126 +44,440 @@
             </plane>
           </geometry>
           <material>
-            <ambient>0.800000012 0.800000012 0.800000012 1</ambient>
-            <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
-            <specular>0.800000012 0.800000012 0.800000012 1</specular>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
           </material>
         </visual>
-        <pose>0 0 0 0 0 0</pose>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1</mass>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-        </inertial>
-        <enable_wind>false</enable_wind>
       </link>
-      <pose>0 0 0 0 0 0</pose>
-      <self_collide>false</self_collide>
     </model>
+
+    <!-- ============================================ -->
+    <!-- TUONG BAO NGOAI (20x15m)                    -->
+    <!-- Moi tuong nist_maze_wall_120 dai 1.2m        -->
+    <!-- ============================================ -->
+
+    <!-- TUONG BAC (top) - doc theo truc X -->
+    <!-- Tu x=-10 den x=+10, y=+7.5, can 17 tuong (17x1.2=20.4m) -->
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120</name>
-      <pose>3.500194787979126 0.23359900712966919 0 0 0 0</pose>
+      <name>wall_n_1</name><pose>-9.6 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_0</name>
-      <pose>0.55775178312215412 0.23700515675109912 0 0 0 0</pose>
+      <name>wall_n_2</name><pose>-8.4 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_1</name>
-      <pose>-2.3677970179523875 0.24645153372856043 0 0 0 0</pose>
+      <name>wall_n_3</name><pose>-7.2 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_2</name>
-      <pose>3.5200865090295048 -8.2388156179689531 0 0 0 0</pose>
+      <name>wall_n_4</name><pose>-6.0 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_3</name>
-      <pose>0.56549686035177915 -8.2467648225739651 0 0 0 0</pose>
+      <name>wall_n_5</name><pose>-4.8 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_4</name>
-      <pose>-2.3681797162680551 -8.2544366856634142 0 0 0 0</pose>
+      <name>wall_n_6</name><pose>-3.6 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_5</name>
-      <pose>6.0994014739990234 -1.5353339910507235 0 0 0 1.5700000042340219</pose>
+      <name>wall_n_7</name><pose>-2.4 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_5_1</name>
-      <pose>10.162989131829534 3.98806107910241 0 0 0 1.5700000841906609</pose>
+      <name>wall_n_8</name><pose>-1.2 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_5_2</name>
-      <pose>10.154943304459913 1.0311892009463919 0 0 0 1.5700000841906609</pose>
+      <name>wall_n_9</name><pose>0.0 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_5_3</name>
-      <pose>10.152925969603267 -1.9336369865301388 0 0 0 1.5700000841906609</pose>
+      <name>wall_n_10</name><pose>1.2 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_5_4</name>
-      <pose>0.95662188637032841 3.9433657197461001 0 0 0 1.5700000841906609</pose>
+      <name>wall_n_11</name><pose>2.4 7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_5_5</name>
-      <pose>0.94719756250118081 1.0309010957460893 0 0 0 1.5700000841906609</pose>
+      <name>wall_n_12</name><pose>3.6 7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_n_13</name><pose>4.8 7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_n_14</name><pose>6.0 7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_n_15</name><pose>7.2 7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_n_16</name><pose>8.4 7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_n_17</name><pose>9.6 7.5 0 0 0 0</pose>
     </include>
 
+    <!-- TUONG NAM (bottom) - y=-7.5 -->
     <include>
-      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/table</uri>
-      <name>table</name>
-      <pose>-0.47356671228541369 -2.1649002497828573 0 0 0 0</pose>
-    </include>
-    <include>
-      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/dumpster</uri>
-      <name>Dumpster</name>
-      <pose>3.5524714377709055 4.1681146441410313 0.0013765659918935282 -6.1375696278466901e-08 -3.8407848316582607e-08 -8.5652453595490407e-15</pose>
-    </include>
-    <include>
-      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/cardboard_box</uri>
-      <name>cardboard_box</name>
-      <pose>1.8746377107091465 4.644005466377882 0.14999943493130527 1.2642492757207745e-19 -5.7627664156819206e-19 5.2001615265641397e-21</pose>
-    </include>
-    <include>
-      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/first_2015_trash_can</uri>
-      <name>first_2015_trash_can</name>
-      <pose>1.871824026104721 -0.29980108142421835 -2.6498350109364688e-06 -4.8691872295368042e-07 1.1942776831939009e-05 -0.005845101148138839</pose>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_1</name><pose>-9.6 -7.5 0 0 0 0</pose>
     </include>
     <include>
       <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
-      <name>nist_maze_wall_120_5_5_1</name>
-      <pose>0.95387040001446621 -1.9163620943308839 0 0 0 1.5700000042340219</pose>
+      <name>wall_s_2</name><pose>-8.4 -7.5 0 0 0 0</pose>
     </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_3</name><pose>-7.2 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_4</name><pose>-6.0 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_5</name><pose>-4.8 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_6</name><pose>-3.6 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_7</name><pose>-2.4 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_8</name><pose>-1.2 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_9</name><pose>0.0 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_10</name><pose>1.2 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_11</name><pose>2.4 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_12</name><pose>3.6 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_13</name><pose>4.8 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_14</name><pose>6.0 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_15</name><pose>7.2 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_16</name><pose>8.4 -7.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_s_17</name><pose>9.6 -7.5 0 0 0 0</pose>
+    </include>
+
+    <!-- TUONG DONG (right) - x=+10, doc theo Y, xoay 90° -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_1</name><pose>10.0 -6.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_2</name><pose>10.0 -5.4 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_3</name><pose>10.0 -4.2 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_4</name><pose>10.0 -3.0 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_5</name><pose>10.0 -1.8 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_6</name><pose>10.0 -0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_7</name><pose>10.0 0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_8</name><pose>10.0 1.8 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_9</name><pose>10.0 3.0 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_10</name><pose>10.0 4.2 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_11</name><pose>10.0 5.4 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_e_12</name><pose>10.0 6.6 0 0 0 1.5708</pose>
+    </include>
+
+    <!-- TUONG TAY (left) - x=-10 -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_1</name><pose>-10.0 -6.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_2</name><pose>-10.0 -5.4 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_3</name><pose>-10.0 -4.2 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_4</name><pose>-10.0 -3.0 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_5</name><pose>-10.0 -1.8 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_6</name><pose>-10.0 -0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_7</name><pose>-10.0 0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_8</name><pose>-10.0 1.8 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_9</name><pose>-10.0 3.0 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_10</name><pose>-10.0 4.2 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_11</name><pose>-10.0 5.4 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_w_12</name><pose>-10.0 6.6 0 0 0 1.5708</pose>
+    </include>
+
+    <!-- ============================================ -->
+    <!-- TUONG NGAN TRONG - tao hanh lang va phong   -->
+    <!-- ============================================ -->
+
+    <!-- HANH LANG GIUA: tuong ngang tai y=+2.5 (co cua) -->
+    <!-- Phan trai: x=-10 den x=-3.6 -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_l_1</name><pose>-9.6 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_l_2</name><pose>-8.4 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_l_3</name><pose>-7.2 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_l_4</name><pose>-6.0 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_l_5</name><pose>-4.8 2.5 0 0 0 0</pose>
+    </include>
+    <!-- Cua trai: khoang trong x=-3.6 den x=-1.2 (2.4m) -->
+    <!-- Phan giua: x=-1.2 den x=+1.2 -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_c_1</name><pose>-1.2 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_c_2</name><pose>0.0 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_c_3</name><pose>1.2 2.5 0 0 0 0</pose>
+    </include>
+    <!-- Cua phai: khoang trong x=+2.4 den x=+4.8 (2.4m) -->
+    <!-- Phan phai: x=+4.8 den x=+10 -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_r_1</name><pose>4.8 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_r_2</name><pose>6.0 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_r_3</name><pose>7.2 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_r_4</name><pose>8.4 2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid_r_5</name><pose>9.6 2.5 0 0 0 0</pose>
+    </include>
+
+    <!-- HANH LANG GIUA: tuong ngang tai y=-2.5 (co cua) -->
+    <!-- Phan trai -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_l_1</name><pose>-9.6 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_l_2</name><pose>-8.4 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_l_3</name><pose>-7.2 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_l_4</name><pose>-6.0 -2.5 0 0 0 0</pose>
+    </include>
+    <!-- Cua trai: x=-4.8 den x=-2.4 -->
+    <!-- Phan giua -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_c_1</name><pose>-1.2 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_c_2</name><pose>0.0 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_c_3</name><pose>1.2 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_c_4</name><pose>2.4 -2.5 0 0 0 0</pose>
+    </include>
+    <!-- Cua phai: x=+3.6 den x=+6.0 -->
+    <!-- Phan phai -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_r_1</name><pose>7.2 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_r_2</name><pose>8.4 -2.5 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_mid2_r_3</name><pose>9.6 -2.5 0 0 0 0</pose>
+    </include>
+
+    <!-- TUONG DOC NGAN GIUA (doc theo Y tai x=0) -->
+    <!-- Tu y=-2.5 den y=+2.5, tao 2 hanh lang trai phai -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_v_1</name><pose>0.0 -1.8 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_v_2</name><pose>0.0 -0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_v_3</name><pose>0.0 0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_v_4</name><pose>0.0 1.8 0 0 0 1.5708</pose>
+    </include>
+
+    <!-- TUONG DOC PHAI (x=+5.0) -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vr_1</name><pose>5.0 -1.8 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vr_2</name><pose>5.0 -0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vr_3</name><pose>5.0 0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vr_4</name><pose>5.0 1.8 0 0 0 1.5708</pose>
+    </include>
+
+    <!-- TUONG DOC TRAI (x=-5.0) -->
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vl_1</name><pose>-5.0 -1.8 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vl_2</name><pose>-5.0 -0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vl_3</name><pose>-5.0 0.6 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>file:///home/hiep0247/gazebo_models/gazebo_models/nist_maze_wall_120</uri>
+      <name>wall_vl_4</name><pose>-5.0 1.8 0 0 0 1.5708</pose>
+    </include>
+
+    <!-- LIGHT -->
     <light name='sun' type='directional'>
       <pose>0 0 10 0 0 0</pose>
       <cast_shadows>true</cast_shadows>
       <intensity>1</intensity>
-      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
-      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
-      <specular>0.200000003 0.200000003 0.200000003 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
       <attenuation>
         <range>1000</range>
         <linear>0.01</linear>
-        <constant>0.90000000000000002</constant>
+        <constant>0.9</constant>
         <quadratic>0.001</quadratic>
       </attenuation>
       <spot>
@@ -177,5 +486,69 @@
         <falloff>0</falloff>
       </spot>
     </light>
+
+    <!-- WALKING ACTORS -->
+    <actor name="person_1">
+      <pose>3 -3 0 0 0 0</pose>
+      <skin>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walk">
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+          <waypoint><time>0</time><pose>3 -1.5 0 0 0 1.5708</pose></waypoint>
+          <waypoint><time>6</time><pose>3 1.5 0 0 0 1.5708</pose></waypoint>
+          <waypoint><time>12</time><pose>3 -1.5 0 0 0 -1.5708</pose></waypoint>
+          <waypoint><time>18</time><pose>3 -1.5 0 0 0 1.5708</pose></waypoint>
+        </trajectory>
+      </script>
+      <link name="collision_body">
+        <pose>0 0 0.9 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <cylinder><radius>0.3</radius><length>1.8</length></cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </actor>
+
+    <actor name="person_2">
+      <pose>-3 0 0 0 0 0</pose>
+      <skin>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name="walk">
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>5</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id="0" type="walk">
+          <waypoint><time>0</time><pose>-7 0 0 0 0 0</pose></waypoint>
+          <waypoint><time>8</time><pose>-3 0 0 0 0 0</pose></waypoint>
+          <waypoint><time>16</time><pose>-7 0 0 0 0 3.1416</pose></waypoint>
+          <waypoint><time>24</time><pose>-7 0 0 0 0 3.1416</pose></waypoint>
+        </trajectory>
+      </script>
+      <link name="collision_body">
+        <pose>0 0 0.9 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <cylinder><radius>0.3</radius><length>1.8</length></cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </actor>
+
   </world>
 </sdf>

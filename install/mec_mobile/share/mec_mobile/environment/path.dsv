@@ -1,1 +1,1 @@
-prepend-non-duplicate-if-exists;PATH;bin
+/home/hiep0247/hiep_ros2/build/mec_mobile/ament_cmake_environment_hooks/path.dsv

@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+<robot name="mec_agv"
+       xmlns:xacro="http://www.ros.org/wiki/xacro"
+       xmlns:gz="http://gazebosim.org/schema">
+
+  <!-- ========================= -->
+  <!-- ARGUMENTS -->
+  <!-- ========================= -->
+
+  <xacro:arg name="use_gazebo" default="true"/>
+
+  <!-- ========================= -->
+  <!-- INCLUDE FILES -->
+  <!-- ========================= -->
+
+  <xacro:include filename="$(find mec_mobile_description)/urdf/base.urdf.xacro"/>
+  <xacro:include filename="$(find mec_mobile_description)/urdf/wheel.urdf.xacro"/>
+  <xacro:include filename="$(find mec_mobile_description)/urdf/lidar.urdf.xacro"/>
+  <xacro:include filename="$(find mec_mobile_description)/urdf/imu.urdf.xacro"/>
+
+  <!-- GAZEBO CONTROL -->
+  <xacro:include filename="$(find mec_mobile_description)/urdf/control/mec_mobile_v1.gazebo"/>
+
+  <!-- ========================= -->
+  <!-- BASE FOOTPRINT -->
+  <!-- ========================= -->
+
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint"
+         type="fixed">
+
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+
+    <!-- bánh xe bán kính 0.08 -->
+    <origin xyz="0 0 0.08"
+            rpy="0 0 0"/>
+
+  </joint>
+
+  <!-- ========================= -->
+  <!-- BASE -->
+  <!-- ========================= -->
+
+  <xacro:base_link/>
+
+  <!-- ========================= -->
+  <!-- DRIVE WHEELS -->
+  <!-- ========================= -->
+
+  <!-- LEFT -->
+  <xacro:wheel
+      wheel_name="left_drive_wheel"
+      x="0.0"
+      y="0.25"
+      z="0.0"/>
+
+  <!-- RIGHT -->
+  <xacro:wheel
+      wheel_name="right_drive_wheel"
+      x="0.0"
+      y="-0.25"
+      z="0.0"/>
+
+<!-- FRONT LIDAR -->
+  <xacro:lidar_link
+      lidar_name="front_lidar"
+      x="0.9"
+      y="0.35"
+      z="0.11"
+      roll="0"
+      pitch="0"
+      yaw="0.7854"/>     <!-- doi tu -1.5708 thanh -0.7854 (-45°) -->
+
+  <!-- REAR LIDAR -->
+  <xacro:lidar_link
+      lidar_name="rear_lidar"
+      x="-0.9"
+      y="-0.35"
+      z="0.11"
+      roll="0"
+      pitch="0"
+      yaw="3.927"/>      
+  <!-- ========================= -->
+  <!-- IMU -->
+  <!-- ========================= -->
+
+  <xacro:imu_link
+      x="0.0"
+      y="0.0"
+      z="0.35"/>
+
+  <!-- ========================= -->
+  <!-- GAZEBO MATERIAL -->
+  <!-- ========================= -->
+
+</robot>

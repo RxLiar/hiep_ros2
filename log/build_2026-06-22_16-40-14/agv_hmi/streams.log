@@ -1,0 +1,24 @@
+[0.621s] Invoking command in '/home/hiep0247/hiep_ros2/build/agv_hmi': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_hmi/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/hiep0247/hiep_ros2/build/agv_hmi/build --no-deps symlink_data
+[0.861s] running develop
+[1.015s] running egg_info
+[1.015s] creating agv_hmi.egg-info
+[1.031s] writing agv_hmi.egg-info/PKG-INFO
+[1.031s] writing dependency_links to agv_hmi.egg-info/dependency_links.txt
+[1.031s] writing entry points to agv_hmi.egg-info/entry_points.txt
+[1.031s] writing requirements to agv_hmi.egg-info/requires.txt
+[1.031s] writing top-level names to agv_hmi.egg-info/top_level.txt
+[1.031s] writing manifest file 'agv_hmi.egg-info/SOURCES.txt'
+[1.063s] reading manifest file 'agv_hmi.egg-info/SOURCES.txt'
+[1.063s] writing manifest file 'agv_hmi.egg-info/SOURCES.txt'
+[1.080s] running build_ext
+[1.080s] Creating /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv-hmi.egg-link (link to .)
+[1.080s] Installing hmi script to /home/hiep0247/hiep_ros2/install/agv_hmi/lib/agv_hmi
+[1.081s] 
+[1.081s] Installed /home/hiep0247/hiep_ros2/build/agv_hmi
+[1.081s] running symlink_data
+[1.081s] creating /home/hiep0247/hiep_ros2/install/agv_hmi/share/ament_index
+[1.081s] creating /home/hiep0247/hiep_ros2/install/agv_hmi/share/ament_index/resource_index
+[1.081s] creating /home/hiep0247/hiep_ros2/install/agv_hmi/share/ament_index/resource_index/packages
+[1.081s] symbolically linking /home/hiep0247/hiep_ros2/build/agv_hmi/resource/agv_hmi -> /home/hiep0247/hiep_ros2/install/agv_hmi/share/ament_index/resource_index/packages
+[1.081s] symbolically linking /home/hiep0247/hiep_ros2/build/agv_hmi/package.xml -> /home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi
+[1.107s] Invoked command in '/home/hiep0247/hiep_ros2/build/agv_hmi' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_hmi/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/hiep0247/hiep_ros2/build/agv_hmi/build --no-deps symlink_data

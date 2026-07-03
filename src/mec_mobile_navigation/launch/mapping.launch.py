@@ -38,7 +38,11 @@ def generate_launch_description():
         'config',
         'slam_toolbox_mapping.yaml'
     )
-
+    ekf_config_path = os.path.join(
+    get_package_share_directory('mec_mobile_navigation'),
+    'config',
+    'ekf.yaml'
+    )
     # Launch rviz
     rviz_node = Node(
         package='rviz2',
@@ -49,7 +53,7 @@ def generate_launch_description():
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ]
     )
-
+    
     slam_toolbox_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(slam_toolbox_launch_path),
         launch_arguments={
@@ -58,12 +62,38 @@ def generate_launch_description():
         }.items()
     )
 
+    # Them EKF node de fuse odom + IMU
+    ekf_node = Node(
+    package='robot_localization',
+    executable='ekf_node',
+    name='ekf_filter_node',
+    output='screen',
+    parameters=[
+        ekf_config_path,
+        {'use_sim_time': LaunchConfiguration('use_sim_time')}
+    ]
+    )
+    # ========================
+    # LASER MERGER NODE
+    # ========================
+    laser_merger_node = Node(
+        package='mec_mobile_navigation',
+        executable='laser_merger_node.py',
+        name='laser_merger',
+        output='screen',
+        parameters=[{
+            'use_sim_time': LaunchConfiguration('use_sim_time')
+        }]
+    )
+    #launchDescriptionObject.add_action(ekf_node)
+    
     launchDescriptionObject = LaunchDescription()
-
     launchDescriptionObject.add_action(rviz_launch_arg)
     launchDescriptionObject.add_action(rviz_config_arg)
     launchDescriptionObject.add_action(sim_time_arg)
-    launchDescriptionObject.add_action(rviz_node)
+    launchDescriptionObject.add_action(ekf_node)
+    launchDescriptionObject.add_action(laser_merger_node)
     launchDescriptionObject.add_action(slam_toolbox_launch)
+    launchDescriptionObject.add_action(rviz_node)
 
     return launchDescriptionObject

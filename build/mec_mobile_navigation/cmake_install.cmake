@@ -43,71 +43,15 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation" TYPE DIRECTORY FILES
-    "/home/hiep0247/hiep_ros2/src/mec_mobile_navigation/launch"
-    "/home/hiep0247/hiep_ros2/src/mec_mobile_navigation/config"
-    "/home/hiep0247/hiep_ros2/src/mec_mobile_navigation/rviz"
-    "/home/hiep0247/hiep_ros2/src/mec_mobile_navigation/maps"
-    )
+  include("/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_symlink_install/ament_cmake_symlink_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/package_run_dependencies" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/mec_mobile_navigation")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/parent_prefix_path" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_index/share/ament_index/resource_index/parent_prefix_path/mec_mobile_navigation")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation/environment" TYPE FILE FILES "/opt/ros/jazzy/share/ament_cmake_core/cmake/environment_hooks/environment/ament_prefix_path.sh")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation/environment" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_environment_hooks/ament_prefix_path.dsv")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation/environment" TYPE FILE FILES "/opt/ros/jazzy/share/ament_cmake_core/cmake/environment_hooks/environment/path.sh")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation/environment" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_environment_hooks/path.dsv")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_environment_hooks/local_setup.bash")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_environment_hooks/local_setup.sh")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_environment_hooks/local_setup.zsh")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_environment_hooks/local_setup.dsv")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_environment_hooks/package.dsv")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ament_index/resource_index/packages" TYPE FILE FILES "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_index/share/ament_index/resource_index/packages/mec_mobile_navigation")
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation/cmake" TYPE FILE FILES
-    "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_core/mec_mobile_navigationConfig.cmake"
-    "/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_core/mec_mobile_navigationConfig-version.cmake"
-    )
-endif()
-
-if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/mec_mobile_navigation" TYPE FILE FILES "/home/hiep0247/hiep_ros2/src/mec_mobile_navigation/package.xml")
+  execute_process(
+        COMMAND
+        "/usr/bin/python3" "-m" "compileall"
+        "/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation"
+      )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)

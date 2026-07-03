@@ -1,0 +1,17 @@
+[0.797s] Invoking command in '/home/hiep0247/hiep_ros2/build/agv_hmi': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_hmi/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/hiep0247/hiep_ros2/build/agv_hmi/build --no-deps symlink_data
+[1.050s] running develop
+[1.215s] running egg_info
+[1.230s] writing agv_hmi.egg-info/PKG-INFO
+[1.231s] writing dependency_links to agv_hmi.egg-info/dependency_links.txt
+[1.231s] writing entry points to agv_hmi.egg-info/entry_points.txt
+[1.231s] writing requirements to agv_hmi.egg-info/requires.txt
+[1.231s] writing top-level names to agv_hmi.egg-info/top_level.txt
+[1.266s] reading manifest file 'agv_hmi.egg-info/SOURCES.txt'
+[1.267s] writing manifest file 'agv_hmi.egg-info/SOURCES.txt'
+[1.284s] running build_ext
+[1.284s] Creating /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv-hmi.egg-link (link to .)
+[1.285s] Installing hmi script to /home/hiep0247/hiep_ros2/install/agv_hmi/lib/agv_hmi
+[1.285s] 
+[1.285s] Installed /home/hiep0247/hiep_ros2/build/agv_hmi
+[1.285s] running symlink_data
+[1.313s] Invoked command in '/home/hiep0247/hiep_ros2/build/agv_hmi' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_hmi/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/hiep0247/hiep_ros2/build/agv_hmi/build --no-deps symlink_data
