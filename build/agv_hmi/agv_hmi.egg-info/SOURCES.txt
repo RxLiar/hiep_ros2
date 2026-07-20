@@ -1,8 +1,16 @@
 package.xml
 setup.cfg
 setup.py
+../../build/agv_hmi/agv_hmi.egg-info/PKG-INFO
+../../build/agv_hmi/agv_hmi.egg-info/SOURCES.txt
+../../build/agv_hmi/agv_hmi.egg-info/dependency_links.txt
+../../build/agv_hmi/agv_hmi.egg-info/entry_points.txt
+../../build/agv_hmi/agv_hmi.egg-info/requires.txt
+../../build/agv_hmi/agv_hmi.egg-info/top_level.txt
+../../build/agv_hmi/agv_hmi.egg-info/zip-safe
 agv_hmi/__init__.py
 agv_hmi/main.py
+agv_hmi/version.py
 agv_hmi.egg-info/PKG-INFO
 agv_hmi.egg-info/SOURCES.txt
 agv_hmi.egg-info/dependency_links.txt

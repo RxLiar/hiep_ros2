@@ -1,52 +1,66 @@
 """
-main_window.py — AGV Busan Autonomous Robot v4.2.6
+main_window.py — AGV Busan Autonomous Robot v4.3.0
 
-Giữ nguyên hoàn toàn v4.2.4 (threading fix qua _nav_result_signal /
-_nav_feedback_signal, wire velocity/pose_estimate từ RoutesPage),
-chỉ thêm:
+Giữ nguyên hoàn toàn v4.2.6 (threading fix qua _nav_result_signal /
+_nav_feedback_signal, wire velocity/pose_estimate từ RoutesPage,
+_ensure_nav_running / _toggle_nav_launch / _run_route_from_list),
+chỉ thêm/sửa:
 
-  [+] _ensure_nav_running(map_path):
-        - Nếu Nav2 chưa chạy → start() với map:=<map_path>.
-        - Nếu Nav2 đang chạy với CÙNG map → giữ nguyên, không làm gì.
-        - Nếu Nav2 đang chạy với map KHÁC → stop() rồi start() lại
-          với map mới, vì map_server/AMCL chỉ load map một lần lúc
-          khởi động, không thể đổi map khi đang chạy (runtime).
+  [D] Stuck-handling: khi 1 waypoint (chỉ áp dụng cho mission chạy từ
+      Routes screen — mission_source == "routes") thất bại giữa lộ
+      trình, KHÔNG còn reset toàn bộ về waypoint đầu như trước. Thay
+      vào đó mission chuyển sang trạng thái "stuck", giữ nguyên
+      _mission_wps/_mission_idx/_active_record/_cargo_count, và
+      RoutesPage hiện banner với 3 lựa chọn:
+        - Thử lại/Tiếp tục: gửi lại đúng goal của WP đang dở (Nav2 tự
+          replan từ vị trí hiện tại — kể cả sau khi operator lái tay
+          bằng joystick để thoát chỗ kẹt).
+        - Bỏ qua điểm này: đánh dấu WP hiện tại là DONE (không chạy
+          task), nhảy sang WP kế tiếp.
+        - Huỷ toàn bộ: y hệt Stop hiện tại — đóng log "failed", cargo
+          đã chở tính đến lúc đó vẫn được lưu.
+      Mission chạy từ Navigation screen (Engineer test nhanh waypoint)
+      KHÔNG bị ảnh hưởng — vẫn giữ hành vi cũ (fail = reset).
 
-  [+] _toggle_nav_launch (nút bật NAV2 trên Navigation screen):
-        dùng self._nav._selected_map_path, gọi qua _ensure_nav_running.
+  [E] Auto / Manual mode (chỉ áp dụng cho Routes screen):
+        - Auto: hành vi cũ + Lặp lại + Stuck-handling ở trên, chạy
+          liên tục không cần can thiệp.
+        - Manual: mỗi waypoint tách thành 2 bước bấm riêng biệt —
+          "Đến WP" rồi "Xác nhận/Thực hiện Task" — nút Start đổi nhãn
+          động theo bước sắp tới. Dùng chung cơ chế Stuck-handling khi
+          bước "Đến WP" lỗi, và dùng chung cơ chế Lặp lại khi hết 1
+          lượt (quay lại WP1, tiếp tục dừng-chờ-bấm).
 
-  [+] _run_route_from_list (nút Start trên Routes screen):
-        dùng map_path của route đang chạy, gọi qua _ensure_nav_running.
+  [FIX-1] _cleanup_leaving_page(): rời Navigation/Routes KHÔNG còn tự
+      _stop_nav_launch() nữa — chỉ dừng mission đang chạy (an toàn: robot
+      không nên tự di chuyển khi operator không theo dõi màn hình điều
+      khiển). Nav2 (map_server/amcl/bt_navigator...) chỉ tắt khi: bấm nút
+      "Tắt NAV", đóng app, hoặc đổi map (xử lý sẵn trong
+      _ensure_nav_running). Trước đây chỉ cần lướt sang xem Conveyor/
+      Settings là Nav2 bị kill/restart — gây trễ và khó chịu khi vận hành.
 
-Fix v4.2.6:
-  [A] _wire(): Navigation screen KHÔNG nối thẳng run_mission_signal
-      vào _start_mission nữa. Thay bằng _run_navigation_mission(),
-      để trước khi gửi waypoint luôn đảm bảo Nav2/RViz đang chạy đúng
-      map đang chọn trong Navigation.
+  [FIX-2] Bộ đếm retry Nav2 (_start_nav_retry / _on_nav_retry_tick):
+      trước đây "elapsed = 60 - attempts" bị hiểu nhầm là giây trong khi
+      thực chất là số tick (mỗi tick 500ms) — hiển thị sai kiểu "1/30s"
+      rồi nhảy tới "60/30s". Đã sửa tính đúng theo giây thực tế, và khi
+      hết thời gian sẽ báo rõ "Không bắt đầu được mission" thay vì lẫn
+      với "mission failed".
 
-  [B] _toggle_nav_launch(): nếu Navigation chưa chọn map thì vẫn bật
-      Nav2 bằng map mặc định của navigation.launch.py. Nếu đã chọn map
-      thì truyền map:=<map đang chọn>.
-
-  [C] _ensure_nav_running(): hỗ trợ map_path rỗng => extra_args=[]
-      để dùng default my_map.yaml. Nếu map_path có giá trị thì truyền
-      map:=... Nếu Nav2 đang chạy map khác thì stop() + start() lại.
-
-  [D] NAV_KILL_PATTERNS thêm map_server để tránh map_server cũ giữ lại
-      map cũ khi restart Nav2 với map khác.
-
-YÊU CẦU: process_manager.py phải là bản v4.2.6 hoặc mới hơn, có
-ManagedLaunch.start(extra_args=...) và current_extra_args.
+  [NEW] switch_user_signal + _on_switch_user_clicked(): cho phép quay về
+      màn hình Login để đổi người vận hành (operator/engineer) mà không
+      cần khởi động lại toàn bộ ROS node — xem thêm agv_hmi/main.py
+      (class Session quản lý vòng đời MainWindow qua ROS node dùng chung).
 """
 import os
 import copy
 import json
 
 from agv_hmi.ui.process_manager import ManagedLaunch
+from agv_hmi.version import full_label
 
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QStackedWidget, QLabel, QPushButton
+    QStackedWidget, QLabel, QPushButton, QMessageBox, QApplication
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 
@@ -56,7 +70,9 @@ from agv_hmi.ui.language_selector import LanguageSelector
 from agv_hmi.ui.home_page import HomePage
 from agv_hmi.ui.mapping_page import MappingPage
 from agv_hmi.ui.navigation_page import NavigationPage
-from agv_hmi.ui.routes_page import RoutesPage, WP_PENDING, WP_MOVING, WP_TASK, WP_DONE
+from agv_hmi.ui.routes_page import (
+    RoutesPage, WP_PENDING, WP_MOVING, WP_TASK, WP_DONE, WP_STUCK,
+)
 from agv_hmi.ui.conveyor_panel import ConveyorPage
 from agv_hmi.ui.map_library_page import MapLibraryPage
 from agv_hmi.ui.settings_page import SettingsPage
@@ -117,7 +133,7 @@ class Sidebar(QWidget):
         self._app_lbl = QLabel(tr("app_name"))
         self._app_lbl.setObjectName("AppTitle")
         self._app_lbl.setWordWrap(True)
-        self._ver_lbl = QLabel("v4.2.6 · ROS2 Jazzy")
+        self._ver_lbl = QLabel(full_label())
         self._ver_lbl.setObjectName("AppVersion")
         tl.addWidget(self._app_lbl); tl.addWidget(self._ver_lbl)
         ll.addWidget(self._logo); ll.addSpacing(8); ll.addWidget(txt)
@@ -210,6 +226,9 @@ class MainWindow(QMainWindow):
     velocity_signal      = pyqtSignal(float, float)
     pose_estimate_signal = pyqtSignal(float, float, float)
 
+    # [NEW] Đổi người vận hành: quay về màn hình Login, ROS node vẫn sống.
+    switch_user_signal   = pyqtSignal()
+
     # FIX threading: marshal NavClient callback (chạy trong rclpy
     # spin thread) về Qt main thread an toàn qua QueuedConnection.
     _nav_result_signal   = pyqtSignal(bool, int)
@@ -219,6 +238,18 @@ class MainWindow(QMainWindow):
         super().__init__()
         self._role      = role
         self._theme_mgr = theme_mgr
+
+        # [FIX] Phân biệt "đóng cửa sổ để đổi người vận hành" (Session sẽ
+        # mở lại Login, KHÔNG thoát app) với "đóng cửa sổ thật" (bấm nút X
+        # titlebar, Alt+F4...) — trường hợp sau PHẢI gọi app.quit(), nếu
+        # không process sẽ chạy ngầm mãi mãi dù cửa sổ đã biến mất (đây
+        # chính là nguyên nhân app không exit được / Ctrl+C không có tác
+        # dụng, vì QApplication.exec() không bao giờ return).
+        self._switching_user = False
+
+        # Cleanup có thể được gọi từ closeEvent() và aboutToQuit.
+        # Guard này bảo đảm Mapping/Nav2 chỉ bị stop đúng một lần.
+        self._shutdown_done = False
 
         self.setWindowTitle(tr("app_name"))
         self.setMinimumSize(1024, 600)
@@ -238,10 +269,40 @@ class MainWindow(QMainWindow):
         self._mission_timers:  list[QTimer] = []
         self._confirm_continue = None
 
+        # Pha hiện tại của mission. Pause chỉ hợp lệ khi robot đang
+        # di chuyển; không huỷ timer task để tránh chạy task lần thứ hai.
+        self._mission_phase = "idle"
+
         self._nav_retry_timer:    QTimer | None = None
         self._nav_retry_attempts: int = 0
+        # [FIX-2] Lưu tổng số attempt để tính đúng số giây đã trôi qua,
+        # thay vì lấy trực tiếp số tick làm số giây.
+        self._nav_retry_total:    int = 60
         self._nav_retry_wps:      list[dict] = []
         self._nav_retry_token:    int = 0
+
+        # [D][E] Nguồn khởi tạo mission: "routes" (RoutesPage) hoặc
+        # "navigation" (NavigationPage - Engineer test nhanh waypoint).
+        # Stuck-handling và Auto/Manual CHỈ áp dụng khi mission_source
+        # == "routes", để không ảnh hưởng luồng test waypoint hiện có
+        # của Engineer trên Navigation screen.
+        self._mission_source:  str = "routes"
+
+        # [D] Stuck-handling state
+        self._mission_stuck: bool = False
+        self._stuck_wp_idx:  int = -1
+
+        # [E] Auto/Manual: False = Auto (mặc định), True = Manual.
+        # Đồng bộ với toggle trên RoutesPage qua mode_changed signal.
+        self._manual_mode: bool = False
+        # Hành động đang chờ operator bấm "bước kế" trong Manual mode:
+        # ("task", idx) = đang chờ chạy Task tại WP idx (hoặc xác nhận
+        #                  nếu WP không có task).
+        # ("move", idx) = task của WP idx đã xong; khi bấm sẽ đánh dấu
+        #                  WP idx DONE rồi chuyển sang WP kế tiếp.
+        # ("move_after_skip", idx) = WP lỗi đã được bỏ qua và mission_idx
+        #                  đã trỏ tới WP kế; khi bấm chỉ gửi goal WP kế.
+        self._manual_pending_action: tuple[str, int] | None = None
 
         self._last_x   = 0.0
         self._last_y   = 0.0
@@ -312,6 +373,8 @@ class MainWindow(QMainWindow):
         self._sidebar.retranslate_requested.connect(self._retranslate_all)
 
         self._home.connection_toggle.connect(self._on_connection_toggle)
+        # [NEW] Nút đổi người vận hành trên Home
+        self._home.switch_user_requested.connect(self._on_switch_user_clicked)
 
         self._mapping.velocity_signal.connect(self.velocity_signal)
         self._mapping.save_map_requested.connect(self._do_save_map)
@@ -343,6 +406,15 @@ class MainWindow(QMainWindow):
         if hasattr(self._routes, "edit_route_signal"):
             self._routes.edit_route_signal.connect(self._edit_route)
 
+        # [E] Auto/Manual mode + bước tiếp theo trong Manual
+        self._routes.mode_changed.connect(self._on_mode_changed)
+        self._routes.manual_continue_signal.connect(self._on_manual_continue)
+
+        # [D] Stuck-handling: Thử lại / Bỏ qua / Huỷ
+        self._routes.retry_wp_signal.connect(self._on_retry_wp)
+        self._routes.skip_wp_signal.connect(self._on_skip_wp)
+        self._routes.cancel_stuck_signal.connect(self._on_cancel_stuck)
+
         self._conveyor.conveyor_cmd.connect(self._on_conveyor_cmd)
         self._maplib.map_selected.connect(self._load_map_to_nav)
 
@@ -370,10 +442,17 @@ class MainWindow(QMainWindow):
 
     def _cleanup_leaving_page(self, old_idx: int):
         """
-        Giữ nguyên hoàn toàn logic v4.2.1:
-          - Rời Mapping → cleanup SLAM
-          - Rời Nav     → stop mission + stop nav launch
-          - Rời Routes  → stop mission + stop nav launch
+        [FIX-1] Rời Nav/Routes → LUÔN dừng mission đang chạy (an toàn:
+        robot không nên tự di chuyển khi operator không còn theo dõi
+        màn hình điều khiển).
+
+        NHƯNG không còn tự _stop_nav_launch() (kill map_server/amcl/
+        bt_navigator...) chỉ vì chuyển sang xem Conveyor/Settings/Map
+        Library — trước đây việc này gây restart Nav2 không cần thiết
+        và làm chậm trải nghiệm vận hành. Nav2 giờ chỉ tắt khi:
+          - Bấm nút "Tắt NAV" trên Navigation screen, hoặc
+          - Đóng app (shutdown_processes), hoặc
+          - Đổi sang route/map khác cần restart (_ensure_nav_running lo).
         """
         if old_idx == Sidebar.IDX_MAPPING:
             try:
@@ -382,10 +461,8 @@ class MainWindow(QMainWindow):
                 pass
         elif old_idx == Sidebar.IDX_NAV:
             self._stop_mission()
-            self._stop_nav_launch()
         elif old_idx == Sidebar.IDX_ROUTES:
             self._stop_mission()
-            self._stop_nav_launch()
 
     # ── Nav2 launch control ────────────────────────────────────────────
 
@@ -463,7 +540,11 @@ class MainWindow(QMainWindow):
         Chạy waypoint từ Navigation screen.
         Trước khi gửi goal, đảm bảo Nav2/RViz dùng đúng map đang chọn
         trong Navigation. Nếu chưa chọn map thì dùng map mặc định.
+
+        [D][E] mission_source = "navigation" — Stuck-handling và
+        Auto/Manual KHÔNG áp dụng cho luồng này, giữ nguyên hành vi cũ.
         """
+        self._mission_source = "navigation"
         map_path = getattr(self._nav, "_selected_map_path", "") or ""
         ok, msg = self._ensure_nav_running(map_path)
         try:
@@ -502,12 +583,25 @@ class MainWindow(QMainWindow):
         self.velocity_signal.emit(0.0, 0.0)
 
     def shutdown_processes(self):
-        self._stop_mission()
+        """Dừng mission, Mapping và Nav2 đúng một lần."""
+        if self._shutdown_done:
+            return
+        self._shutdown_done = True
+
+        try:
+            self._stop_mission()
+        except Exception as e:
+            print(f"[Shutdown] Stop mission failed: {e}")
+
         try:
             self._mapping.cleanup()
-        except Exception:
-            pass
-        self._stop_nav_launch()
+        except Exception as e:
+            print(f"[Shutdown] Mapping cleanup failed: {e}")
+
+        try:
+            self._stop_nav_launch()
+        except Exception as e:
+            print(f"[Shutdown] Nav2 cleanup failed: {e}")
 
     # ── ROS → UI ─────────────────────────────────────────────────────
 
@@ -593,6 +687,35 @@ class MainWindow(QMainWindow):
 
     def _on_connection_toggle(self):
         self._sidebar.switch(Sidebar.IDX_NAV)
+
+    # ── [NEW] Đổi người vận hành ─────────────────────────────────────
+
+    def _on_switch_user_clicked(self):
+        """
+        Nút "Đổi người vận hành" trên Home. Nếu mission đang chạy, hỏi
+        xác nhận trước vì đổi user sẽ dừng mission (tránh robot chạy vô
+        chủ khi HMI đã đóng để đăng nhập lại). ROS node vẫn giữ nguyên,
+        chỉ MainWindow bị đóng và LoginDialog mở lại — xem agv_hmi/main.py.
+        """
+        if self._mission_running:
+            reply = QMessageBox.question(
+                self, tr("home_switch_user"),
+                "Đang chạy lộ trình. Dừng lộ trình và đổi người vận hành?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+            self._stop_mission()
+        else:
+            reply = QMessageBox.question(
+                self, tr("home_switch_user"),
+                "Quay về màn hình đăng nhập để đổi người vận hành?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+        # [FIX] Đánh dấu đây là đóng cửa sổ để đổi người vận hành —
+        # closeEvent() sẽ dựa vào cờ này để KHÔNG gọi app.quit().
+        self._switching_user = True
+        self.switch_user_signal.emit()
 
     # ── Map save ──────────────────────────────────────────────────────
 
@@ -688,7 +811,11 @@ class MainWindow(QMainWindow):
         _ensure_nav_running(mp) — nếu Nav2 đang chạy với map khác,
         sẽ tự stop() + start() lại với map đúng, tránh lệch vị trí
         robot giữa RViz và app khi chạy Routes.
+
+        [D][E] mission_source = "routes" — bật Stuck-handling và
+        Auto/Manual cho mission này.
         """
+        self._mission_source = "routes"
         route = copy.deepcopy(route or {})
         mp = self._normalize_map_path(route.get("map_path", ""))
         if not mp or not os.path.exists(mp):
@@ -733,6 +860,8 @@ class MainWindow(QMainWindow):
                          token: int, max_attempts: int = 60):
         self._nav_retry_wps      = wps
         self._nav_retry_token    = token
+        # [FIX-2] Lưu lại tổng attempt để tính đúng số giây đã trôi qua.
+        self._nav_retry_total    = max_attempts
         self._nav_retry_attempts = max_attempts
         if self._nav_retry_timer is None:
             self._nav_retry_timer = QTimer(self)
@@ -760,13 +889,24 @@ class MainWindow(QMainWindow):
             self._start_mission(self._nav_retry_wps, token=token)
             return
         self._nav_retry_attempts -= 1
-        elapsed = 60 - self._nav_retry_attempts
+
+        # [FIX-2] Tính đúng số giây theo interval timer thực tế (500ms/tick)
+        # thay vì lấy trực tiếp số tick làm số giây (bug cũ: "1/30s"...
+        # "60/30s" — sai đơn vị hoàn toàn).
+        total_sec   = int(self._nav_retry_total * 0.5)
+        elapsed_sec = int((self._nav_retry_total - self._nav_retry_attempts) * 0.5)
         self._routes.set_status(
-            f"Đang chờ Nav2 sẵn sàng... ({elapsed}/30s)")
+            f"Đang chờ Nav2 sẵn sàng... ({elapsed_sec}/{total_sec}s)")
+
         if self._nav_retry_attempts <= 0:
             self._stop_nav_retry()
+            # [FIX-2] Phân biệt rõ "không bắt đầu được mission" (Nav2
+            # chưa ready, mission chưa hề start) với "mission failed"
+            # (mission đã chạy nhưng thất bại giữa chừng) — 2 trạng thái
+            # khác nhau, tránh gây hiểu nhầm khi xem log/status.
             self._routes.set_status(
-                "Nav2 chưa sẵn sàng sau 30s.\n"
+                f"Không bắt đầu được mission: Nav2 action server "
+                f"chưa sẵn sàng sau {total_sec}s.\n"
                 "Kiểm tra navigation.launch.py.")
             self._sidebar.set_ros_status("Nav2 chưa sẵn sàng", ok=False)
             try: self._routes.set_mission_done()
@@ -788,6 +928,27 @@ class MainWindow(QMainWindow):
         if token is not None and token != self._mission_token:
             return False
         return self._mission_running and not self._mission_paused
+
+    def _set_pause_controls(self, can_pause: bool, paused: bool = False):
+        """Đồng bộ Pause/Resume cho đúng page đang sở hữu mission."""
+        nav_owner = self._mission_source == "navigation"
+        route_owner = self._mission_source == "routes"
+
+        try:
+            self._nav._pause_btn.setEnabled(
+                bool(nav_owner and can_pause and not paused))
+            self._nav._resume_btn.setEnabled(bool(nav_owner and paused))
+        except Exception:
+            pass
+
+        try:
+            manual = route_owner and self._manual_mode
+            self._routes._pause_btn.setEnabled(
+                bool(route_owner and can_pause and not paused and not manual))
+            self._routes._resume_btn.setEnabled(
+                bool(route_owner and paused and not manual))
+        except Exception:
+            pass
 
     def _schedule_mission_timer(self, delay_ms: int,
                                 callback, token: int | None = None):
@@ -818,7 +979,8 @@ class MainWindow(QMainWindow):
 
     def _start_mission(self, waypoints: list[dict],
                        token: int | None = None):
-        if not waypoints or not self.nav_client: return
+        if not waypoints or not self.nav_client:
+            return
         if token is None:
             token = self._new_mission_token()
         else:
@@ -827,106 +989,170 @@ class MainWindow(QMainWindow):
         self._cancel_mission_timers()
         self._clear_route_confirm()
         self._confirm_continue = None
+        self._mission_phase = "idle"
+
+        # Reset trạng thái stuck/manual của lần chạy trước.
+        self._mission_stuck = False
+        self._stuck_wp_idx = -1
+        self._manual_pending_action = None
+        try:
+            self._routes.clear_stuck()
+        except Exception:
+            pass
 
         if self._mission_running:
             self._cancel_reason = "restart"
             self.nav_client.cancel_goal()
 
-        self._mission_wps     = copy.deepcopy(waypoints)
-        self._mission_idx     = 0
+        self._mission_wps = copy.deepcopy(waypoints)
+        self._mission_idx = 0
         self._mission_running = True
-        self._mission_paused  = False
-        self._cancel_reason   = None
+        self._mission_paused = False
+        self._cancel_reason = None
 
         self._nav.set_mission_running(True)
-        for i in range(len(waypoints)):
-            self._routes.set_wp_status(i, WP_PENDING)
+        if self._mission_source == "routes":
+            for i in range(len(waypoints)):
+                self._routes.set_wp_status(i, WP_PENDING)
 
-        # Flush log cũ trước khi bắt đầu mới
-        try:
-            if getattr(self._routes, "_active_record", None) is not None:
-                self._routes._stop_logging("cancelled")
-        except Exception: pass
+            # Chỉ Routes mission được phép đóng/mở route log.
+            try:
+                if getattr(self._routes, "_active_record", None) is not None:
+                    self._routes._stop_logging("cancelled")
+            except Exception:
+                pass
 
-        # Ghi log mới (chỉ khi mission từ Routes)
-        if getattr(self._routes, "_current_route", None) is not None:
-            try: self._routes._start_logging()
-            except Exception as e:
-                print(f"[Mission] _start_logging failed: {e}")
+            if getattr(self._routes, "_current_route", None) is not None:
+                try:
+                    self._routes._start_logging()
+                except Exception as e:
+                    print(f"[Mission] _start_logging failed: {e}")
 
         self._run_next(token=token)
 
     def _run_next(self, token: int | None = None):
-        if not self._mission_active(token): return
+        if not self._mission_active(token):
+            return
         if self._mission_idx >= len(self._mission_wps):
-            self._on_mission_done(); return
+            self._on_mission_done()
+            return
 
-        wp  = self._mission_wps[self._mission_idx]
+        self._mission_phase = "moving"
+        self._set_pause_controls(can_pause=True, paused=False)
+
+        wp = self._mission_wps[self._mission_idx]
         idx = self._mission_idx
         msg = tr("nav_going", wp["label"], wp["x"], wp["y"])
-        self._nav.set_status(msg); self._routes.set_status(msg)
-        self._routes.set_wp_status(idx, WP_MOVING)
+        self._nav.set_status(msg)
+        if self._mission_source == "routes":
+            self._routes.set_status(msg)
+            self._routes.set_wp_status(idx, WP_MOVING)
 
         t = self._mission_token
-        # FIX threading: emit signal thay vì gọi callback trực tiếp.
-        # NavClient callback chạy trong rclpy spin thread — gọi thẳng
-        # method thao tác Qt widget (QTimer, QLabel) từ thread đó gây
-        # lỗi "Timers cannot be stopped from another thread".
         self.nav_client.send_goal(
             wp["x"], wp["y"],
             on_result=lambda ok, t=t: self._nav_result_signal.emit(ok, t),
-            on_feedback=lambda d, t=t: self._nav_feedback_signal.emit(idx + 1, d, t),
+            on_feedback=lambda d, t=t: self._nav_feedback_signal.emit(
+                idx + 1, d, t),
         )
 
     def _on_feedback(self, n: int, dist: float, token: int = None):
-        if token is not None and token != self._mission_token: return
-        if not self._mission_running: return
+        if token is not None and token != self._mission_token:
+            return
+        if not self._mission_running:
+            return
         msg = tr("nav_remaining", n, dist)
-        self._nav.set_status(msg); self._routes.set_status(msg)
+        self._nav.set_status(msg)
+        if self._mission_source == "routes":
+            self._routes.set_status(msg)
 
     def _on_wp_result(self, success: bool, token: int = None):
-        if token is not None and token != self._mission_token: return
-        if not self._mission_running: return
+        if token is not None and token != self._mission_token:
+            return
+        if not self._mission_running:
+            return
+
         if not success:
             if self._mission_paused or self._cancel_reason in (
                     "pause", "stop", "restart"):
                 return
-            self._mission_running = False
-            self._routes.set_wp_status(self._mission_idx, WP_PENDING)
-            self._nav.set_status(tr("nav_failed"))
-            self._routes.set_status(tr("nav_failed"))
-            self._nav.set_mission_running(False)
-            self._cancel_mission_timers(); self._clear_route_confirm()
-            try: self._routes.on_mission_failed()
-            except AttributeError: self._routes.set_mission_done()
+
+            self._set_pause_controls(can_pause=False, paused=False)
+
+            # Navigation test mission không được ghi log hoặc điều khiển
+            # repeat state của RoutesPage.
+            if self._mission_source != "routes":
+                self._mission_running = False
+                self._mission_phase = "idle"
+                self._nav.set_status(tr("nav_failed"))
+                self._nav.set_mission_running(False)
+                self._cancel_mission_timers()
+                self._clear_route_confirm()
+                return
+
+            # Routes mission: giữ tiến độ và chuyển sang STUCK.
+            idx = self._mission_idx
+            self._mission_phase = "stuck"
+            self._mission_stuck = True
+            self._stuck_wp_idx = idx
+            self._routes.set_wp_status(idx, WP_STUCK)
+            label = (self._mission_wps[idx].get("label", "?")
+                     if 0 <= idx < len(self._mission_wps) else "?")
+            msg = f"⚠ Gặp sự cố tại WP {label} — xem lựa chọn bên dưới"
+            self._nav.set_status(msg)
+            self._routes.on_mission_stuck(label)
             return
 
         idx = self._mission_idx
-        self._routes.set_wp_status(idx, WP_TASK)
+        self._mission_phase = "task"
+        self._set_pause_controls(can_pause=False, paused=False)
+        if self._mission_source == "routes":
+            self._routes.set_wp_status(idx, WP_TASK)
         tasks = self._mission_wps[idx].get("tasks", [])
+
+        if self._mission_source == "routes" and self._manual_mode:
+            self._mission_phase = "manual_wait"
+            label = self._mission_wps[idx].get("label", "?")
+            self._manual_pending_action = ("task", idx)
+            if tasks:
+                self._routes.manual_prompt(tr("manual_step_task", label))
+            else:
+                self._routes.manual_prompt(tr("manual_step_confirm", label))
+            return
+
         if tasks:
-            self._execute_tasks(tasks, on_done=self._advance,
-                                token=self._mission_token)
+            self._execute_tasks(
+                tasks, on_done=self._advance, token=self._mission_token)
         else:
             self._advance(token=self._mission_token)
 
     def _execute_tasks(self, tasks: list[dict], on_done,
                        token: int | None = None):
-        if not self._mission_active(token): return
-        if not tasks: on_done(token=token); return
-        sequential = [t for t in tasks
-                      if t.get("order") != "parallel"
-                      or t.get("type") == "confirm"]
-        parallel   = [t for t in tasks
-                      if t.get("order") == "parallel"
-                      and t.get("type") != "confirm"]
+        if not self._mission_active(token):
+            return
+        self._mission_phase = "task"
+        self._set_pause_controls(can_pause=False, paused=False)
+        if not tasks:
+            on_done(token=token)
+            return
+        sequential = [
+            t for t in tasks
+            if t.get("order") != "parallel" or t.get("type") == "confirm"
+        ]
+        parallel = [
+            t for t in tasks
+            if t.get("order") == "parallel" and t.get("type") != "confirm"
+        ]
         delays = []
         for task in parallel:
             d = self._execute_single_task(task, token=token)
-            if isinstance(d, int): delays.append(d)
+            if isinstance(d, int):
+                delays.append(d)
         wait_ms = max(delays, default=0)
+
         def _after():
             self._run_sequential(sequential, 0, on_done, token=token)
+
         if wait_ms > 0:
             self._schedule_mission_timer(wait_ms, _after, token=token)
         else:
@@ -993,75 +1219,241 @@ class MainWindow(QMainWindow):
         return 0
 
     def _advance(self, token: int | None = None):
-        if not self._mission_active(token): return
+        if not self._mission_active(token):
+            return
         idx = self._mission_idx
-        if not (0 <= idx < len(self._mission_wps)): return
+        if not (0 <= idx < len(self._mission_wps)):
+            return
+        if self._mission_source == "routes":
+            self._routes.set_wp_status(idx, WP_DONE)
+            self._routes.set_task_status("—")
+        self._clear_route_confirm()
+        self._mission_idx += 1
+        self._run_next(token=token)
+
+    # ── [E] Manual mode: xử lý task xong → chờ bước "di chuyển kế" ──────
+
+    def _manual_after_task_done(self, token: int | None = None):
+        """Dừng chờ operator sau khi task của waypoint hiện tại hoàn tất."""
+        if token is not None and token != self._mission_token:
+            return
+        if not self._mission_running:
+            return
+
+        self._mission_phase = "manual_wait"
+        self._set_pause_controls(can_pause=False, paused=False)
+        idx = self._mission_idx
+        self._routes.set_task_status("—")
+        self._clear_route_confirm()
+
+        self._manual_pending_action = ("move", idx)
+        next_idx = idx + 1
+        if next_idx < len(self._mission_wps):
+            next_label = self._mission_wps[next_idx].get("label", "?")
+            self._routes.manual_prompt(tr("manual_step_move", next_label))
+        else:
+            self._routes.manual_prompt(tr("manual_step_finish"))
+
+    def _on_manual_continue(self):
+        """Thực hiện đúng một bước Manual đang chờ."""
+        if self._mission_source != "routes" or not self._manual_mode:
+            return
+        if self._manual_pending_action is None:
+            return
+
+        kind, idx = self._manual_pending_action
+        self._manual_pending_action = None
+
+        if kind == "task":
+            tasks = (self._mission_wps[idx].get("tasks", [])
+                     if 0 <= idx < len(self._mission_wps) else [])
+            if tasks:
+                self._execute_tasks(
+                    tasks,
+                    on_done=self._manual_after_task_done,
+                    token=self._mission_token,
+                )
+            else:
+                self._manual_after_task_done(token=self._mission_token)
+
+        elif kind == "move":
+            # Task tại WP hiện tại đã xong: đánh dấu WP hiện tại DONE,
+            # tăng mission_idx rồi mới gửi goal WP kế tiếp.
+            self._advance(token=self._mission_token)
+
+        elif kind == "move_after_skip":
+            # _on_skip_wp() đã tăng mission_idx. Không được gọi _advance()
+            # vì sẽ đánh dấu nhầm WP kế tiếp DONE và bỏ qua thêm một điểm.
+            self._run_next(token=self._mission_token)
+
+    def _on_mode_changed(self, manual: bool):
+        """RoutesPage đổi Auto/Manual — chỉ có tác dụng khi mission rảnh
+        (RoutesPage đã tự khoá 2 nút này trong lúc đang chạy)."""
+        self._manual_mode = manual
+
+    # ── [D] Stuck-handling: Thử lại / Bỏ qua / Huỷ ──────────────────────
+
+    def _on_retry_wp(self):
+        """Gửi lại đúng goal của waypoint đang dở — Nav2 tự replan từ
+        vị trí hiện tại của robot (kể cả sau khi operator lái tay)."""
+        if not self._mission_stuck: return
+        idx = self._stuck_wp_idx
+        self._mission_stuck = False
+        self._stuck_wp_idx = -1
+        self._routes.clear_stuck()
+        if not (0 <= idx < len(self._mission_wps)):
+            return
+        self._routes.set_wp_status(idx, WP_MOVING)
+        wp = self._mission_wps[idx]
+        msg = tr("nav_going", wp.get("label", "?"), wp.get("x", 0.0), wp.get("y", 0.0))
+        self._nav.set_status(msg); self._routes.set_status(msg)
+        self._run_next(token=self._mission_token)
+
+    def _on_skip_wp(self):
+        """Bỏ qua waypoint đang kẹt mà không bỏ nhầm waypoint kế tiếp."""
+        if not self._mission_stuck:
+            return
+        idx = self._stuck_wp_idx
+        self._mission_stuck = False
+        self._stuck_wp_idx = -1
+        self._routes.clear_stuck()
+        if not (0 <= idx < len(self._mission_wps)):
+            return
+
         self._routes.set_wp_status(idx, WP_DONE)
-        self._routes.set_task_status("—"); self._clear_route_confirm()
-        self._mission_idx += 1; self._run_next(token=token)
+        self._mission_idx = idx + 1
+
+        if self._mission_idx >= len(self._mission_wps):
+            self._on_mission_done()
+            return
+
+        if self._manual_mode:
+            self._mission_phase = "manual_wait"
+            self._set_pause_controls(can_pause=False, paused=False)
+            next_label = self._mission_wps[self._mission_idx].get("label", "?")
+            self._manual_pending_action = (
+                "move_after_skip", self._mission_idx)
+            self._routes.manual_prompt(tr("manual_step_move", next_label))
+        else:
+            self._run_next(token=self._mission_token)
+
+    def _on_cancel_stuck(self):
+        """Huỷ mission do lỗi và ghi log failed thay vì cancelled."""
+        if not self._mission_stuck:
+            return
+        self._mission_stuck = False
+        self._stuck_wp_idx = -1
+        self._routes.clear_stuck()
+        self._stop_mission(log_status="failed")
 
     def _on_mission_done(self):
-        self._mission_running  = False
-        self._mission_paused   = False
-        self._cancel_reason    = None
+        source = self._mission_source
+        self._mission_running = False
+        self._mission_paused = False
+        self._mission_phase = "idle"
+        self._cancel_reason = None
         self._confirm_continue = None
-        self._cancel_mission_timers(); self._clear_route_confirm()
+        self._cancel_mission_timers()
+        self._clear_route_confirm()
+        self._set_pause_controls(can_pause=False, paused=False)
+
         self._nav.set_status(tr("nav_done"))
-        self._routes.set_status(tr("nav_done"))
         self._nav.set_mission_running(False)
         self._nav.map_widget.clear_nav_path()
-        self._routes.map_widget.clear_nav_path()
-        try: self._routes.on_mission_success()
-        except AttributeError: self._routes.set_mission_done()
+
+        if source == "routes":
+            self._routes.set_status(tr("nav_done"))
+            self._routes.map_widget.clear_nav_path()
+            try:
+                self._routes.on_mission_success()
+            except AttributeError:
+                self._routes.set_mission_done()
 
     def _pause_mission(self):
-        if self._mission_running and not self._mission_paused:
-            self._mission_paused = True
-            self._cancel_reason  = "pause"
-            self._cancel_mission_timers(); self._clear_route_confirm()
-            self._confirm_continue = None
-            if self.nav_client: self.nav_client.cancel_goal()
-            self._nav.set_mission_paused(True)
-            self._nav.set_status("⏸ Đã tạm dừng.")
+        # Pause task có thể khiến timer bị huỷ rồi task chạy lại từ đầu.
+        # Vì vậy chỉ cho Pause khi Nav2 đang di chuyển tới waypoint.
+        if not self._mission_running or self._mission_paused:
+            return
+
+        if self._mission_phase != "moving":
+            msg = "Chỉ có thể Pause khi robot đang di chuyển."
+            self._nav.set_status(msg)
+            if self._mission_source == "routes":
+                self._routes.set_status(msg)
+            self._set_pause_controls(can_pause=False, paused=False)
+            return
+
+        self._mission_paused = True
+        self._mission_phase = "paused_moving"
+        self._cancel_reason = "pause"
+        self._cancel_mission_timers()
+        self._clear_route_confirm()
+        self._confirm_continue = None
+        if self.nav_client:
+            self.nav_client.cancel_goal()
+        self._nav.set_mission_paused(True)
+        self._set_pause_controls(can_pause=False, paused=True)
+        self._nav.set_status("⏸ Đã tạm dừng.")
+        if self._mission_source == "routes":
             self._routes.set_status("⏸ Đã tạm dừng.")
 
     def _resume_mission(self):
         if self._mission_running and self._mission_paused:
             self._mission_paused = False
-            self._cancel_reason  = None
+            self._mission_phase = "moving"
+            self._cancel_reason = None
             self._nav.set_mission_paused(False)
+            self._set_pause_controls(can_pause=True, paused=False)
             self._run_next(token=self._mission_token)
 
-    def _stop_mission(self):
-        was_running          = self._mission_running
-        self._cancel_reason  = "stop"
+    def _stop_mission(self, log_status: str = "cancelled"):
+        source = self._mission_source
+        was_running = self._mission_running
+        self._cancel_reason = "stop"
         self._new_mission_token()
         self._stop_nav_retry()
-        self._cancel_mission_timers(); self._clear_route_confirm()
+        self._cancel_mission_timers()
+        self._clear_route_confirm()
         self._confirm_continue = None
 
-        self._mission_running = False
-        self._mission_paused  = False
-        self._mission_wps     = []
-        self._mission_idx     = 0
+        self._mission_stuck = False
+        self._stuck_wp_idx = -1
+        self._manual_pending_action = None
+        try:
+            self._routes.clear_stuck()
+        except Exception:
+            pass
 
-        if self.nav_client: self.nav_client.cancel_goal()
+        self._mission_running = False
+        self._mission_paused = False
+        self._mission_phase = "idle"
+        self._mission_wps = []
+        self._mission_idx = 0
+        self._set_pause_controls(can_pause=False, paused=False)
+
+        if self.nav_client:
+            self.nav_client.cancel_goal()
 
         self._nav.set_status(tr("nav_stopped"))
         self._nav.set_mission_running(False)
-        self._routes.set_status(tr("nav_stopped"))
         self.velocity_signal.emit(0.0, 0.0)
         self._nav.map_widget.clear_nav_path()
-        self._routes.map_widget.clear_nav_path()
-        
-        if was_running:
-            try:
-                if getattr(self._routes, "_active_record", None) is not None:
-                    self._routes._stop_logging("cancelled")
-            except Exception: pass
 
-        try: self._routes.set_mission_done()
-        except Exception: pass
+        if source == "routes":
+            self._routes.set_status(tr("nav_stopped"))
+            self._routes.map_widget.clear_nav_path()
+
+            if was_running:
+                try:
+                    if getattr(self._routes, "_active_record", None) is not None:
+                        self._routes._stop_logging(log_status)
+                except Exception:
+                    pass
+
+            try:
+                self._routes.set_mission_done()
+            except Exception:
+                pass
 
     # ── Window controls ───────────────────────────────────────────────
 
@@ -1070,7 +1462,19 @@ class MainWindow(QMainWindow):
         else: self.showMaximized()
 
     def closeEvent(self, ev):
-        self.shutdown_processes(); super().closeEvent(ev)
+        """Dọn process và thoát Qt, trừ trường hợp đổi người vận hành."""
+        try:
+            self.shutdown_processes()
+        except Exception as e:
+            print(f"[MainWindow] Shutdown failed: {e}")
+
+        super().closeEvent(ev)
+
+        if ev.isAccepted() and not self._switching_user:
+            app = QApplication.instance()
+            if app is not None:
+                # Tránh gọi quit lồng ngay bên trong closeEvent stack.
+                QTimer.singleShot(0, app.quit)
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)

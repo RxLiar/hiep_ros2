@@ -1,11 +1,24 @@
 """
-routes_page.py — Routes screen v2.3
+routes_page.py — Routes screen v2.5
 
-Thêm mới so với v2.2:
-  [1] JoystickWidget overlay lên map_widget (góc trái dưới).
-  [2] Pose Estimate toggle button + MODE_POSE trên map_widget.
-  [3] pose_estimate_signal emit lên MainWindow → publish_initial_pose.
-  [4] Joystick velocity_signal emit lên MainWindow → /cmd_vel.
+[NEW so với v2.4]
+  - [D] Stuck-handling: khi 1 waypoint thất bại giữa lộ trình, thay vì
+    kết thúc mission ngay, hiện banner cảnh báo với 3 lựa chọn: Thử
+    lại/Tiếp tục, Bỏ qua điểm này, Huỷ toàn bộ. Xử lý thật sự nằm ở
+    MainWindow — RoutesPage chỉ hiện UI và emit signal.
+  - [E] Auto / Manual mode: segmented toggle phía trên Mission Control.
+    Auto = hành vi cũ (chạy liên tục). Manual = nút Start đổi nhãn theo
+    từng bước ("Đến WPx" / "Thực hiện Task WPx" / "Xác nhận & đi tiếp"),
+    mỗi lần bấm chỉ thực hiện đúng 1 hành động — tiện theo dõi/bảo trì.
+    Pause/Resume bị khoá khi ở Manual (không cần dùng đến).
+    Khoá 2 nút Auto/Manual trong lúc mission đang chạy.
+
+Giữ nguyên v2.4:
+  - Repeat / Lặp lại lộ trình: chạy 1 lần / N lần / vô hạn, mỗi chu kỳ
+    ghi 1 record log riêng, chặn đổi route khi đang chạy/lặp.
+  - JoystickWidget overlay lên map_widget (góc trái dưới).
+  - Pose Estimate toggle button + MODE_POSE trên map_widget.
+  - pose_estimate_signal / velocity_signal emit lên MainWindow.
 """
 
 import os
@@ -20,6 +33,8 @@ from PyQt6.QtWidgets import (
     QScrollArea, QMessageBox, QTabWidget,
     QTableWidget, QTableWidgetItem, QHeaderView,
     QFileDialog, QAbstractItemView,
+    QComboBox, QSpinBox,      # cho repeat combo/spin
+    QButtonGroup,             # [NEW] cho Auto/Manual toggle
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QPixmap, QColor
@@ -36,14 +51,17 @@ WP_PENDING = "pending"
 WP_MOVING  = "moving"
 WP_TASK    = "task"
 WP_DONE    = "done"
+WP_STUCK   = "stuck"   # [NEW] waypoint đang gặp sự cố, chờ operator xử lý
 
 WP_STATUS_ICON = {
     WP_PENDING: "□", WP_MOVING: "●",
     WP_TASK:    "◆", WP_DONE:   "✓",
+    WP_STUCK:   "⚠",
 }
 WP_STATUS_COLOR = {
     WP_PENDING: "#8B949E", WP_MOVING: "#58A6FF",
     WP_TASK:    "#E3B341", WP_DONE:   "#3FB950",
+    WP_STUCK:   "#F85149",
 }
 STATUS_COLOR = {
     "success": "#3FB950", "failed": "#F85149",
@@ -346,6 +364,15 @@ class RoutesPage(QWidget):
     velocity_signal       = pyqtSignal(float, float)        # [1] joystick → /cmd_vel
     pose_estimate_signal  = pyqtSignal(float, float, float) # [2] → /initialpose
 
+    # [E] Auto/Manual mode + bước tiếp theo trong Manual
+    mode_changed          = pyqtSignal(bool)   # True = manual
+    manual_continue_signal = pyqtSignal()
+
+    # [D] Stuck-handling: Thử lại / Bỏ qua / Huỷ
+    retry_wp_signal    = pyqtSignal()
+    skip_wp_signal     = pyqtSignal()
+    cancel_stuck_signal = pyqtSignal()
+
     def __init__(self, role: str = "operator"):
         super().__init__()
         self._role = role
@@ -354,6 +381,19 @@ class RoutesPage(QWidget):
         self._bumper_labels: dict[str, QLabel] = {}
         self._active_record: dict | None = None
         self._cargo_count = 0
+
+        # [NEW] Repeat state
+        self._repeat_active = False
+        self._repeat_done   = 0
+        self._repeat_pause_ms = 3000        # nghỉ giữa 2 chuyến
+        self._repeat_timer = QTimer(self)
+        self._repeat_timer.setSingleShot(True)
+        self._repeat_timer.timeout.connect(self._repeat_next_cycle)
+
+        # [E] Auto/Manual state
+        self._manual_mode = False
+        self._awaiting_manual_step = False
+
         self._build()
         self.refresh()
 
@@ -556,6 +596,83 @@ class RoutesPage(QWidget):
         self._elapsed_timer.setInterval(1000)
         self._elapsed_timer.timeout.connect(self._update_elapsed)
 
+        # [E] Auto / Manual mode toggle
+        mode_box = QGroupBox(tr("mode_title"))
+        mode_lay = QHBoxLayout(mode_box); mode_lay.setSpacing(6)
+        self._mode_group = QButtonGroup(self)
+        self._mode_group.setExclusive(True)
+        self._auto_btn = QPushButton(tr("mode_auto"))
+        self._auto_btn.setCheckable(True)
+        self._auto_btn.setChecked(True)
+        self._auto_btn.setFixedHeight(32)
+        self._auto_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._manual_btn = QPushButton(tr("mode_manual"))
+        self._manual_btn.setCheckable(True)
+        self._manual_btn.setFixedHeight(32)
+        self._manual_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._mode_group.addButton(self._auto_btn)
+        self._mode_group.addButton(self._manual_btn)
+        self._auto_btn.toggled.connect(self._on_mode_toggled)
+        mode_lay.addWidget(self._auto_btn)
+        mode_lay.addWidget(self._manual_btn)
+        lay.addWidget(mode_box)
+
+        # [NEW] Repeat / Lặp lại lộ trình
+        repeat_box = QGroupBox(tr("route_repeat_title"))
+        rl = QVBoxLayout(repeat_box); rl.setSpacing(6)
+
+        self._repeat_combo = QComboBox()
+        self._repeat_combo.addItem(tr("route_repeat_once"),     "once")
+        self._repeat_combo.addItem(tr("route_repeat_count"),    "count")
+        self._repeat_combo.addItem(tr("route_repeat_infinite"), "infinite")
+        self._repeat_combo.currentIndexChanged.connect(self._on_repeat_mode_changed)
+        rl.addWidget(self._repeat_combo)
+
+        count_row = QHBoxLayout()
+        count_row.addWidget(QLabel(tr("route_repeat_times")))
+        self._repeat_spin = QSpinBox()
+        self._repeat_spin.setRange(2, 999)
+        self._repeat_spin.setValue(3)
+        self._repeat_spin.setFixedWidth(80)
+        count_row.addStretch(); count_row.addWidget(self._repeat_spin)
+        self._repeat_count_row = QWidget(); self._repeat_count_row.setLayout(count_row)
+        self._repeat_count_row.setVisible(False)
+        rl.addWidget(self._repeat_count_row)
+
+        self._repeat_progress_lbl = QLabel("")
+        self._repeat_progress_lbl.setStyleSheet(
+            "color:#58A6FF;font-size:12px;font-weight:700;background:transparent;")
+        self._repeat_progress_lbl.setVisible(False)
+        rl.addWidget(self._repeat_progress_lbl)
+
+        lay.addWidget(repeat_box)
+
+        # [D] Stuck banner — ẩn mặc định, chỉ hiện khi mission gặp sự cố
+        self._stuck_frame = QFrame()
+        self._stuck_frame.setStyleSheet(
+            "QFrame{background:#2E2000;border:1px solid #9E6A03;"
+            "border-radius:8px;}")
+        sfl = QVBoxLayout(self._stuck_frame)
+        sfl.setContentsMargins(10, 8, 10, 8); sfl.setSpacing(6)
+        self._stuck_lbl = QLabel("")
+        self._stuck_lbl.setWordWrap(True)
+        self._stuck_lbl.setStyleSheet(
+            "color:#E3B341;font-size:12px;font-weight:700;background:transparent;")
+        sfl.addWidget(self._stuck_lbl)
+        stuck_btns = QHBoxLayout(); stuck_btns.setSpacing(6)
+        self._stuck_retry_btn  = _btn(tr("stuck_retry"),  "BtnPrimary", h=30)
+        self._stuck_skip_btn   = _btn(tr("stuck_skip"),   h=30)
+        self._stuck_cancel_btn = _btn(tr("stuck_cancel"), "BtnDanger",  h=30)
+        self._stuck_retry_btn.clicked.connect(self.retry_wp_signal)
+        self._stuck_skip_btn.clicked.connect(self.skip_wp_signal)
+        self._stuck_cancel_btn.clicked.connect(self.cancel_stuck_signal)
+        stuck_btns.addWidget(self._stuck_retry_btn)
+        stuck_btns.addWidget(self._stuck_skip_btn)
+        stuck_btns.addWidget(self._stuck_cancel_btn)
+        sfl.addLayout(stuck_btns)
+        self._stuck_frame.setVisible(False)
+        lay.addWidget(self._stuck_frame)
+
         # Mission control
         ctrl_box = QGroupBox("MISSION CONTROL")
         cl = QVBoxLayout(ctrl_box); cl.setSpacing(6)
@@ -613,6 +730,75 @@ class RoutesPage(QWidget):
             self.map_widget.set_mode(MODE_GOAL)
             self.map_widget.clear_pose_estimate()
             self._pose_btn.setText(tr("nav_pose_enable"))
+
+    # ── [E] Auto / Manual mode toggle ───────────────────────────────────
+
+    def _on_mode_toggled(self, auto_checked: bool):
+        """auto_checked=True nghĩa là nút AUTO đang được chọn."""
+        self._manual_mode = not auto_checked
+        self.mode_changed.emit(self._manual_mode)
+
+    def manual_prompt(self, text: str):
+        """
+        [E] Gọi bởi MainWindow khi Manual mode đang chờ operator bấm
+        bước kế tiếp. Đổi nhãn nút Start và bật lại (nút này bị disable
+        khi mission đang chạy bình thường ở Auto).
+        """
+        self._awaiting_manual_step = True
+        self._start_btn.setText(text)
+        self._start_btn.setEnabled(True)
+
+    def manual_busy(self):
+        """Operator vừa bấm bước kế — khoá nút lại để tránh bấm lặp
+        trong lúc robot đang di chuyển / task đang chạy."""
+        self._awaiting_manual_step = False
+        self._start_btn.setEnabled(False)
+
+    # ── [D] Stuck-handling ───────────────────────────────────────────────
+
+    def on_mission_stuck(self, wp_label: str):
+        """Gọi bởi MainWindow khi 1 waypoint thất bại — hiện banner với
+        3 lựa chọn xử lý, không kết thúc mission."""
+        self._stuck_lbl.setText(tr("stuck_title", wp_label))
+        self._stuck_frame.setVisible(True)
+        self._start_btn.setEnabled(False)
+        self._pause_btn.setEnabled(False)
+        self._resume_btn.setEnabled(False)
+
+    def clear_stuck(self):
+        self._stuck_frame.setVisible(False)
+
+    # ── [NEW] Repeat logic ────────────────────────────────────────────
+
+    def _on_repeat_mode_changed(self, _idx):
+        mode = self._repeat_combo.currentData()
+        self._repeat_count_row.setVisible(mode == "count")
+
+    def _should_repeat_more(self) -> bool:
+        mode = self._repeat_combo.currentData()
+        if mode == "infinite":
+            return True
+        if mode == "count":
+            return self._repeat_done < self._repeat_spin.value()
+        return False
+
+    def _update_repeat_progress_label(self):
+        mode = self._repeat_combo.currentData()
+        if mode == "once":
+            self._repeat_progress_lbl.setVisible(False)
+            return
+        self._repeat_progress_lbl.setVisible(True)
+        n = self._repeat_done + 1
+        if mode == "infinite":
+            self._repeat_progress_lbl.setText(tr("route_repeat_progress_inf", n))
+        else:
+            self._repeat_progress_lbl.setText(
+                tr("route_repeat_progress", n, self._repeat_spin.value()))
+
+    def _repeat_next_cycle(self):
+        if not self._repeat_active or not self._current_route:
+            return
+        self._on_start()
 
     # ── Tab ───────────────────────────────────────────────────────────
 
@@ -699,9 +885,21 @@ class RoutesPage(QWidget):
 
     def set_mission_done(self):
         self._start_btn.setEnabled(self._current_route_is_ready())
+        self._start_btn.setText(tr("nav_start"))
         self._pause_btn.setEnabled(False)
         self._resume_btn.setEnabled(False)
         self.clear_confirm()
+        # [NEW] Reset trạng thái lặp — chuỗi lặp coi như kết thúc.
+        self._repeat_timer.stop()
+        self._repeat_active = False
+        self._repeat_combo.setEnabled(True)
+        self._repeat_spin.setEnabled(True)
+        self._repeat_progress_lbl.setVisible(False)
+        # [D][E] Reset Manual step + banner Stuck + mở khoá Auto/Manual
+        self._awaiting_manual_step = False
+        self.clear_stuck()
+        self._auto_btn.setEnabled(True)
+        self._manual_btn.setEnabled(True)
 
     def set_wp_status(self, idx, status):
         if not (0 <= idx < len(self._wp_status_labels)): return
@@ -721,10 +919,25 @@ class RoutesPage(QWidget):
             f"📦 Hàng đã vận chuyển: {self._cargo_count}")
 
     def on_mission_success(self):
-        self._stop_logging("success"); self.set_mission_done()
+        """
+        [NEW] Ghi log chu kỳ vừa xong. Nếu đang trong chuỗi lặp và còn
+        lượt (đếm) hoặc chưa Stop (vô hạn) → nghỉ _repeat_pause_ms rồi
+        tự chạy lại. Ngược lại → kết thúc chuỗi (set_mission_done).
+        """
+        self._stop_logging("success")
+        self._repeat_done += 1
+        if self._repeat_active and self._should_repeat_more():
+            self._update_repeat_progress_label()
+            wait_s = self._repeat_pause_ms // 1000
+            self.set_status(tr("route_repeat_waiting", wait_s))
+            self._repeat_timer.start(self._repeat_pause_ms)
+        else:
+            self.set_mission_done()
 
     def on_mission_failed(self):
-        self._stop_logging("failed"); self.set_mission_done()
+        """[NEW] Thất bại giữa chừng → DỪNG LUÔN chuỗi lặp, không lặp lại lỗi."""
+        self._stop_logging("failed")
+        self.set_mission_done()
 
     # ── Logging ───────────────────────────────────────────────────────
 
@@ -748,11 +961,22 @@ class RoutesPage(QWidget):
     def _stop_logging(self, status):
         self._elapsed_timer.stop()
         if self._active_record is None: return
+
+        # [NEW] Ghi chú rõ đây là chu kỳ lặp thứ mấy, để phân biệt trong
+        # tab Lịch sử khi nhiều chu kỳ cùng route_id chồng lên nhau.
+        notes = ""
+        if self._repeat_active and self._repeat_combo.currentData() != "once":
+            if self._repeat_combo.currentData() == "infinite":
+                notes = f"Chu kỳ lặp #{self._repeat_done + 1} (vô hạn)"
+            else:
+                notes = f"Chu kỳ lặp {self._repeat_done + 1}/{self._repeat_spin.value()}"
+
         try:
             ML.finish_record(
                 self._active_record, status=status,
                 waypoints_done=self._active_record.get("waypoints_done", 0),
                 cargo_count=self._cargo_count,
+                notes=notes,
             )
         except Exception as e:
             print(f"[RoutesPage] stop logging failed: {e}")
@@ -783,6 +1007,13 @@ class RoutesPage(QWidget):
         return path
 
     def _on_run(self, route):
+        # [NEW] Chặn đổi route khi đang chạy/lặp — tránh log lẫn lộn
+        # giữa route cũ đang chạy nền và route mới vừa chọn.
+        if self._repeat_active or self._pause_btn.isEnabled():
+            QMessageBox.warning(self, tr("route_repeat_title"),
+                                 tr("route_busy_warning"))
+            return
+
         self._current_route = copy.deepcopy(route)
         mp = self._normalize_map_path(self._current_route.get("map_path",""))
         self._current_route["map_path"] = mp
@@ -852,6 +1083,13 @@ class RoutesPage(QWidget):
     # ── Mission buttons ───────────────────────────────────────────────
 
     def _on_start(self):
+        # [E] Đang chờ operator bấm bước kế trong Manual mode — KHÔNG
+        # phải bắt đầu mission mới, mà là thực hiện đúng bước đang chờ.
+        if self._awaiting_manual_step:
+            self.manual_busy()
+            self.manual_continue_signal.emit()
+            return
+
         if not self._current_route:
             self._status_lbl.setText("Chưa chọn lộ trình."); return
         mp = self._normalize_map_path(
@@ -863,13 +1101,36 @@ class RoutesPage(QWidget):
         if not self._current_route.get("waypoints", []):
             self._status_lbl.setText("Route không có waypoint."); return
         self._current_route["map_path"] = mp
+
+        # [NEW] Bắt đầu (hoặc tiếp tục) chuỗi lặp. Nếu đây là lần Start
+        # đầu tiên của chuỗi (không phải do _repeat_next_cycle gọi lại)
+        # thì reset bộ đếm và khoá combo/spin lại để tránh đổi giữa chừng.
+        if not self._repeat_active:
+            self._repeat_done = 0
+            self._repeat_active = True
+            self._repeat_combo.setEnabled(False)
+            self._repeat_spin.setEnabled(False)
+        self._update_repeat_progress_label()
+
+        self._start_btn.setText(tr("nav_start"))
         self._start_btn.setEnabled(False)
-        self._pause_btn.setEnabled(True)
+        # [E] Manual mode không dùng Pause (mỗi bước đã tự "pause" sẵn).
+        self._pause_btn.setEnabled(not self._manual_mode)
         self._resume_btn.setEnabled(False)
-        # MainWindow v4.2.3 gọi _start_logging sau khi Nav2 ready
+        # [E] Khoá Auto/Manual trong lúc mission đang chạy
+        self._auto_btn.setEnabled(False)
+        self._manual_btn.setEnabled(False)
+        # MainWindow gọi _start_logging sau khi Nav2 ready
         self.run_route_signal.emit(copy.deepcopy(self._current_route))
 
     def _on_stop(self):
+        # [NEW] Dừng hẳn chuỗi lặp (không chỉ dừng chu kỳ hiện tại).
+        self._repeat_timer.stop()
+        self._repeat_active = False
+        # [D][E] Dọn banner Stuck + trạng thái chờ bước Manual (phòng khi
+        # operator bấm Stop ngay lúc đang stuck/đang chờ bước kế).
+        self._awaiting_manual_step = False
+        self.clear_stuck()
         if self._active_record is not None:
             self._stop_logging("cancelled")
         self.stop_signal.emit()
@@ -907,7 +1168,9 @@ class RoutesPage(QWidget):
 
     def retranslate(self):
         self.error_header.retranslate()
-        self._start_btn.setText(tr("nav_start"))
+        # [E] Không ghi đè nhãn động ("Đến WP2"...) nếu đang chờ bước Manual
+        if not self._awaiting_manual_step:
+            self._start_btn.setText(tr("nav_start"))
         self._stop_btn.setText(tr("nav_stop"))
         self._pause_btn.setText(tr("nav_pause"))
         self._resume_btn.setText(tr("nav_resume"))
@@ -916,10 +1179,26 @@ class RoutesPage(QWidget):
             tr("nav_pose_active") if self._pose_btn.isChecked()
             else tr("nav_pose_enable"))
         self._empty_lbl.setText(tr("route_no_routes"))
+        # [E] Retranslate Auto/Manual toggle + banner Stuck
+        self._auto_btn.setText(tr("mode_auto"))
+        self._manual_btn.setText(tr("mode_manual"))
+        self._stuck_retry_btn.setText(tr("stuck_retry"))
+        self._stuck_skip_btn.setText(tr("stuck_skip"))
+        self._stuck_cancel_btn.setText(tr("stuck_cancel"))
+        # [NEW] Retranslate repeat controls
+        cur_idx = self._repeat_combo.currentIndex()
+        self._repeat_combo.blockSignals(True)
+        self._repeat_combo.clear()
+        self._repeat_combo.addItem(tr("route_repeat_once"),     "once")
+        self._repeat_combo.addItem(tr("route_repeat_count"),    "count")
+        self._repeat_combo.addItem(tr("route_repeat_infinite"), "infinite")
+        self._repeat_combo.setCurrentIndex(max(0, cur_idx))
+        self._repeat_combo.blockSignals(False)
+        self._update_repeat_progress_label()
         self.refresh()
 
 
 __all__ = [
     "RoutesPage",
-    "WP_PENDING", "WP_MOVING", "WP_TASK", "WP_DONE",
+    "WP_PENDING", "WP_MOVING", "WP_TASK", "WP_DONE", "WP_STUCK",
 ]

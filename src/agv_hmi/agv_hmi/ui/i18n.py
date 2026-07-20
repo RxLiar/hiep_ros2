@@ -1,33 +1,16 @@
 """
 i18n.py — 3 ngôn ngữ: Tiếng Việt / English / 한국어
+
+[NEW] Thêm key cho:
+  - home_switch_user: nút đổi người vận hành trên Home
+  - route_repeat_*: setup lặp lại lộ trình (N lần / vô hạn) trên Routes
+  - route_busy_warning: cảnh báo khi đang chạy/lặp mà chọn route khác
 """
 
 _lang = "vi"
 
 _S = {
-    
-    # Routes page
-    "route_run":         {"vi": "▶ Chạy",       "en": "▶ Run",        "ko": "▶ 실행"},
-    "route_edit":        {"vi": "✏ Chỉnh sửa",  "en": "✏ Edit",       "ko": "✏ 편집"},
-    "route_title":       {"vi": "LỘ TRÌNH",      "en": "ROUTES",       "ko": "경로"},
-    "delete_route":      {"vi": "Xoá lộ trình",  "en": "Delete Route", "ko": "경로 삭제"},
-    "delete_map":        {"vi": "Xoá map",        "en": "Delete Map",   "ko": "지도 삭제"},
-    "no_routes":         {"vi": "Chưa có lộ trình.\nTạo trong Navigation.",
-                          "en": "No routes yet.\nCreate in Navigation.",
-                          "ko": "경로 없음.\n내비게이션에서 생성하세요."},
- 
-    # Conveyor card status
-    "conv_status_idle":  {"vi": "Chờ",            "en": "Idle",         "ko": "대기"},
-    "conv_status_run":   {"vi": "Đang chạy",       "en": "Running",      "ko": "실행 중"},
-    "conv_send":         {"vi": "Chuyển hàng",     "en": "Transfer",     "ko": "전송"},
- 
-    # Map library
-    "maplib_title":      {"vi": "THƯ VIỆN MAP",    "en": "MAP LIBRARY",  "ko": "지도 라이브러리"},
-    "maplib_refresh":    {"vi": "↺ Làm mới",       "en": "↺ Refresh",    "ko": "↺ 새로고침"},
-    "maplib_use_nav":    {"vi": "⊳ Dùng trong Nav","en": "⊳ Use in Nav", "ko": "⊳ 내비에서 사용"},
-    "maplib_delete":     {"vi": "🗑 Xoá",          "en": "🗑 Delete",    "ko": "🗑 삭제"},
-    "maplib_created":    {"vi": "Tạo:",            "en": "Created:",     "ko": "생성:"},
- 
+
     # Route delete confirm (takes 1 positional arg)
     "route_del_confirm": {"vi": "Xoá lộ trình '{}'?",
                           "en": "Delete route '{}'?",
@@ -37,9 +20,9 @@ _S = {
     "app_name":          {"vi": "AGV Busan Autonomous Robot",
                           "en": "AGV Busan Autonomous Robot",
                           "ko": "AGV 부산 자율 로봇"},
-    "app_version":       {"vi": "v4.2.0 · ROS2 Jazzy",
-                          "en": "v4.2.0 · ROS2 Jazzy",
-                          "ko": "v4.2.0 · ROS2 재지"},
+    "app_version":       {"vi": "v4.3.0 · ROS2 Jazzy",
+                          "en": "v4.3.0 · ROS2 Jazzy",
+                          "ko": "v4.3.0 · ROS2 재지"},
     # ── Login ──────────────────────────────────────────────────────
     "login_select_mode": {"vi": "Chọn chế độ làm việc",
                           "en": "Select Operating Mode",
@@ -92,6 +75,10 @@ _S = {
     "home_conv":         {"vi": "Băng tải {}",  "en": "Conveyor {}",  "ko": "컨베이어 {}"},
     "home_has_cargo":    {"vi": "Có hàng",     "en": "Has cargo",    "ko": "화물 있음"},
     "home_no_cargo":     {"vi": "Không hàng",  "en": "No cargo",     "ko": "화물 없음"},
+    # [NEW] Nút đổi người vận hành trên Home
+    "home_switch_user":  {"vi": "Đổi người vận hành",
+                          "en": "Switch operator",
+                          "ko": "운영자 변경"},
 
     # ── Errors / Robot status ──────────────────────────────────────
     "no_errors":         {"vi": "Không có lỗi","en": "No errors",    "ko": "오류 없음"},
@@ -177,9 +164,61 @@ _S = {
                           "en": "No routes yet.\nCreate in Navigation.",
                           "ko": "경로 없음.\n내비게이션에서 생성하세요."},
     "route_title":       {"vi": "LỘ TRÌNH",     "en": "ROUTES",       "ko": "경로"},
-    "route_del_confirm": {"vi": "Xoá lộ trình '{}'?",
-                          "en": "Delete route '{}'?",
-                          "ko": "경로 '{}'을(를) 삭제할까요?"},
+    "delete_route":      {"vi": "Xoá lộ trình",  "en": "Delete Route", "ko": "경로 삭제"},
+    "delete_map":        {"vi": "Xoá map",        "en": "Delete Map",   "ko": "지도 삭제"},
+    "route_run":         {"vi": "▶ Chạy",       "en": "▶ Run",        "ko": "▶ 실행"},
+    "route_edit":        {"vi": "✏ Chỉnh sửa",  "en": "✏ Edit",       "ko": "✏ 편집"},
+
+    # [NEW] Lặp lại lộ trình (repeat)
+    "route_repeat_title":    {"vi": "LẶP LẠI LỘ TRÌNH", "en": "REPEAT ROUTE", "ko": "경로 반복"},
+    "route_repeat_once":     {"vi": "Chạy 1 lần", "en": "Run once", "ko": "1회 실행"},
+    "route_repeat_count":    {"vi": "Lặp lại N lần", "en": "Repeat N times", "ko": "N회 반복"},
+    "route_repeat_infinite": {"vi": "Lặp vô hạn (đến khi Stop)",
+                              "en": "Loop until stopped",
+                              "ko": "정지할 때까지 반복"},
+    "route_repeat_times":    {"vi": "Số lần lặp", "en": "Repeat count", "ko": "반복 횟수"},
+    "route_repeat_progress": {"vi": "Chuyến {}/{}", "en": "Run {}/{}", "ko": "{}/{} 회차"},
+    "route_repeat_progress_inf": {"vi": "Chuyến {} (vô hạn)",
+                                  "en": "Run {} (infinite)",
+                                  "ko": "{}회차 (무한)"},
+    "route_repeat_waiting":  {"vi": "⏳ Nghỉ giữa các chuyến ({}s)...",
+                              "en": "⏳ Pausing between runs ({}s)...",
+                              "ko": "⏳ 회차 사이 대기 ({}초)..."},
+    "route_busy_warning":    {"vi": "Đang chạy/lặp lộ trình. Vui lòng Stop trước khi chọn lộ trình khác.",
+                              "en": "A route is running/repeating. Please Stop before selecting another route.",
+                              "ko": "경로가 실행/반복 중입니다. 다른 경로를 선택하기 전에 정지하세요."},
+
+    # [NEW] Auto / Manual mode
+    "mode_title":   {"vi": "CHẾ ĐỘ CHẠY", "en": "RUN MODE", "ko": "실행 모드"},
+    "mode_auto":    {"vi": "⚙ Auto",      "en": "⚙ Auto",   "ko": "⚙ 자동"},
+    "mode_manual":  {"vi": "🖐 Manual",    "en": "🖐 Manual", "ko": "🖐 수동"},
+
+    "manual_step_move":    {"vi": "▶ Đến {}",
+                            "en": "▶ Go to {}",
+                            "ko": "▶ {}(으)로 이동"},
+    "manual_step_task":    {"vi": "▶ Thực hiện Task {}",
+                            "en": "▶ Run task at {}",
+                            "ko": "▶ {} 작업 실행"},
+    "manual_step_confirm": {"vi": "✔ Xác nhận & đi tiếp {}",
+                            "en": "✔ Confirm & continue {}",
+                            "ko": "✔ 확인 후 {} 계속"},
+    "manual_step_finish":  {"vi": "✅ Hoàn tất",
+                            "en": "✅ Finish",
+                            "ko": "✅ 완료"},
+
+    # [NEW] Stuck-handling (mission gặp sự cố giữa lộ trình)
+    "stuck_title":  {"vi": "⚠ Lộ trình gặp sự cố tại WP {}",
+                     "en": "⚠ Route stuck at WP {}",
+                     "ko": "⚠ WP {}에서 경로 문제 발생"},
+    "stuck_retry":  {"vi": "🔁 Thử lại/Tiếp tục",
+                     "en": "🔁 Retry/Continue",
+                     "ko": "🔁 재시도/계속"},
+    "stuck_skip":   {"vi": "⏭ Bỏ qua điểm này",
+                     "en": "⏭ Skip this point",
+                     "ko": "⏭ 이 지점 건너뛰기"},
+    "stuck_cancel": {"vi": "✕ Huỷ toàn bộ",
+                     "en": "✕ Cancel all",
+                     "ko": "✕ 전체 취소"},
 
     # ── Tasks ──────────────────────────────────────────────────────
     "task_title":        {"vi": "TASKS",        "en": "TASKS",        "ko": "작업"},
@@ -209,6 +248,8 @@ _S = {
                           "ko": "⬛ 모든 컨베이어 정지"},
     "conv_idle":         {"vi": "Chờ",          "en": "Idle",         "ko": "대기"},
     "conv_running":      {"vi": "Đang chạy",    "en": "Running",      "ko": "실행 중"},
+    "conv_status_idle":  {"vi": "Chờ",            "en": "Idle",         "ko": "대기"},
+    "conv_status_run":   {"vi": "Đang chạy",       "en": "Running",      "ko": "실행 중"},
     "sensor_title":      {"vi": "CẢM BIẾN",     "en": "SENSORS",      "ko": "센서"},
     "sensor_n":          {"vi": "Sensor {}",    "en": "Sensor {}",    "ko": "센서 {}"},
 
@@ -259,7 +300,7 @@ _S = {
                            "ko": "새 비밀번호가 일치하지 않습니다!"},
     "settings_future":   {"vi": "Tính năng sắp có...",
                           "en": "Coming soon...",
-                          "ko": "곧 제공 예정..."},                   
+                          "ko": "곧 제공 예정..."},
     "settings_theme_title": {"vi": "GIAO DIỆN", "en": "APPEARANCE", "ko": "테마"},
     "settings_theme_hint":  {"vi": "Chọn chế độ sáng/tối cho ứng dụng. Áp dụng ngay không cần khởi động lại.",
                               "en": "Choose light/dark mode. Applies immediately, no restart needed.",
