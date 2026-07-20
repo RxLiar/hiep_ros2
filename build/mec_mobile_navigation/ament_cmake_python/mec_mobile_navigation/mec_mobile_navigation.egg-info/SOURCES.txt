@@ -1,7 +1,0 @@
-setup.py
-mec_mobile_navigation/__init__.py
-mec_mobile_navigation/laser_merger_node.py
-mec_mobile_navigation.egg-info/PKG-INFO
-mec_mobile_navigation.egg-info/SOURCES.txt
-mec_mobile_navigation.egg-info/dependency_links.txt
-mec_mobile_navigation.egg-info/top_level.txt

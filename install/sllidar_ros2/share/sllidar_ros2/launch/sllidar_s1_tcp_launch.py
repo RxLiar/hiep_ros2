@@ -1,1 +1,0 @@
-/home/hiep0247/hiep_ros2/src/sllidar_ros2/launch/sllidar_s1_tcp_launch.py

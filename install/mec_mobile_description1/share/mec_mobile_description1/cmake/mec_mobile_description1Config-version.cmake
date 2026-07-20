@@ -1,1 +1,0 @@
-/home/hiep0247/hiep_ros2/build/mec_mobile_description1/ament_cmake_core/mec_mobile_description1Config-version.cmake

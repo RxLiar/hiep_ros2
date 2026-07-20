@@ -1,1 +1,0 @@
-/home/hiep0247/hiep_ros2/src/mec_mobile_gazebo/launch/spawn_robot_bck260518.launch.py

@@ -1,1 +1,0 @@
-/home/hiep0247/hiep_ros2/src/mec_mobile_description/launch/robot_state_publisher.launch.py

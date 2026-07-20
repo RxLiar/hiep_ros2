@@ -1,1 +1,0 @@
-/home/hiep0247/hiep_ros2/build/mec_mobile_description/ament_cmake_environment_hooks/local_setup.bash
