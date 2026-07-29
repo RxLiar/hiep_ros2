@@ -1,0 +1,63 @@
+ekf_filter_node:
+    ros__parameters:
+        frequency: 50.0            # Hz - cao hon IMU rate
+        two_d_mode: true           # AGV chi di trong mat phang
+        publish_tf: true           # publish odom→base_footprint TF
+        publish_acceleration: false
+
+        map_frame: map
+        odom_frame: odom
+        base_link_frame: base_footprint
+        world_frame: odom
+
+        # ============================
+        # ENCODER (wheel odometry)
+        # ============================
+        odom0: /odom
+        odom0_config: [false, false, false,   # x, y, z
+                       false, false, false,   # roll, pitch, yaw
+                       true,  false, false,   # vx, vy, vz
+                       false, false, true,    # vroll, vpitch, vyaw
+                       false, false, false]   # ax, ay, az
+        odom0_differential: false
+        odom0_relative: false
+        odom0_queue_size: 10
+        
+        # ============================
+        # IMU
+        # ============================
+        imu0: /imu
+        imu0_config: [false, false, false,    # x, y, z
+                      false, false, false,    # roll, pitch, yaw
+                      false, false, false,    # vx, vy, vz
+                      false, false, true,     # vroll, vpitch, vyaw ← lay angular vel
+                      false, false, false]    # ax, ay, az
+        imu0_differential: false
+        imu0_relative: false
+        imu0_queue_size: 10
+        imu0_remove_gravitational_acceleration: true
+
+        # ============================
+        # PROCESS NOISE - AGV 450kg
+        # ============================
+        process_noise_covariance: [
+          0.05,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.05,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.06,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.03,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.03,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.06,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.025, 0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.025, 0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.04,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.01,  0.0,   0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.01,  0.0,   0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.02,  0.0,   0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.01,  0.0,   0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.01,  0.0,
+          0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.015]
+
+        initial_estimate_covariance: [
+          1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9,
+          1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9,
+          1e-9, 1e-9, 1e-9]

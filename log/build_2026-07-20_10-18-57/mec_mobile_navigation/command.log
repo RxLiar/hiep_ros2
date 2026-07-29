@@ -1,0 +1,1 @@
+Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j7 -l7

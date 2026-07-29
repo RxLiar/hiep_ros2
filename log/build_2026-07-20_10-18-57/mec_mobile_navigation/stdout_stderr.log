@@ -1,0 +1,10 @@
+Built target ament_cmake_python_copy_mec_mobile_navigation
+running egg_info
+creating mec_mobile_navigation.egg-info
+writing mec_mobile_navigation.egg-info/PKG-INFO
+writing dependency_links to mec_mobile_navigation.egg-info/dependency_links.txt
+writing top-level names to mec_mobile_navigation.egg-info/top_level.txt
+writing manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+reading manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+writing manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+Built target ament_cmake_python_build_mec_mobile_navigation_egg

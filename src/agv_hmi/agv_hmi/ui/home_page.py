@@ -14,7 +14,7 @@ from PyQt6.QtGui import QPixmap
 
 from agv_hmi.ui.i18n import tr
 
-LOGO_PATH = "/home/hiep0247/Downloads/logo_busan.png"
+LOGO_PATH = "/home/hiep0247/Downloads/TBD_logo.png"
 
 CONN_OFFLINE = "offline"
 CONN_IDLE = "idle"
@@ -175,7 +175,7 @@ class HomePage(QWidget):
             "background:transparent;"
         )
 
-        self._sub_lbl = QLabel("Busan Autonomous Robot HMI · ROS2 Jazzy")
+        self._sub_lbl = QLabel("Pacific Autonomous Robot HMI · ROS2 Jazzy")
         self._sub_lbl.setStyleSheet(
             "font-size:12px;"
             "color:#8B949E;"
@@ -248,7 +248,7 @@ class HomePage(QWidget):
                 )
                 return
 
-        self._logo_lbl.setText("BUSAN")
+        self._logo_lbl.setText("TBD")
         self._logo_lbl.setStyleSheet(
             "background:#185FA5;"
             "border-radius:12px;"

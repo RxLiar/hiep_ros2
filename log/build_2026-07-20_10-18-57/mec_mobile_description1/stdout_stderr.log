@@ -1,0 +1,25 @@
+-- Install configuration: ""
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/wheel.urdf.xacro
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/base.urdf.xacro
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/imu.urdf.xacro
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/robot.urdf.xacro
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/lidar.urdf.xacro
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_right.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/camera.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base_bckup.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/lidar.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/imu.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_bckup.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_left.stl
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch/display.launch.py
+[31mCMake Error at cmake_install.cmake:46 (file):
+  file INSTALL cannot find
+  "/home/hiep0247/hiep_ros2/src/mec_mobile_description1/rviz": No such file
+  or directory.
+
+[0m

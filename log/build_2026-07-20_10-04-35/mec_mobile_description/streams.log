@@ -1,0 +1,34 @@
+[0.032s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_description -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_description
+[0.469s] -- The C compiler identification is GNU 13.3.0
+[0.469s] -- The CXX compiler identification is GNU 13.3.0
+[0.469s] -- Detecting C compiler ABI info
+[0.513s] -- Detecting C compiler ABI info - done
+[0.523s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.523s] -- Detecting C compile features
+[0.523s] -- Detecting C compile features - done
+[0.536s] -- Detecting CXX compiler ABI info
+[0.648s] -- Detecting CXX compiler ABI info - done
+[0.655s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.655s] -- Detecting CXX compile features
+[0.656s] -- Detecting CXX compile features - done
+[0.674s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.877s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[1.047s] [31mCMake Error at CMakeLists.txt:10 (find_package):
+[1.047s]   By not providing "Findurdf_tutorial.cmake" in CMAKE_MODULE_PATH this
+[1.047s]   project has asked CMake to find a package configuration file provided by
+[1.047s]   "urdf_tutorial", but CMake did not find one.
+[1.047s] 
+[1.047s]   Could not find a package configuration file provided by "urdf_tutorial"
+[1.047s]   with any of the following names:
+[1.047s] 
+[1.048s]     urdf_tutorialConfig.cmake
+[1.048s]     urdf_tutorial-config.cmake
+[1.048s] 
+[1.048s]   Add the installation prefix of "urdf_tutorial" to CMAKE_PREFIX_PATH or set
+[1.048s]   "urdf_tutorial_DIR" to a directory containing one of the above files.  If
+[1.048s]   "urdf_tutorial" provides a separate development package or SDK, be sure it
+[1.048s]   has been installed.
+[1.048s] 
+[1.048s] [0m
+[1.048s] -- Configuring incomplete, errors occurred!
+[1.051s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_description -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_description

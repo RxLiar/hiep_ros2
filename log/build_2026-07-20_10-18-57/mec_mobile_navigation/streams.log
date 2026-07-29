@@ -1,0 +1,11 @@
+[0.352s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j7 -l7
+[0.429s] Built target ament_cmake_python_copy_mec_mobile_navigation
+[0.748s] running egg_info
+[0.751s] creating mec_mobile_navigation.egg-info
+[0.767s] writing mec_mobile_navigation.egg-info/PKG-INFO
+[0.767s] writing dependency_links to mec_mobile_navigation.egg-info/dependency_links.txt
+[0.767s] writing top-level names to mec_mobile_navigation.egg-info/top_level.txt
+[0.767s] writing manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+[0.831s] reading manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+[0.832s] writing manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+[0.858s] Built target ament_cmake_python_build_mec_mobile_navigation_egg

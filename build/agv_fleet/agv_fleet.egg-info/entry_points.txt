@@ -1,0 +1,5 @@
+[console_scripts]
+fleet_agent = agv_fleet.fleet_agent:main
+fleet_map_id = agv_fleet.map_registry:main
+fleet_server = agv_fleet.fleet_server:main
+fleet_simulator = agv_fleet.fleet_simulator:main

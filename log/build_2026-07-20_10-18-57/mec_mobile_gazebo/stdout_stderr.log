@@ -1,0 +1,26 @@
+-- Install configuration: ""
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/world.launch.py
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/spawn_robot.launch.py
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/spawn_robot_bck260518.launch.py
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world.sdf
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_bck260626.sdf
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/empty.sdf
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_1.sdf
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_v2.sdf
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/package_run_dependencies/mec_mobile_gazebo
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/parent_prefix_path/mec_mobile_gazebo
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/ament_prefix_path.sh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/ament_prefix_path.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/path.sh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/path.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.bash
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.sh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.zsh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/packages/mec_mobile_gazebo
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/cmake/mec_mobile_gazeboConfig.cmake
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/cmake/mec_mobile_gazeboConfig-version.cmake
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.xml

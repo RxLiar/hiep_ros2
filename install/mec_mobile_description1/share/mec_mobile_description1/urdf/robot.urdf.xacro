@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+
+<robot name="mec_agv"
+       xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ========================= -->
+  <!-- INCLUDE FILES -->
+  <!-- ========================= -->
+
+  <xacro:include filename="$(find mec_mobile_description1)/urdf/base.urdf.xacro"/>
+  <xacro:include filename="$(find mec_mobile_description1)/urdf/wheel.urdf.xacro"/>
+  <xacro:include filename="$(find mec_mobile_description1)/urdf/lidar.urdf.xacro"/>
+  <xacro:include filename="$(find mec_mobile_description1)/urdf/imu.urdf.xacro"/>
+
+
+   <!-- ========================= -->
+  <!-- BASE -->
+  <!-- ========================= -->
+
+  <xacro:base_link/>
+
+  
+  <!-- ========================= -->
+  <!-- BASE FOOTPRINT -->
+  <!-- ========================= -->
+
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint"
+         type="fixed">
+
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+
+      <origin xyz="0 0 0.08"
+            rpy="0 0 0"/>
+
+  </joint>
+
+ 
+
+  <!-- ========================= -->
+  <!-- DRIVE WHEELS -->
+  <!-- ========================= -->
+
+  <!-- LEFT DRIVE WHEEL -->
+  <xacro:wheel
+      wheel_name="left_drive_wheel"
+      x="0.0"
+      y="0.25"
+      z="0.0"/>
+
+  <!-- RIGHT DRIVE WHEEL -->
+  <xacro:wheel
+      wheel_name="right_drive_wheel"
+      x="0.0"
+      y="-0.25"
+      z="0.0"/>
+
+ <!-- FRONT LIDAR -->
+ <xacro:lidar_link
+    lidar_name="front_lidar"
+    x="0.82"
+    y="0.28"
+    z="0.07"
+    roll="1.57"
+    pitch="0"
+    yaw="-0.7854"/>
+
+ <!-- REAR LIDAR -->
+ <xacro:lidar_link
+    lidar_name="rear_lidar"
+    x="-0.82"
+    y="-0.28"
+    z="0.07"
+    roll="1.57"
+    pitch="0"
+    yaw="2.3562"/>
+  <!-- ========================= -->
+  <!-- IMU -->
+  <!-- ========================= -->
+
+  <xacro:imu_link
+      x="0.0"
+      y="0.0"
+      z="0.35"/>
+
+</robot>

@@ -1,0 +1,18 @@
+[0.445s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_description1 -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_description1
+[0.521s] -- The C compiler identification is GNU 13.3.0
+[0.568s] -- The CXX compiler identification is GNU 13.3.0
+[0.580s] -- Detecting C compiler ABI info
+[0.707s] -- Detecting C compiler ABI info - done
+[0.713s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.713s] -- Detecting C compile features
+[0.714s] -- Detecting C compile features - done
+[0.722s] -- Detecting CXX compiler ABI info
+[0.820s] -- Detecting CXX compiler ABI info - done
+[0.829s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.831s] -- Detecting CXX compile features
+[0.831s] -- Detecting CXX compile features - done
+[0.832s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.983s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[1.220s] -- Configuring done (0.8s)
+[1.220s] -- Generating done (0.0s)
+[1.221s] -- Build files have been written to: /home/hiep0247/hiep_ros2/build/mec_mobile_description1

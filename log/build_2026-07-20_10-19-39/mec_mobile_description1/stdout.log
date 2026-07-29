@@ -1,0 +1,38 @@
+-- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/hiep0247/hiep_ros2/build/mec_mobile_description1
+-- Install configuration: ""
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/wheel.urdf.xacro
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/base.urdf.xacro
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/imu.urdf.xacro
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/robot.urdf.xacro
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/lidar.urdf.xacro
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_right.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/camera.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base_bckup.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/lidar.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/imu.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_bckup.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_left.stl
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch
+-- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch/display.launch.py
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/package_run_dependencies/mec_mobile_description1
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/parent_prefix_path/mec_mobile_description1
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/ament_prefix_path.sh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/ament_prefix_path.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/path.sh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/path.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.bash
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.sh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.zsh
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.dsv
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/packages/mec_mobile_description1
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/cmake/mec_mobile_description1Config.cmake
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/cmake/mec_mobile_description1Config-version.cmake
+-- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.xml

@@ -1,0 +1,29 @@
+[0.348s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j7 -l7
+[0.390s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j7 -l7
+[0.399s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description1
+[0.407s] -- Install configuration: ""
+[0.407s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf
+[0.407s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/wheel.urdf.xacro
+[0.408s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/base.urdf.xacro
+[0.408s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/imu.urdf.xacro
+[0.408s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/robot.urdf.xacro
+[0.408s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/lidar.urdf.xacro
+[0.409s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes
+[0.410s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_right.stl
+[0.410s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/camera.stl
+[0.410s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base_bckup.stl
+[0.449s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/lidar.stl
+[0.449s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base.stl
+[0.495s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel.stl
+[0.495s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/imu.stl
+[0.495s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_bckup.stl
+[0.498s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_left.stl
+[0.500s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch
+[0.501s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch/display.launch.py
+[0.501s] [31mCMake Error at cmake_install.cmake:46 (file):
+[0.501s]   file INSTALL cannot find
+[0.501s]   "/home/hiep0247/hiep_ros2/src/mec_mobile_description1/rviz": No such file
+[0.501s]   or directory.
+[0.501s] 
+[0.502s] [0m
+[0.505s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description1

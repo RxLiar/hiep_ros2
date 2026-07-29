@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: agv-fleet
+Version: 0.1.0
+Summary: Fleet Agent, Fleet Server and two-computer simulation tools for AGV HMI.
+Maintainer: Busan AGV Team
+Maintainer-email: devnull@example.com
+License: Apache-2.0

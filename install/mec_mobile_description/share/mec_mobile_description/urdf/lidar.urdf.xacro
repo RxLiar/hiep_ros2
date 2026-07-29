@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:macro name="lidar_link"
+    params="lidar_name x y z roll pitch yaw">
+
+    <link name="${lidar_name}">
+        <visual>
+                      <!-- Visual xoay rieng de mesh hien thi dung -->
+            <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+            <geometry>
+                <mesh filename="file://$(find mec_mobile_description)/meshes/lidar.stl"
+                      scale="0.001 0.001 0.001"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="0.04" length="0.07"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="0.3"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0"
+                     iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
+    </link>
+
+    <joint name="${lidar_name}_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="${lidar_name}"/>
+        <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}"/>
+    </joint>
+
+    <!-- Gazebo sensor plugin -->
+    <gazebo reference="${lidar_name}">
+        <sensor name="${lidar_name}_sensor" type="gpu_lidar">
+
+            <topic>${lidar_name}/scan</topic>
+            <update_rate>20</update_rate>
+            <always_on>true</always_on>
+            <visualize>true</visualize>
+            <gz_frame_id>${lidar_name}</gz_frame_id>
+            <lidar>
+                <scan>
+                    <horizontal>
+                        <!-- Tim 320: 320 beams, 270 deg FOV -->
+                        <!-- Richbeam: dieu chinh theo spec thuc te -->
+                        <samples>320</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-2.35619</min_angle>
+                        <max_angle>2.35619</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.1</min>
+                    <max>20.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                </noise>
+            </lidar>
+
+        </sensor>
+    </gazebo>
+
+</xacro:macro>
+</robot>

@@ -1,0 +1,12 @@
+fleet_robot_simulator:
+  ros__parameters:
+    robot_id: AGV001
+    robot_name: Simulation PC 1
+    map_id: M02101
+    map_version: 1
+    center_x: 0.0
+    center_y: 0.0
+    radius: 2.0
+    angular_speed: 0.18
+    battery_start: 95
+    publish_hz: 5.0

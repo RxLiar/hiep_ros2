@@ -1,0 +1,6 @@
+source;share/agv_fleet/hook/pythonpath.ps1
+source;share/agv_fleet/hook/pythonpath.dsv
+source;share/agv_fleet/hook/pythonpath.sh
+source;share/agv_fleet/hook/ament_prefix_path.ps1
+source;share/agv_fleet/hook/ament_prefix_path.dsv
+source;share/agv_fleet/hook/ament_prefix_path.sh

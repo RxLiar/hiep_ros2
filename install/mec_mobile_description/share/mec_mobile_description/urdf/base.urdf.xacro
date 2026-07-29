@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:macro name="base_link"
+              params="">
+
+  <link name="base_link">
+
+  <visual>
+      <origin xyz="0 0 0" rpy="0 0 3.14159"/>
+      <geometry>
+          <mesh filename="file://$(find mec_mobile_description)/meshes/base.stl"
+                scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="blue_agv">
+          <color rgba="0.1 0.1 0.8 1.0"/>
+      </material>
+  </visual>
+
+    <!-- COLLISION -->
+    <collision>
+
+      <origin xyz="0 0 0.645"/>
+
+      <geometry>
+        <box size="1.8 0.7 1.45"/>
+      </geometry>
+
+    </collision>
+
+    <!-- INERTIAL -->
+    <inertial>
+    <!-- trọng tâm dồn thấp: z = 0.3m so với base_link -->
+    <!-- = khoảng 0.38m so với mặt đất, hợp lý cho AGV hàng nặng 
+      ixx = (1/12) * m * (y² + z²) = (1/12) * 450 * (0.7² + 1.45²) = (1/12) * 450 * (0.49 + 2.1025) = 97.59
+      iyy = (1/12) * m * (x² + z²) = (1/12) * 450 * (1.8² + 1.45²) = (1/12) * 450 * (3.24 + 2.1025) = 200.21
+      izz = (1/12) * m * (x² + y²) = (1/12) * 450 * (1.8² + 0.7²)  = (1/12) * 450 * (3.24 + 0.49)  = 139.87
+    -->
+    <origin xyz="0 0 0.3"/>
+    <mass value="450.0"/>
+    <inertia
+        ixx="97.59"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="200.21"
+        iyz="0.0"
+        izz="139.87"/>
+    </inertial>
+
+  </link>
+
+</xacro:macro>
+
+</robot>
