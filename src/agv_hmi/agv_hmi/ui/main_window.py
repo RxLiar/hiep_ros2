@@ -645,6 +645,14 @@ class MainWindow(QMainWindow):
         self._mapping.update_map(msg)
         if not self._nav._selected_map_path:
             self._nav.update_map(msg)
+        # Fleet phải dùng cùng metadata /map với AMCL và Nav2.
+        if hasattr(self, "_fleet"):
+            try:
+                self._fleet.update_map_info(msg)
+            except Exception as exc:
+                print(
+                    f"[MainWindow] Không chuyển được /map info sang Fleet: {exc}"
+                )
 
     def on_scan_update(self, world_pts):
         self._mapping.update_scan(world_pts)

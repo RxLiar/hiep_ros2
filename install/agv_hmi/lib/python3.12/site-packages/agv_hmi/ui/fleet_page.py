@@ -159,6 +159,7 @@ class FleetPage(QWidget):
         self._render_detail(None)
         return box
 
+    
     def update_snapshot_json(self, payload: str) -> None:
         try:
             data = json.loads(payload or "{}")

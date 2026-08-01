@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import math
-import os
 from pathlib import Path
 
 import numpy as np
@@ -28,14 +27,31 @@ class FleetMapWidget(QWidget):
         self._resolution = 0.05
         self._map_w = 0
         self._map_h = 0
+        # Metadata thực tế nhận từ topic /map.
+        # Dùng để đồng bộ hệ tọa độ Fleet với AMCL/Nav2.
+        self._runtime_origin_x: float | None = None
+        self._runtime_origin_y: float | None = None
+        self._runtime_resolution: float | None = None
+        self._runtime_map_w = 0
+        self._runtime_map_h = 0
         self._robot_screen_positions: dict[str, QPointF] = {}
 
     def set_map_id(self, map_id: str) -> None:
-        map_id = str(map_id or "")
-        if map_id == self._map_id:
+        map_id = str(map_id or "").strip()
+        # Reload when the same map was selected but no pixmap is currently
+        # available (for example, the files were copied after opening the HMI).
+        if (
+            map_id == self._map_id
+            and self._pixmap is not None
+            and not self._pixmap.isNull()
+        ):
             return
         self._map_id = map_id
         self._load_registered_map(map_id)
+        self.update()
+
+    def reload_current_map(self) -> None:
+        self._load_registered_map(self._map_id)
         self.update()
 
     def set_robots(self, robots: list[dict]) -> None:
@@ -45,6 +61,105 @@ class FleetMapWidget(QWidget):
     def set_selected_robot(self, robot_id: str) -> None:
         self._selected_robot_id = str(robot_id or "")
         self.update()
+    def set_runtime_map_info(self, msg) -> None:
+        """Nhận metadata thực tế từ nav_msgs/OccupancyGrid topic /map."""
+        try:
+            info = msg.info
+
+            width = int(info.width)
+            height = int(info.height)
+            resolution = float(info.resolution)
+            origin_x = float(info.origin.position.x)
+            origin_y = float(info.origin.position.y)
+
+            if width <= 0 or height <= 0 or resolution <= 0.0:
+                print(
+                    "[FleetMapWidget] Bỏ qua /map info không hợp lệ: "
+                    f"{width}x{height}, resolution={resolution}"
+                )
+                return
+
+            self._runtime_origin_x = origin_x
+            self._runtime_origin_y = origin_y
+            self._runtime_resolution = resolution
+            self._runtime_map_w = width
+            self._runtime_map_h = height
+
+            print(
+                "[FleetMapWidget] Runtime /map info: "
+                f"origin=({origin_x:.6f}, {origin_y:.6f}), "
+                f"size={width}x{height}, "
+                f"resolution={resolution:.9f}"
+            )
+
+            if self._map_w > 0 and self._map_h > 0:
+                geometry_matches = (
+                    width == self._map_w
+                    and height == self._map_h
+                    and math.isclose(
+                        resolution,
+                        self._resolution,
+                        rel_tol=1e-6,
+                        abs_tol=1e-9,
+                    )
+                )
+
+                if not geometry_matches:
+                    print(
+                        "[FleetMapWidget] CẢNH BÁO: /map không khớp PGM. "
+                        f"/map={width}x{height}@{resolution}, "
+                        f"PGM={self._map_w}x{self._map_h}@{self._resolution}. "
+                        "Fleet tiếp tục dùng metadata YAML."
+                    )
+
+            self.update()
+
+        except Exception as exc:
+            print(f"[FleetMapWidget] Không đọc được runtime /map info: {exc}")
+
+
+    def _coordinate_map_info(
+        self,
+    ) -> tuple[float, float, float, int, int]:
+        """Chọn metadata dùng để chuyển world coordinate sang pixel."""
+
+        runtime_ready = (
+            self._runtime_origin_x is not None
+            and self._runtime_origin_y is not None
+            and self._runtime_resolution is not None
+            and self._runtime_map_w > 0
+            and self._runtime_map_h > 0
+        )
+
+        runtime_matches_image = (
+            runtime_ready
+            and self._runtime_map_w == self._map_w
+            and self._runtime_map_h == self._map_h
+            and math.isclose(
+                float(self._runtime_resolution),
+                self._resolution,
+                rel_tol=1e-6,
+                abs_tol=1e-9,
+            )
+        )
+
+        if runtime_matches_image:
+            return (
+                float(self._runtime_origin_x),
+                float(self._runtime_origin_y),
+                float(self._runtime_resolution),
+                self._runtime_map_w,
+                self._runtime_map_h,
+            )
+
+        # Fallback khi chưa có /map hoặc /map không khớp file PGM.
+        return (
+            self._origin_x,
+            self._origin_y,
+            self._resolution,
+            self._map_w,
+            self._map_h,
+        )
 
     def load_map_file(self, yaml_path: str) -> bool:
         try:
@@ -81,10 +196,18 @@ class FleetMapWidget(QWidget):
                 QImage.Format.Format_RGB888,
             ).copy()
             self._pixmap = QPixmap.fromImage(qimg)
+            print(
+                f"[FleetMapWidget] Loaded map: {path} "
+                f"({self._map_w}x{self._map_h}, "
+                f"resolution={self._resolution})"
+            )
             self.update()
             return True
-        except Exception:
+        except Exception as exc:
+            print(f"[FleetMapWidget] Cannot load map '{yaml_path}': {exc}")
             self._pixmap = None
+            self._map_w = 0
+            self._map_h = 0
             return False
 
     def _load_registered_map(self, map_id: str) -> None:
@@ -102,23 +225,50 @@ class FleetMapWidget(QWidget):
                 return
 
     def paintEvent(self, event) -> None:
+        # PyQt6 requires targetRect and sourceRect to use the same QRect type.
+        # The old code mixed QRectF with QRect, which raised TypeError and left
+        # the QPainter active, producing repeated QBackingStore warnings.
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.fillRect(self.rect(), QColor("#0D1117"))
-        self._robot_screen_positions.clear()
+        if not painter.isActive():
+            return
 
-        if self._pixmap is not None and not self._pixmap.isNull():
-            rect = self._map_target_rect()
-            painter.drawPixmap(rect, self._pixmap, self._pixmap.rect())
-            self._draw_robots_on_map(painter, rect)
-        else:
-            self._draw_grid(painter)
-            self._draw_robots_auto_fit(painter)
+        try:
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.fillRect(self.rect(), QColor("#0D1117"))
+            self._robot_screen_positions.clear()
 
-        painter.setPen(QColor("#8B949E"))
-        painter.setFont(QFont("Sans", 10))
-        caption = self._map_id or "No map selected"
-        painter.drawText(12, 22, caption)
+            if self._pixmap is not None and not self._pixmap.isNull():
+                target_rect = self._map_target_rect()
+                source_rect = QRectF(
+                    0.0,
+                    0.0,
+                    float(self._pixmap.width()),
+                    float(self._pixmap.height()),
+                )
+                painter.drawPixmap(target_rect, self._pixmap, source_rect)
+                self._draw_robots_on_map(painter, target_rect)
+            else:
+                self._draw_grid(painter)
+                self._draw_robots_auto_fit(painter)
+
+            painter.setPen(QColor("#8B949E"))
+            painter.setFont(QFont("Sans", 10))
+            caption = self._map_id or "No map selected"
+            painter.drawText(12, 22, caption)
+        except Exception as exc:
+            # Keep the Qt paint loop alive and make the error visible instead of
+            # repeatedly crashing paintEvent.
+            print(f"[FleetMapWidget] paint error: {exc}")
+            painter.resetTransform()
+            painter.fillRect(self.rect(), QColor("#0D1117"))
+            painter.setPen(QColor("#F85149"))
+            painter.drawText(
+                self.rect(),
+                Qt.AlignmentFlag.AlignCenter,
+                f"Fleet map paint error\n{exc}",
+            )
+        finally:
+            painter.end()
 
     def _map_target_rect(self) -> QRectF:
         if self._map_w <= 0 or self._map_h <= 0:
@@ -136,12 +286,68 @@ class FleetMapWidget(QWidget):
             height,
         )
 
-    def _world_to_map_screen(self, x: float, y: float, rect: QRectF) -> QPointF:
-        mx = (x - self._origin_x) / self._resolution
-        my = self._map_h - (y - self._origin_y) / self._resolution
+    def _world_to_map_screen(
+        self,
+        x: float,
+        y: float,
+        rect: QRectF,
+    ) -> QPointF:
+        # Mặc định dùng metadata lấy từ active.yaml.
+        origin_x = self._origin_x
+        origin_y = self._origin_y
+        resolution = self._resolution
+        map_w = self._map_w
+        map_h = self._map_h
+
+        # Chỉ dùng metadata runtime nếu các biến đã tồn tại và hợp lệ.
+        runtime_origin_x = getattr(self, "_runtime_origin_x", None)
+        runtime_origin_y = getattr(self, "_runtime_origin_y", None)
+        runtime_resolution = getattr(
+            self,
+            "_runtime_resolution",
+            None,
+        )
+        runtime_map_w = getattr(self, "_runtime_map_w", 0)
+        runtime_map_h = getattr(self, "_runtime_map_h", 0)
+
+        runtime_valid = (
+            runtime_origin_x is not None
+            and runtime_origin_y is not None
+            and runtime_resolution is not None
+            and float(runtime_resolution) > 0.0
+            and int(runtime_map_w) > 0
+            and int(runtime_map_h) > 0
+            and int(runtime_map_w) == self._map_w
+            and int(runtime_map_h) == self._map_h
+            and math.isclose(
+                float(runtime_resolution),
+                float(self._resolution),
+                rel_tol=1e-6,
+                abs_tol=1e-9,
+            )
+        )
+
+        if runtime_valid:
+            origin_x = float(runtime_origin_x)
+            origin_y = float(runtime_origin_y)
+            resolution = float(runtime_resolution)
+            map_w = int(runtime_map_w)
+            map_h = int(runtime_map_h)
+
+        if resolution <= 0.0 or map_w <= 0 or map_h <= 0:
+            return rect.center()
+
+        map_x = (x - origin_x) / resolution
+        map_y = (y - origin_y) / resolution
+
+        pixel_x = map_x
+        pixel_y = map_h - map_y
+
         return QPointF(
-            rect.left() + mx / max(1, self._map_w) * rect.width(),
-            rect.top() + my / max(1, self._map_h) * rect.height(),
+            rect.left()
+            + pixel_x / map_w * rect.width(),
+            rect.top()
+            + pixel_y / map_h * rect.height(),
         )
 
     def _draw_robots_on_map(self, painter: QPainter, rect: QRectF) -> None:

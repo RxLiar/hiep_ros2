@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import math
-import os
 from pathlib import Path
 
 import numpy as np
@@ -31,11 +30,21 @@ class FleetMapWidget(QWidget):
         self._robot_screen_positions: dict[str, QPointF] = {}
 
     def set_map_id(self, map_id: str) -> None:
-        map_id = str(map_id or "")
-        if map_id == self._map_id:
+        map_id = str(map_id or "").strip()
+        # Reload when the same map was selected but no pixmap is currently
+        # available (for example, the files were copied after opening the HMI).
+        if (
+            map_id == self._map_id
+            and self._pixmap is not None
+            and not self._pixmap.isNull()
+        ):
             return
         self._map_id = map_id
         self._load_registered_map(map_id)
+        self.update()
+
+    def reload_current_map(self) -> None:
+        self._load_registered_map(self._map_id)
         self.update()
 
     def set_robots(self, robots: list[dict]) -> None:
@@ -81,10 +90,18 @@ class FleetMapWidget(QWidget):
                 QImage.Format.Format_RGB888,
             ).copy()
             self._pixmap = QPixmap.fromImage(qimg)
+            print(
+                f"[FleetMapWidget] Loaded map: {path} "
+                f"({self._map_w}x{self._map_h}, "
+                f"resolution={self._resolution})"
+            )
             self.update()
             return True
-        except Exception:
+        except Exception as exc:
+            print(f"[FleetMapWidget] Cannot load map '{yaml_path}': {exc}")
             self._pixmap = None
+            self._map_w = 0
+            self._map_h = 0
             return False
 
     def _load_registered_map(self, map_id: str) -> None:
@@ -102,23 +119,50 @@ class FleetMapWidget(QWidget):
                 return
 
     def paintEvent(self, event) -> None:
+        # PyQt6 requires targetRect and sourceRect to use the same QRect type.
+        # The old code mixed QRectF with QRect, which raised TypeError and left
+        # the QPainter active, producing repeated QBackingStore warnings.
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.fillRect(self.rect(), QColor("#0D1117"))
-        self._robot_screen_positions.clear()
+        if not painter.isActive():
+            return
 
-        if self._pixmap is not None and not self._pixmap.isNull():
-            rect = self._map_target_rect()
-            painter.drawPixmap(rect, self._pixmap, self._pixmap.rect())
-            self._draw_robots_on_map(painter, rect)
-        else:
-            self._draw_grid(painter)
-            self._draw_robots_auto_fit(painter)
+        try:
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.fillRect(self.rect(), QColor("#0D1117"))
+            self._robot_screen_positions.clear()
 
-        painter.setPen(QColor("#8B949E"))
-        painter.setFont(QFont("Sans", 10))
-        caption = self._map_id or "No map selected"
-        painter.drawText(12, 22, caption)
+            if self._pixmap is not None and not self._pixmap.isNull():
+                target_rect = self._map_target_rect()
+                source_rect = QRectF(
+                    0.0,
+                    0.0,
+                    float(self._pixmap.width()),
+                    float(self._pixmap.height()),
+                )
+                painter.drawPixmap(target_rect, self._pixmap, source_rect)
+                self._draw_robots_on_map(painter, target_rect)
+            else:
+                self._draw_grid(painter)
+                self._draw_robots_auto_fit(painter)
+
+            painter.setPen(QColor("#8B949E"))
+            painter.setFont(QFont("Sans", 10))
+            caption = self._map_id or "No map selected"
+            painter.drawText(12, 22, caption)
+        except Exception as exc:
+            # Keep the Qt paint loop alive and make the error visible instead of
+            # repeatedly crashing paintEvent.
+            print(f"[FleetMapWidget] paint error: {exc}")
+            painter.resetTransform()
+            painter.fillRect(self.rect(), QColor("#0D1117"))
+            painter.setPen(QColor("#F85149"))
+            painter.drawText(
+                self.rect(),
+                Qt.AlignmentFlag.AlignCenter,
+                f"Fleet map paint error\n{exc}",
+            )
+        finally:
+            painter.end()
 
     def _map_target_rect(self) -> QRectF:
         if self._map_w <= 0 or self._map_h <= 0:

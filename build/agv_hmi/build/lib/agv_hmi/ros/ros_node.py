@@ -466,32 +466,65 @@ class RosInterface(QObject):
 
     # ── Publishers ────────────────────────────────────────────────
 
+    def _ros_context_alive(self) -> bool:
+        if self._is_shutdown:
+            return False
+        try:
+            return bool(rclpy.ok())
+        except Exception:
+            return False
+
+    def _safe_publish(self, publisher, msg) -> bool:
+        if not self._ros_context_alive():
+            return False
+        try:
+            publisher.publish(msg)
+            return True
+        except Exception as exc:
+            # During application shutdown, Qt timers/signals may deliver one last
+            # callback after the ROS context has already been invalidated.
+            if not self._is_shutdown:
+                try:
+                    self.node.get_logger().warn(f"ROS publish failed: {exc}")
+                except Exception:
+                    pass
+            return False
+
     def publish_velocity(self, linear: float, angular: float):
+        if not self._ros_context_alive():
+            return
         t = Twist()
-        t.linear.x  = float(linear)
+        t.linear.x = float(linear)
         t.angular.z = float(angular)
-        self._cmd_pub.publish(t)
+        self._safe_publish(self._cmd_pub, t)
 
     def publish_initial_pose(self, x: float, y: float, yaw: float):
+        if not self._ros_context_alive():
+            return
         msg = PoseWithCovarianceStamped()
-        msg.header.frame_id         = "map"
-        msg.header.stamp            = self.node.get_clock().now().to_msg()
-        msg.pose.pose.position.x    = float(x)
-        msg.pose.pose.position.y    = float(y)
+        msg.header.frame_id = "map"
+        msg.header.stamp = self.node.get_clock().now().to_msg()
+        msg.pose.pose.position.x = float(x)
+        msg.pose.pose.position.y = float(y)
         msg.pose.pose.orientation.z = math.sin(yaw / 2.0)
         msg.pose.pose.orientation.w = math.cos(yaw / 2.0)
-        cov      = [0.0] * 36
-        cov[0]   = 0.25
-        cov[7]   = 0.25
-        cov[35]  = 0.0685
+        cov = [0.0] * 36
+        cov[0] = 0.25
+        cov[7] = 0.25
+        cov[35] = 0.0685
         msg.pose.covariance = cov
-        self._init_pose_pub.publish(msg)
+        self._safe_publish(self._init_pose_pub, msg)
 
     def publish_conveyor_cmd(self, payload: dict):
-        msg      = String()
+        if not self._ros_context_alive():
+            return
+        msg = String()
         msg.data = json.dumps(payload, ensure_ascii=False)
-        self._conveyor_pub.publish(msg)
-        self.node.get_logger().info(f"[HMI] /conveyor_cmd -> {msg.data}")
+        if self._safe_publish(self._conveyor_pub, msg):
+            try:
+                self.node.get_logger().info(f"[HMI] /conveyor_cmd -> {msg.data}")
+            except Exception:
+                pass
 
     def spin_once(self):
         pass  # spin thread handles everything

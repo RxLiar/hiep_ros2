@@ -1,0 +1,30 @@
+[0.838s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo -- -j7 -l7
+[1.002s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo -- -j7 -l7
+[1.005s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo
+[1.022s] -- Install configuration: ""
+[1.025s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch
+[1.026s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/world.launch.py
+[1.026s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/spawn_robot.launch.py
+[1.041s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/spawn_robot_bck260518.launch.py
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world.sdf
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_bck260626.sdf
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/empty.sdf
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_1.sdf
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_v2.sdf
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/package_run_dependencies/mec_mobile_gazebo
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/parent_prefix_path/mec_mobile_gazebo
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/ament_prefix_path.sh
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/ament_prefix_path.dsv
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/path.sh
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/environment/path.dsv
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.bash
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.sh
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.zsh
+[1.042s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/local_setup.dsv
+[1.042s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.dsv
+[1.043s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/packages/mec_mobile_gazebo
+[1.043s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/cmake/mec_mobile_gazeboConfig.cmake
+[1.043s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/cmake/mec_mobile_gazeboConfig-version.cmake
+[1.043s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.xml
+[1.043s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo
