@@ -1,0 +1,83 @@
+[0.028s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description -- -j12 -l12
+[0.443s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description -- -j12 -l12
+[0.450s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description
+[0.460s] -- Install configuration: ""
+[0.462s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes
+[0.463s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/camera.stl
+[0.463s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/lidar.stl
+[0.463s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d
+[0.463s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual
+[0.464s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual/laser_link.STL
+[0.464s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual/back_left_wheel_X3.STL
+[0.464s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual/back_right_wheel_X3.STL
+[0.464s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual/camera_link.STL
+[0.464s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual/front_left_wheel_X3.STL
+[0.464s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual/base_link_X3.STL
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d/visual/front_right_wheel_X3.STL
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/wheel.stl
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/base.stl
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/imu.stl
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/intel_realsense
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/intel_realsense/visual
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/intel_realsense/visual/d435.stl
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/rplidar
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/rplidar/rplidar_s2.stl
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/rplidar/Lidar_tim.stl
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Bản vẽ
+[0.465s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Bản vẽ/Camera.stl
+[0.466s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Bản vẽ/Imu.stl
+[0.466s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Bản vẽ/Lidar.stl
+[0.466s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Bản vẽ/Wheel_AGV.stl
+[0.466s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Bản vẽ/Base.stl
+[0.466s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Bản vẽ.zip
+[0.467s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Lidar_tim.stl
+[0.467s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Camera.stl
+[0.469s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Wheel_right.stl
+[0.469s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Imu.stl
+[0.469s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Wheel_left.stl
+[0.469s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/meshes/robot_3d_v1/Base.stl
+[0.469s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/sensors
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/sensors/lidar.urdf.xacro
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/sensors/imu.urdf.xacro
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/sensors/rgbd_camera.urdf.xacro
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/control
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/control/mec_mobile.gazebo
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/control/mec_mobile_v1.gazebo
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/mech
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/mech/robot_3d_base.urdf.xacro
+[0.470s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/mech/mecanum_wheel.urdf.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/robot.urdf.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/wheel.urdf.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/lidar.urdf.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/imu.urdf.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/materials.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/base.urdf.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/robots
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/robots/robot_3d.urdf.xacro
+[0.471s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/urdf/robots/robot_3d_agv.urdf.xacro
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/launch
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/launch/display_urdf_v1.launch.py
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/launch/robot_state_publisher.launch.py
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/launch/check_urdf.launch.py
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/rviz
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/rviz/mec_mobile_description_agv.rviz
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/rviz/rviz.rviz
+[0.472s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/rviz/mec_mobile_description.rviz
+[0.473s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/ament_index/resource_index/package_run_dependencies/mec_mobile_description
+[0.473s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/ament_index/resource_index/parent_prefix_path/mec_mobile_description
+[0.473s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/environment/ament_prefix_path.sh
+[0.473s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/environment/ament_prefix_path.dsv
+[0.473s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/environment/path.sh
+[0.473s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/environment/path.dsv
+[0.473s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/local_setup.bash
+[0.474s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/local_setup.sh
+[0.474s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/local_setup.zsh
+[0.474s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/local_setup.dsv
+[0.474s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.dsv
+[0.474s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/ament_index/resource_index/packages/mec_mobile_description
+[0.474s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/cmake/mec_mobile_descriptionConfig.cmake
+[0.474s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/cmake/mec_mobile_descriptionConfig-version.cmake
+[0.474s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.xml
+[0.475s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description

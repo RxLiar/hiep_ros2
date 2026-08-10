@@ -1,9 +1,15 @@
-"""Fleet Agent: collect one AGV's local ROS topics and publish compact state."""
+"""Fleet Agent: collect one AGV's local ROS topics and publish compact state.
+
+The active map is updated dynamically from ``/fleet/map_context``. Therefore
+``map_id`` and ``map_version`` no longer need to be fixed in the launch command.
+"""
 from __future__ import annotations
 
 import json
 import math
+import os
 import time
+from pathlib import Path
 
 import rclpy
 from action_msgs.msg import GoalStatusArray
@@ -13,7 +19,7 @@ from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy
 from std_msgs.msg import Bool, Int32, String
 
-from .protocol import RobotState, validate_map_id, validate_robot_id
+from .protocol import RobotState, make_event, validate_map_id, validate_robot_id
 
 
 def _yaw_from_quaternion(q) -> float:
@@ -44,27 +50,49 @@ class FleetAgent(Node):
 
         self.declare_parameter("robot_id", "AGV001")
         self.declare_parameter("robot_name", "Busan AGV 01")
-        self.declare_parameter("map_id", "M00001")
-        self.declare_parameter("map_version", 1)
+        # Backward-compatible optional initial map. Route context overrides it.
+        self.declare_parameter("map_id", "")
+        self.declare_parameter("map_version", 0)
         self.declare_parameter("source_namespace", "")
-        self.declare_parameter("publish_hz", 2.0)
+        self.declare_parameter("publish_hz", 5.0)
         self.declare_parameter("assume_online", True)
+        self.declare_parameter("persist_map_context", True)
 
         self.robot_id = validate_robot_id(self.get_parameter("robot_id").value)
         self.robot_name = str(self.get_parameter("robot_name").value or self.robot_id)
-        self.map_id = validate_map_id(self.get_parameter("map_id").value)
-        self.map_version = max(1, int(self.get_parameter("map_version").value))
-        self.source_namespace = str(self.get_parameter("source_namespace").value or "").strip("/")
+        initial_map_id = validate_map_id(
+            self.get_parameter("map_id").value, allow_empty=True
+        )
+        initial_map_version = int(self.get_parameter("map_version").value or 0)
+        if initial_map_id:
+            initial_map_version = max(1, initial_map_version)
+        else:
+            initial_map_version = 0
+        self.source_namespace = str(
+            self.get_parameter("source_namespace").value or ""
+        ).strip("/")
         self.assume_online = bool(self.get_parameter("assume_online").value)
+        self.persist_map_context = bool(
+            self.get_parameter("persist_map_context").value
+        )
+
+        self._context_path = (
+            Path.home()
+            / ".agv_hmi"
+            / "fleet_agent"
+            / f"{self.robot_id}_map_context.json"
+        )
 
         self.state = RobotState(
             robot_id=self.robot_id,
             robot_name=self.robot_name,
-            map_id=self.map_id,
-            map_version=self.map_version,
+            map_id=initial_map_id,
+            map_version=initial_map_version,
             connection="online" if self.assume_online else "offline",
         )
         self._sequence = 0
+        if not initial_map_id:
+            self._load_persisted_context()
 
         state_qos = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -72,8 +100,20 @@ class FleetAgent(Node):
             history=HistoryPolicy.KEEP_LAST,
             depth=10,
         )
+        context_qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=20,
+        )
         self._state_pub = self.create_publisher(String, "/fleet/robot_state", state_qos)
-        self._event_pub = self.create_publisher(String, "/fleet/events", 10)
+        self._event_pub = self.create_publisher(String, "/fleet/events", 20)
+        self._map_context_sub = self.create_subscription(
+            String,
+            "/fleet/map_context",
+            self._map_context_cb,
+            context_qos,
+        )
 
         self.create_subscription(
             PoseWithCovarianceStamped,
@@ -100,14 +140,112 @@ class FleetAgent(Node):
 
         hz = max(0.5, min(20.0, float(self.get_parameter("publish_hz").value)))
         self.create_timer(1.0 / hz, self._publish_state)
+        map_label = (
+            f"{self.state.map_id} v{self.state.map_version}"
+            if self.state.map_id
+            else "waiting for route map context"
+        )
         self.get_logger().info(
-            f"Fleet Agent started: robot={self.robot_id}, map={self.map_id} v{self.map_version}, "
+            f"Fleet Agent started: robot={self.robot_id}, map={map_label}, "
             f"source_namespace=/{self.source_namespace or '(root)'}"
         )
 
     def _topic(self, suffix: str) -> str:
         suffix = suffix.strip("/")
         return f"/{self.source_namespace}/{suffix}" if self.source_namespace else f"/{suffix}"
+
+    def _load_persisted_context(self) -> None:
+        if not self.persist_map_context or not self._context_path.is_file():
+            return
+        try:
+            data = json.loads(self._context_path.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                return
+            map_id = validate_map_id(data.get("map_id", ""), allow_empty=True)
+            if not map_id:
+                return
+            self.state.map_id = map_id
+            self.state.map_version = max(1, int(data.get("map_version", 1)))
+            self.state.map_checksum = str(data.get("map_checksum", ""))
+            self.state.map_path = str(data.get("map_path", ""))
+            self.state.route_id = str(data.get("route_id", ""))
+            self.state.route_name = str(data.get("route_name", ""))
+        except Exception as exc:
+            self.get_logger().warn(f"Cannot load persisted map context: {exc}")
+
+    def _persist_context(self, data: dict) -> None:
+        if not self.persist_map_context:
+            return
+        try:
+            self._context_path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = self._context_path.with_suffix(".tmp")
+            tmp.write_text(
+                json.dumps(data, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            os.replace(tmp, self._context_path)
+        except Exception as exc:
+            self.get_logger().warn(f"Cannot persist map context: {exc}")
+
+    def _map_context_cb(self, msg: String) -> None:
+        try:
+            data = json.loads(str(msg.data or "{}"))
+            if not isinstance(data, dict):
+                raise ValueError("map context must be a JSON object")
+
+            target_robot_id = str(
+                data.get("robot_id", data.get("target_robot_id", ""))
+            ).strip().upper()
+            if target_robot_id and target_robot_id != self.robot_id:
+                return
+
+            map_id = validate_map_id(data.get("map_id", ""))
+            map_version = max(1, int(data.get("map_version", 1)))
+            old_map = (self.state.map_id, self.state.map_version)
+
+            self.state.map_id = map_id
+            self.state.map_version = map_version
+            self.state.map_checksum = str(data.get("map_checksum", "")).strip().lower()
+            self.state.map_path = str(data.get("map_path", "")).strip()
+            self.state.route_id = str(data.get("route_id", "")).strip()
+            self.state.route_name = str(data.get("route_name", "")).strip()
+            self.state.mission_id = str(data.get("mission_id", "")).strip()
+            self.state.waypoint_current = max(
+                0, int(data.get("waypoint_current", 0) or 0)
+            )
+            self.state.waypoint_total = max(
+                0, int(data.get("waypoint_total", 0) or 0)
+            )
+
+            persisted = {
+                "robot_id": self.robot_id,
+                "map_id": self.state.map_id,
+                "map_version": self.state.map_version,
+                "map_checksum": self.state.map_checksum,
+                "map_path": self.state.map_path,
+                "route_id": self.state.route_id,
+                "route_name": self.state.route_name,
+                "updated_at": time.time(),
+            }
+            self._persist_context(persisted)
+
+            if old_map != (map_id, map_version):
+                self.get_logger().info(
+                    f"Map context updated: {map_id} v{map_version}, "
+                    f"route={self.state.route_name or self.state.route_id or '-'}"
+                )
+                event = String()
+                event.data = make_event(
+                    "map_context_updated",
+                    self.robot_id,
+                    f"Map changed to {map_id} v{map_version}",
+                    map_id=map_id,
+                    map_version=map_version,
+                    route_id=self.state.route_id,
+                )
+                self._event_pub.publish(event)
+        except Exception as exc:
+            self.get_logger().warn(f"Invalid /fleet/map_context payload: {exc}")
 
     def _pose_cb(self, msg: PoseWithCovarianceStamped) -> None:
         pose = msg.pose.pose

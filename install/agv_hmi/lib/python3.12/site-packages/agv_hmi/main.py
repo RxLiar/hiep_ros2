@@ -57,6 +57,7 @@ class Session:
         window.nav_client = self.nav_client
         window.map_saver = self.map_saver
         window.set_conveyor_cmd_callback(self.ros.publish_conveyor_cmd)
+        window.set_fleet_map_context_callback(self.ros.publish_fleet_map_context)
 
         ros = self.ros
         _safe_connect(ros, "pose_signal", window.on_pose_update)

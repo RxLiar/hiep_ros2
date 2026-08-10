@@ -1,21 +1,15 @@
-"""
-route_manager.py — Quản lý lộ trình lưu trữ JSON
+"""Route storage with Fleet map context.
 
-Mỗi route:
-{
-  "id": "uuid4",
-  "name": "Khu A → Kho B",
-  "map_path": "/home/.../maps/floor1.yaml",
-  "waypoints": [
-    {"label": "1", "x": 1.2, "y": 3.4, "action": "Không có", "delay": 3,
-     "conveyor_id": null, "conveyor_mode": null}
-  ],
-  "created": "2025-01-01T00:00:00",
-  "modified": "2025-01-01T00:00:00"
-}
+Backward compatible with legacy routes that only contain ``map_path``.
+New/updated routes also store ``map_id``, ``map_version`` and
+``map_checksum`` so Fleet Agent can change maps automatically when a route is
+started.
 """
+from __future__ import annotations
+
 import json
 import os
+import tempfile
 import uuid
 from datetime import datetime
 from typing import Optional
@@ -40,38 +34,116 @@ def load_all() -> list[dict]:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         return data if isinstance(data, list) else []
-    except Exception:
+    except Exception as exc:
+        print(f"[RouteManager] load failed: {exc}")
         return []
 
 
 def save_all(routes: list[dict]):
-    with open(_routes_file(), "w", encoding="utf-8") as f:
-        json.dump(routes, f, ensure_ascii=False, indent=2)
+    path = _routes_file()
+    directory = os.path.dirname(path)
+    os.makedirs(directory, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(prefix="routes_", suffix=".json", dir=directory)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(routes, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, path)
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
-def create_route(name: str, map_path: str = "", waypoints: Optional[list] = None) -> dict:
+def _apply_map_context(
+    route: dict,
+    *,
+    map_path: str,
+    map_id: str = "",
+    map_version: int = 1,
+    map_checksum: str = "",
+) -> None:
+    route["map_path"] = str(map_path or "")
+    route["map_id"] = str(map_id or "").strip().upper()
+    route["map_version"] = max(1, int(map_version or 1)) if route["map_id"] else 0
+    route["map_checksum"] = str(map_checksum or "").strip().lower()
+
+
+def create_route(
+    name: str,
+    map_path: str = "",
+    waypoints: Optional[list] = None,
+    map_id: str = "",
+    map_version: int = 1,
+    map_checksum: str = "",
+) -> dict:
     route = {
         "id": str(uuid.uuid4()),
         "name": name,
-        "map_path": map_path,
         "waypoints": waypoints or [],
         "created": _now(),
         "modified": _now(),
     }
+    _apply_map_context(
+        route,
+        map_path=map_path,
+        map_id=map_id,
+        map_version=map_version,
+        map_checksum=map_checksum,
+    )
     routes = load_all()
     routes.append(route)
     save_all(routes)
     return route
 
 
-def update_route(route_id: str, name: str, map_path: str, waypoints: list) -> bool:
+def update_route(
+    route_id: str,
+    name: str,
+    map_path: str,
+    waypoints: list,
+    map_id: str = "",
+    map_version: int = 1,
+    map_checksum: str = "",
+) -> bool:
     routes = load_all()
-    for r in routes:
-        if r["id"] == route_id:
-            r["name"] = name
-            r["map_path"] = map_path
-            r["waypoints"] = waypoints
-            r["modified"] = _now()
+    for route in routes:
+        if route.get("id") == route_id:
+            route["name"] = name
+            route["waypoints"] = waypoints
+            _apply_map_context(
+                route,
+                map_path=map_path,
+                map_id=map_id,
+                map_version=map_version,
+                map_checksum=map_checksum,
+            )
+            route["modified"] = _now()
+            save_all(routes)
+            return True
+    return False
+
+
+def attach_map_context(
+    route_id: str,
+    *,
+    map_id: str,
+    map_version: int,
+    map_path: str,
+    map_checksum: str = "",
+) -> bool:
+    """Migrate a legacy route or refresh its canonical Fleet map fields."""
+    routes = load_all()
+    for route in routes:
+        if route.get("id") == route_id:
+            _apply_map_context(
+                route,
+                map_path=map_path,
+                map_id=map_id,
+                map_version=map_version,
+                map_checksum=map_checksum,
+            )
+            route["modified"] = _now()
             save_all(routes)
             return True
     return False
@@ -79,7 +151,7 @@ def update_route(route_id: str, name: str, map_path: str, waypoints: list) -> bo
 
 def delete_route(route_id: str) -> bool:
     routes = load_all()
-    new = [r for r in routes if r["id"] != route_id]
+    new = [route for route in routes if route.get("id") != route_id]
     if len(new) == len(routes):
         return False
     save_all(new)
@@ -87,16 +159,21 @@ def delete_route(route_id: str) -> bool:
 
 
 def get_route(route_id: str) -> Optional[dict]:
-    for r in load_all():
-        if r["id"] == route_id:
-            return r
+    for route in load_all():
+        if route.get("id") == route_id:
+            return route
     return None
 
 
-def make_waypoint(label: str, x: float, y: float,
-                  action: str = "Không có", delay: int = 3,
-                  conveyor_id: Optional[int] = None,
-                  conveyor_mode: Optional[str] = None) -> dict:
+def make_waypoint(
+    label: str,
+    x: float,
+    y: float,
+    action: str = "Không có",
+    delay: int = 3,
+    conveyor_id: Optional[int] = None,
+    conveyor_mode: Optional[str] = None,
+) -> dict:
     return {
         "label": label,
         "x": x,

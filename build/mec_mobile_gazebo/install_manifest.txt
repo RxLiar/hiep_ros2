@@ -1,10 +1,13 @@
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/world.launch.py
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/spawn_robot.launch.py
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/launch/spawn_robot_bck260518.launch.py
-/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world.sdf
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_bck260626.sdf
-/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/empty.sdf
+/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world.sdf
+/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/5_room_v1.sdf
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_1.sdf
+/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/empty.sdf
+/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_v0.sdf
+/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_v3.sdf
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/worlds/world_v2.sdf
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/package_run_dependencies/mec_mobile_gazebo
 /home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/ament_index/resource_index/parent_prefix_path/mec_mobile_gazebo

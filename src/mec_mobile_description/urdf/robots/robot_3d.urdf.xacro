@@ -34,11 +34,11 @@
       x_reflect="-1"
       y_reflect="1"/>
 
-    <xacro:mecanum_wheel
+   <!-- <xacro:mecanum_wheel
       prefix="$(arg prefix)"
       side="back_right"
       x_reflect="-1"
-      y_reflect="-1"/>
+      y_reflect="-1"/> -->
 
     <xacro:rgbd_camera
       prefix="$(arg prefix)"

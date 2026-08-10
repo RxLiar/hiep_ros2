@@ -23,7 +23,7 @@ class _TrackedRobot:
 class FleetServer(Node):
     def __init__(self) -> None:
         super().__init__("fleet_server")
-        self.declare_parameter("snapshot_hz", 2.0)
+        self.declare_parameter("snapshot_hz", 5.0)
         self.declare_parameter("warning_timeout_sec", 1.5)
         self.declare_parameter("offline_timeout_sec", 3.0)
 
@@ -72,8 +72,13 @@ class FleetServer(Node):
             last_health=previous.last_health if previous else "online",
         )
         if previous is None:
+            map_label = (
+                f"{state.map_id} v{state.map_version}"
+                if state.map_id
+                else "no map assigned"
+            )
             self.get_logger().info(
-                f"Robot discovered: {state.robot_id} on {state.map_id} v{state.map_version}"
+                f"Robot discovered: {state.robot_id} on {map_label}"
             )
             self._publish_event("robot_discovered", state.robot_id, "Robot connected to fleet")
 
@@ -132,7 +137,7 @@ class FleetServer(Node):
             "schema": "agv_fleet_snapshot_v1",
             "server_time": time.time(),
             "summary": summary,
-            "maps": sorted({robot["map_id"] for robot in robots}),
+            "maps": sorted({robot["map_id"] for robot in robots if robot.get("map_id")}),
             "robots": robots,
         }
         msg = String()

@@ -1,0 +1,618 @@
+[0.075s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.075s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=12, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x70e119a959d0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x70e11ab02240>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x70e11ab02240>>, mixin_verb=('build',))
+[0.098s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.098s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.098s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.098s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.098s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.098s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.098s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/hiep0247/hiep_ros2'
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.099s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(build_backup) by extensions ['ignore', 'ignore_ament_install']
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(build_backup) by extension 'ignore'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(build_backup) ignored
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.115s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extensions ['ignore', 'ignore_ament_install']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extension 'ignore'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extension 'ignore_ament_install'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extensions ['colcon_pkg']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extension 'colcon_pkg'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extensions ['colcon_meta']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extension 'colcon_meta'
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extensions ['ros']
+[0.116s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_fleet) by extension 'ros'
+[0.117s] DEBUG:colcon.colcon_core.package_identification:Package 'src/agv_fleet' with type 'ros.ament_python' and name 'agv_fleet'
+[0.117s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extensions ['ignore', 'ignore_ament_install']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extension 'ignore'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extension 'ignore_ament_install'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extensions ['colcon_pkg']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extension 'colcon_pkg'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extensions ['colcon_meta']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extension 'colcon_meta'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extensions ['ros']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/agv_hmi) by extension 'ros'
+[0.118s] DEBUG:colcon.colcon_core.package_identification:Package 'src/agv_hmi' with type 'ros.ament_python' and name 'agv_hmi'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extensions ['ignore', 'ignore_ament_install']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extension 'ignore'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extension 'ignore_ament_install'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extensions ['colcon_pkg']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extension 'colcon_pkg'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extensions ['colcon_meta']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extension 'colcon_meta'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extensions ['ros']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(src/hiep_robot2) by extension 'ros'
+[0.119s] DEBUG:colcon.colcon_core.package_identification:Package 'src/hiep_robot2' with type 'ros.ament_python' and name 'hiep_robot2'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extensions ['ignore', 'ignore_ament_install']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extension 'ignore'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extension 'ignore_ament_install'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extensions ['colcon_pkg']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extension 'colcon_pkg'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extensions ['colcon_meta']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extension 'colcon_meta'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extensions ['ros']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile) by extension 'ros'
+[0.119s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mec_mobile' with type 'ros.ament_cmake' and name 'mec_mobile'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extensions ['ignore', 'ignore_ament_install']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extension 'ignore'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extension 'ignore_ament_install'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extensions ['colcon_pkg']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extension 'colcon_pkg'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extensions ['colcon_meta']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extension 'colcon_meta'
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extensions ['ros']
+[0.119s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description) by extension 'ros'
+[0.120s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mec_mobile_description' with type 'ros.ament_cmake' and name 'mec_mobile_description'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extensions ['ignore', 'ignore_ament_install']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extension 'ignore'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extension 'ignore_ament_install'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extensions ['colcon_pkg']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extension 'colcon_pkg'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extensions ['colcon_meta']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extension 'colcon_meta'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extensions ['ros']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_description1) by extension 'ros'
+[0.120s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mec_mobile_description1' with type 'ros.ament_cmake' and name 'mec_mobile_description1'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extensions ['ignore', 'ignore_ament_install']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extension 'ignore'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extension 'ignore_ament_install'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extensions ['colcon_pkg']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extension 'colcon_pkg'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extensions ['colcon_meta']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extension 'colcon_meta'
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extensions ['ros']
+[0.120s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_gazebo) by extension 'ros'
+[0.121s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mec_mobile_gazebo' with type 'ros.ament_cmake' and name 'mec_mobile_gazebo'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extensions ['ignore', 'ignore_ament_install']
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extension 'ignore'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extension 'ignore_ament_install'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extensions ['colcon_pkg']
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extension 'colcon_pkg'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extensions ['colcon_meta']
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extension 'colcon_meta'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extensions ['ros']
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/mec_mobile_navigation) by extension 'ros'
+[0.121s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mec_mobile_navigation' with type 'ros.ament_cmake' and name 'mec_mobile_navigation'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extensions ['ignore', 'ignore_ament_install']
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extension 'ignore'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extension 'ignore_ament_install'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extensions ['colcon_pkg']
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extension 'colcon_pkg'
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extensions ['colcon_meta']
+[0.121s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extension 'colcon_meta'
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extensions ['ros']
+[0.122s] Level 1:colcon.colcon_core.package_identification:_identify(src/sllidar_ros2) by extension 'ros'
+[0.122s] DEBUG:colcon.colcon_core.package_identification:Package 'src/sllidar_ros2' with type 'ros.ament_cmake' and name 'sllidar_ros2'
+[0.122s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.122s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.122s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.122s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.122s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.134s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.138s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 9 installed packages in /home/hiep0247/hiep_ros2/install
+[0.138s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 1 installed packages in /home/hiep0247/ros2_ws/install
+[0.139s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 433 installed packages in /opt/ros/jazzy
+[0.140s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'cmake_args' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'cmake_target' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'cmake_clean_cache' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'cmake_clean_first' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'cmake_force_configure' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'ament_cmake_args' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'catkin_cmake_args' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_fleet' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.174s] DEBUG:colcon.colcon_core.verb:Building package 'agv_fleet' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/agv_fleet', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/agv_fleet', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/agv_fleet', 'symlink_install': False, 'test_result_base': None}
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'cmake_args' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'cmake_target' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'cmake_clean_cache' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'cmake_clean_first' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'cmake_force_configure' from command line to 'False'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'ament_cmake_args' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'catkin_cmake_args' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'agv_hmi' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.174s] DEBUG:colcon.colcon_core.verb:Building package 'agv_hmi' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/agv_hmi', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/agv_hmi', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/agv_hmi', 'symlink_install': False, 'test_result_base': None}
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'cmake_args' from command line to 'None'
+[0.174s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'cmake_target' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'cmake_clean_cache' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'cmake_clean_first' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'cmake_force_configure' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'ament_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'catkin_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'hiep_robot2' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.175s] DEBUG:colcon.colcon_core.verb:Building package 'hiep_robot2' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/hiep_robot2', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/hiep_robot2', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/hiep_robot2', 'symlink_install': False, 'test_result_base': None}
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'cmake_target' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'cmake_clean_cache' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'cmake_clean_first' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'cmake_force_configure' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'ament_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'catkin_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.175s] DEBUG:colcon.colcon_core.verb:Building package 'mec_mobile_description' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/mec_mobile_description', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/mec_mobile_description', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/mec_mobile_description', 'symlink_install': False, 'test_result_base': None}
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'cmake_target' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'cmake_clean_cache' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'cmake_clean_first' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'cmake_force_configure' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'ament_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'catkin_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_description1' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.175s] DEBUG:colcon.colcon_core.verb:Building package 'mec_mobile_description1' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/mec_mobile_description1', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/mec_mobile_description1', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/mec_mobile_description1', 'symlink_install': False, 'test_result_base': None}
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'cmake_target' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'cmake_clean_cache' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'cmake_clean_first' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'cmake_force_configure' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'ament_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'catkin_cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_gazebo' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.175s] DEBUG:colcon.colcon_core.verb:Building package 'mec_mobile_gazebo' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/mec_mobile_gazebo', 'symlink_install': False, 'test_result_base': None}
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'cmake_args' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'cmake_target' from command line to 'None'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'cmake_clean_cache' from command line to 'False'
+[0.175s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'cmake_clean_first' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'cmake_force_configure' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'ament_cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'catkin_cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile_navigation' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.176s] DEBUG:colcon.colcon_core.verb:Building package 'mec_mobile_navigation' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/mec_mobile_navigation', 'symlink_install': False, 'test_result_base': None}
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'cmake_target' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'cmake_clean_cache' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'cmake_clean_first' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'cmake_force_configure' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'ament_cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'catkin_cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'sllidar_ros2' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.176s] DEBUG:colcon.colcon_core.verb:Building package 'sllidar_ros2' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/sllidar_ros2', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/sllidar_ros2', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/sllidar_ros2', 'symlink_install': False, 'test_result_base': None}
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'cmake_target' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'cmake_clean_cache' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'cmake_clean_first' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'cmake_force_configure' from command line to 'False'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'ament_cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'catkin_cmake_args' from command line to 'None'
+[0.176s] Level 5:colcon.colcon_core.verb:set package 'mec_mobile' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.176s] DEBUG:colcon.colcon_core.verb:Building package 'mec_mobile' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/hiep0247/hiep_ros2/build/mec_mobile', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/hiep0247/hiep_ros2/install/mec_mobile', 'merge_install': False, 'path': '/home/hiep0247/hiep_ros2/src/mec_mobile', 'symlink_install': False, 'test_result_base': None}
+[0.176s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.177s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.177s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/mec_mobile_description' with build type 'ament_cmake'
+[0.177s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/hiep0247/hiep_ros2/src/mec_mobile_description'
+[0.179s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.179s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.179s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.182s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/agv_fleet' with build type 'ament_python'
+[0.182s] Level 1:colcon.colcon_core.shell:create_environment_hook('agv_fleet', 'ament_prefix_path')
+[0.182s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/hook/ament_prefix_path.ps1'
+[0.183s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/hook/ament_prefix_path.dsv'
+[0.183s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/hook/ament_prefix_path.sh'
+[0.184s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.184s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.186s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/agv_hmi' with build type 'ament_python'
+[0.186s] Level 1:colcon.colcon_core.shell:create_environment_hook('agv_hmi', 'ament_prefix_path')
+[0.186s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/hook/ament_prefix_path.ps1'
+[0.187s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/hook/ament_prefix_path.dsv'
+[0.187s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/hook/ament_prefix_path.sh'
+[0.187s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.187s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.189s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/hiep_robot2' with build type 'ament_python'
+[0.189s] Level 1:colcon.colcon_core.shell:create_environment_hook('hiep_robot2', 'ament_prefix_path')
+[0.190s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/hook/ament_prefix_path.ps1'
+[0.190s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/hook/ament_prefix_path.dsv'
+[0.190s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/hook/ament_prefix_path.sh'
+[0.190s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.190s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.192s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/mec_mobile_description1' with build type 'ament_cmake'
+[0.193s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/hiep0247/hiep_ros2/src/mec_mobile_description1'
+[0.193s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.193s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.195s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/mec_mobile_gazebo' with build type 'ament_cmake'
+[0.195s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/hiep0247/hiep_ros2/src/mec_mobile_gazebo'
+[0.195s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.195s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.197s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/mec_mobile_navigation' with build type 'ament_cmake'
+[0.197s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/hiep0247/hiep_ros2/src/mec_mobile_navigation'
+[0.198s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.198s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.200s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/sllidar_ros2' with build type 'ament_cmake'
+[0.200s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/hiep0247/hiep_ros2/src/sllidar_ros2'
+[0.200s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.200s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.205s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description -- -j12 -l12
+[0.338s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/hiep0247/hiep_ros2/src/agv_fleet'
+[0.338s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.338s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.464s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/hiep0247/hiep_ros2/src/agv_hmi'
+[0.464s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.464s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.594s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/hiep0247/hiep_ros2/src/hiep_robot2'
+[0.595s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.595s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.599s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j12 -l12
+[0.600s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo -- -j12 -l12
+[0.601s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j12 -l12
+[0.603s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/sllidar_ros2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/sllidar_ros2 -- -j12 -l12
+[0.616s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description -- -j12 -l12
+[0.622s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description
+[0.642s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_description)
+[0.643s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j12 -l12
+[0.644s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description1
+[0.644s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description
+[0.650s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description' for CMake module files
+[0.651s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description' for CMake config files
+[0.651s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_description', 'cmake_prefix_path')
+[0.651s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/hook/cmake_prefix_path.ps1'
+[0.651s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/hook/cmake_prefix_path.dsv'
+[0.652s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/hook/cmake_prefix_path.sh'
+[0.652s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/bin'
+[0.653s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/lib/pkgconfig/mec_mobile_description.pc'
+[0.653s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/lib/python3.12/site-packages'
+[0.653s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/bin'
+[0.654s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.ps1'
+[0.655s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.dsv'
+[0.655s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.sh'
+[0.656s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.bash'
+[0.657s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.zsh'
+[0.658s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/colcon-core/packages/mec_mobile_description)
+[0.659s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_description)
+[0.659s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description' for CMake module files
+[0.659s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description' for CMake config files
+[0.660s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_description', 'cmake_prefix_path')
+[0.660s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/hook/cmake_prefix_path.ps1'
+[0.660s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/hook/cmake_prefix_path.dsv'
+[0.661s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/hook/cmake_prefix_path.sh'
+[0.661s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/bin'
+[0.662s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/lib/pkgconfig/mec_mobile_description.pc'
+[0.662s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/lib/python3.12/site-packages'
+[0.662s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description/bin'
+[0.662s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.ps1'
+[0.663s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.dsv'
+[0.663s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.sh'
+[0.664s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.bash'
+[0.664s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/mec_mobile_description/package.zsh'
+[0.664s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_description/share/colcon-core/packages/mec_mobile_description)
+[0.665s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/hiep0247/hiep_ros2/src/mec_mobile' with build type 'ament_cmake'
+[0.665s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/hiep0247/hiep_ros2/src/mec_mobile'
+[0.665s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.665s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.671s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo -- -j12 -l12
+[0.673s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo
+[0.673s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_description1)
+[0.673s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1' for CMake module files
+[0.674s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description1
+[0.674s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1' for CMake config files
+[0.674s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_description1', 'cmake_prefix_path')
+[0.675s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/hook/cmake_prefix_path.ps1'
+[0.675s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/hook/cmake_prefix_path.dsv'
+[0.675s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/hook/cmake_prefix_path.sh'
+[0.675s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/bin'
+[0.676s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/lib/pkgconfig/mec_mobile_description1.pc'
+[0.676s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/lib/python3.12/site-packages'
+[0.676s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/bin'
+[0.676s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.ps1'
+[0.676s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.dsv'
+[0.677s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.sh'
+[0.677s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.bash'
+[0.677s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.zsh'
+[0.678s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/colcon-core/packages/mec_mobile_description1)
+[0.678s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_description1)
+[0.678s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1' for CMake module files
+[0.679s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1' for CMake config files
+[0.679s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_description1', 'cmake_prefix_path')
+[0.679s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/hook/cmake_prefix_path.ps1'
+[0.680s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/hook/cmake_prefix_path.dsv'
+[0.680s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/hook/cmake_prefix_path.sh'
+[0.680s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/bin'
+[0.680s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/lib/pkgconfig/mec_mobile_description1.pc'
+[0.681s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/lib/python3.12/site-packages'
+[0.681s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/bin'
+[0.681s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.ps1'
+[0.682s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.dsv'
+[0.682s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.sh'
+[0.682s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.bash'
+[0.683s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.zsh'
+[0.683s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/colcon-core/packages/mec_mobile_description1)
+[0.686s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_gazebo)
+[0.686s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo' for CMake module files
+[0.688s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo
+[0.688s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo' for CMake config files
+[0.688s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_gazebo', 'cmake_prefix_path')
+[0.688s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/hook/cmake_prefix_path.ps1'
+[0.688s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/hook/cmake_prefix_path.dsv'
+[0.689s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/hook/cmake_prefix_path.sh'
+[0.689s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/bin'
+[0.689s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/lib/pkgconfig/mec_mobile_gazebo.pc'
+[0.689s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/lib/python3.12/site-packages'
+[0.689s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/bin'
+[0.689s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.ps1'
+[0.690s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.dsv'
+[0.690s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.sh'
+[0.690s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.bash'
+[0.690s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.zsh'
+[0.691s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/colcon-core/packages/mec_mobile_gazebo)
+[0.691s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_gazebo)
+[0.691s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo' for CMake module files
+[0.691s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo' for CMake config files
+[0.691s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_gazebo', 'cmake_prefix_path')
+[0.691s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/hook/cmake_prefix_path.ps1'
+[0.692s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/hook/cmake_prefix_path.dsv'
+[0.692s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/hook/cmake_prefix_path.sh'
+[0.692s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/bin'
+[0.692s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/lib/pkgconfig/mec_mobile_gazebo.pc'
+[0.692s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/lib/python3.12/site-packages'
+[0.692s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/bin'
+[0.693s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.ps1'
+[0.693s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.dsv'
+[0.693s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.sh'
+[0.693s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.bash'
+[0.694s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/mec_mobile_gazebo/package.zsh'
+[0.694s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo/share/colcon-core/packages/mec_mobile_gazebo)
+[0.696s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile': CMAKE_PREFIX_PATH=/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/sllidar_ros2:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation:/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile:/home/hiep0247/ros2_ws/install/sllidar_ros2:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile -- -j12 -l12
+[0.696s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/sllidar_ros2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/sllidar_ros2 -- -j12 -l12
+[0.697s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/sllidar_ros2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/sllidar_ros2
+[0.706s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(sllidar_ros2)
+[0.706s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2' for CMake module files
+[0.706s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/sllidar_ros2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/sllidar_ros2
+[0.707s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2' for CMake config files
+[0.707s] Level 1:colcon.colcon_core.shell:create_environment_hook('sllidar_ros2', 'cmake_prefix_path')
+[0.707s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/hook/cmake_prefix_path.ps1'
+[0.707s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/hook/cmake_prefix_path.dsv'
+[0.707s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/hook/cmake_prefix_path.sh'
+[0.708s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/lib'
+[0.708s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/bin'
+[0.708s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/lib/pkgconfig/sllidar_ros2.pc'
+[0.708s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/lib/python3.12/site-packages'
+[0.708s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/bin'
+[0.708s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.ps1'
+[0.709s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.dsv'
+[0.709s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.sh'
+[0.709s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.bash'
+[0.710s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.zsh'
+[0.710s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/colcon-core/packages/sllidar_ros2)
+[0.710s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(sllidar_ros2)
+[0.710s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2' for CMake module files
+[0.711s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2' for CMake config files
+[0.711s] Level 1:colcon.colcon_core.shell:create_environment_hook('sllidar_ros2', 'cmake_prefix_path')
+[0.711s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/hook/cmake_prefix_path.ps1'
+[0.711s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/hook/cmake_prefix_path.dsv'
+[0.711s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/hook/cmake_prefix_path.sh'
+[0.712s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/lib'
+[0.712s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/bin'
+[0.712s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/lib/pkgconfig/sllidar_ros2.pc'
+[0.712s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/lib/python3.12/site-packages'
+[0.712s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/sllidar_ros2/bin'
+[0.712s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.ps1'
+[0.713s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.dsv'
+[0.713s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.sh'
+[0.713s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.bash'
+[0.713s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/sllidar_ros2/package.zsh'
+[0.713s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/sllidar_ros2/share/colcon-core/packages/sllidar_ros2)
+[0.722s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile' returned '0': CMAKE_PREFIX_PATH=/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/sllidar_ros2:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation:/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile:/home/hiep0247/ros2_ws/install/sllidar_ros2:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile -- -j12 -l12
+[0.723s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile': CMAKE_PREFIX_PATH=/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/sllidar_ros2:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation:/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile:/home/hiep0247/ros2_ws/install/sllidar_ros2:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile
+[0.729s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile)
+[0.729s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile' for CMake module files
+[0.729s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile' returned '0': CMAKE_PREFIX_PATH=/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/sllidar_ros2:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation:/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile:/home/hiep0247/ros2_ws/install/sllidar_ros2:/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile
+[0.729s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile' for CMake config files
+[0.729s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile', 'cmake_prefix_path')
+[0.729s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/hook/cmake_prefix_path.ps1'
+[0.730s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/hook/cmake_prefix_path.dsv'
+[0.730s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/hook/cmake_prefix_path.sh'
+[0.730s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/bin'
+[0.730s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/lib/pkgconfig/mec_mobile.pc'
+[0.730s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/lib/python3.12/site-packages'
+[0.731s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/bin'
+[0.731s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.ps1'
+[0.731s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.dsv'
+[0.731s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.sh'
+[0.732s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.bash'
+[0.732s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.zsh'
+[0.732s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile/share/colcon-core/packages/mec_mobile)
+[0.732s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile)
+[0.732s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile' for CMake module files
+[0.732s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile' for CMake config files
+[0.733s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile', 'cmake_prefix_path')
+[0.733s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/hook/cmake_prefix_path.ps1'
+[0.733s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/hook/cmake_prefix_path.dsv'
+[0.733s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/hook/cmake_prefix_path.sh'
+[0.734s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/bin'
+[0.734s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/lib/pkgconfig/mec_mobile.pc'
+[0.734s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/lib/python3.12/site-packages'
+[0.734s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile/bin'
+[0.734s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.ps1'
+[0.734s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.dsv'
+[0.735s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.sh'
+[0.735s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.bash'
+[0.735s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile/share/mec_mobile/package.zsh'
+[0.735s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile/share/colcon-core/packages/mec_mobile)
+[0.907s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j12 -l12
+[0.909s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_navigation
+[0.945s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_navigation)
+[0.945s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation' for CMake module files
+[0.945s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_navigation
+[0.945s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation' for CMake config files
+[0.945s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_navigation', 'cmake_prefix_path')
+[0.945s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/cmake_prefix_path.ps1'
+[0.946s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/cmake_prefix_path.dsv'
+[0.946s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/cmake_prefix_path.sh'
+[0.946s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib'
+[0.946s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/bin'
+[0.946s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/pkgconfig/mec_mobile_navigation.pc'
+[0.947s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages'
+[0.947s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_navigation', 'pythonpath')
+[0.947s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/pythonpath.ps1'
+[0.947s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/pythonpath.dsv'
+[0.947s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/pythonpath.sh'
+[0.948s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/bin'
+[0.948s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.ps1'
+[0.948s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.dsv'
+[0.948s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.sh'
+[0.949s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.bash'
+[0.949s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.zsh'
+[0.949s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/colcon-core/packages/mec_mobile_navigation)
+[0.949s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mec_mobile_navigation)
+[0.949s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation' for CMake module files
+[0.950s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation' for CMake config files
+[0.950s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_navigation', 'cmake_prefix_path')
+[0.950s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/cmake_prefix_path.ps1'
+[0.950s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/cmake_prefix_path.dsv'
+[0.950s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/cmake_prefix_path.sh'
+[0.951s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib'
+[0.951s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/bin'
+[0.951s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/pkgconfig/mec_mobile_navigation.pc'
+[0.951s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages'
+[0.951s] Level 1:colcon.colcon_core.shell:create_environment_hook('mec_mobile_navigation', 'pythonpath')
+[0.951s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/pythonpath.ps1'
+[0.951s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/pythonpath.dsv'
+[0.951s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/hook/pythonpath.sh'
+[0.952s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/bin'
+[0.952s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.ps1'
+[0.952s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.dsv'
+[0.953s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.sh'
+[0.953s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.bash'
+[0.953s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.zsh'
+[0.954s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/colcon-core/packages/mec_mobile_navigation)
+[1.174s] DEBUG:colcon.colcon_core.task.python.build:Available setuptools commands: build_scripts, saveopts, develop, build_clib, init_catalog, bdist, build, bdist_rpm, install_data, editable_wheel, egg_info, upload_docs, symlink_data, install, install_headers, sdist, clean, bdist_wheel, test, upload, compile_catalog, bdist_dumb, install_egg_info, install_lib, easy_install, register, extract_messages, bdist_egg, update_catalog, build_ext, install_scripts, check, setopt, alias, rotate, build_py, dist_info
+[1.176s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/src/agv_fleet': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet/install.log --install-scripts $base/lib/agv_fleet --single-version-externally-managed install_data
+[1.176s] DEBUG:colcon.colcon_core.task.python.build:Available setuptools commands: build_scripts, saveopts, develop, build_clib, init_catalog, bdist, build, bdist_rpm, install_data, editable_wheel, egg_info, upload_docs, symlink_data, install, install_headers, sdist, clean, bdist_wheel, test, upload, compile_catalog, bdist_dumb, install_egg_info, install_lib, easy_install, register, extract_messages, bdist_egg, update_catalog, build_ext, install_scripts, check, setopt, alias, rotate, build_py, dist_info
+[1.177s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/src/agv_hmi': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_hmi/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_hmi build --build-base /home/hiep0247/hiep_ros2/build/agv_hmi/build install --record /home/hiep0247/hiep_ros2/build/agv_hmi/install.log --install-scripts $base/lib/agv_hmi --single-version-externally-managed install_data
+[1.178s] DEBUG:colcon.colcon_core.task.python.build:Available setuptools commands: build_scripts, saveopts, develop, build_clib, init_catalog, bdist, build, bdist_rpm, install_data, editable_wheel, egg_info, upload_docs, symlink_data, install, install_headers, sdist, clean, bdist_wheel, test, upload, compile_catalog, bdist_dumb, install_egg_info, install_lib, easy_install, register, extract_messages, bdist_egg, update_catalog, build_ext, install_scripts, check, setopt, alias, rotate, build_py, dist_info
+[1.180s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/hiep0247/hiep_ros2/src/hiep_robot2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --install-scripts $base/lib/hiep_robot2 --single-version-externally-managed install_data
+[1.503s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_fleet' for CMake module files
+[1.504s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/src/agv_fleet' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet/install.log --install-scripts $base/lib/agv_fleet --single-version-externally-managed install_data
+[1.504s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_fleet' for CMake config files
+[1.504s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_fleet/lib'
+[1.504s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_fleet/bin'
+[1.504s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_fleet/lib/pkgconfig/agv_fleet.pc'
+[1.504s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages'
+[1.505s] Level 1:colcon.colcon_core.shell:create_environment_hook('agv_fleet', 'pythonpath')
+[1.505s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/hook/pythonpath.ps1'
+[1.505s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/hook/pythonpath.dsv'
+[1.505s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/hook/pythonpath.sh'
+[1.506s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_fleet/bin'
+[1.506s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(agv_fleet)
+[1.506s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/package.ps1'
+[1.506s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/package.dsv'
+[1.506s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/package.sh'
+[1.507s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/package.bash'
+[1.507s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/package.zsh'
+[1.507s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/agv_fleet/share/colcon-core/packages/agv_fleet)
+[1.513s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_hmi' for CMake module files
+[1.513s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/src/agv_hmi' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_hmi/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_hmi build --build-base /home/hiep0247/hiep_ros2/build/agv_hmi/build install --record /home/hiep0247/hiep_ros2/build/agv_hmi/install.log --install-scripts $base/lib/agv_hmi --single-version-externally-managed install_data
+[1.513s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_hmi' for CMake config files
+[1.514s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_hmi/lib'
+[1.514s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_hmi/bin'
+[1.514s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_hmi/lib/pkgconfig/agv_hmi.pc'
+[1.514s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages'
+[1.514s] Level 1:colcon.colcon_core.shell:create_environment_hook('agv_hmi', 'pythonpath')
+[1.514s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/hook/pythonpath.ps1'
+[1.514s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/hook/pythonpath.dsv'
+[1.515s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/hook/pythonpath.sh'
+[1.515s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/agv_hmi/bin'
+[1.515s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(agv_hmi)
+[1.515s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/package.ps1'
+[1.516s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/package.dsv'
+[1.516s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/package.sh'
+[1.516s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/package.bash'
+[1.516s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi/package.zsh'
+[1.516s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/agv_hmi/share/colcon-core/packages/agv_hmi)
+[1.517s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/hiep_robot2' for CMake module files
+[1.517s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/hiep0247/hiep_ros2/src/hiep_robot2' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --install-scripts $base/lib/hiep_robot2 --single-version-externally-managed install_data
+[1.517s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/hiep_robot2' for CMake config files
+[1.518s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/hiep_robot2/lib'
+[1.518s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/hiep_robot2/bin'
+[1.518s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/pkgconfig/hiep_robot2.pc'
+[1.518s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages'
+[1.518s] Level 1:colcon.colcon_core.shell:create_environment_hook('hiep_robot2', 'pythonpath')
+[1.518s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/hook/pythonpath.ps1'
+[1.518s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/hook/pythonpath.dsv'
+[1.518s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/hook/pythonpath.sh'
+[1.519s] Level 1:colcon.colcon_core.environment:checking '/home/hiep0247/hiep_ros2/install/hiep_robot2/bin'
+[1.519s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(hiep_robot2)
+[1.519s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/package.ps1'
+[1.519s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/package.dsv'
+[1.520s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/package.sh'
+[1.520s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/package.bash'
+[1.520s] INFO:colcon.colcon_core.shell:Creating package script '/home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/package.zsh'
+[1.520s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/hiep0247/hiep_ros2/install/hiep_robot2/share/colcon-core/packages/hiep_robot2)
+[1.520s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[1.520s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[1.520s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[1.521s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[1.525s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[1.525s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[1.525s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[1.550s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[1.550s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/hiep0247/hiep_ros2/install/local_setup.ps1'
+[1.551s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/hiep0247/hiep_ros2/install/_local_setup_util_ps1.py'
+[1.552s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/hiep0247/hiep_ros2/install/setup.ps1'
+[1.553s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/hiep0247/hiep_ros2/install/local_setup.sh'
+[1.553s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/hiep0247/hiep_ros2/install/_local_setup_util_sh.py'
+[1.554s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/hiep0247/hiep_ros2/install/setup.sh'
+[1.554s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/hiep0247/hiep_ros2/install/local_setup.bash'
+[1.555s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/hiep0247/hiep_ros2/install/setup.bash'
+[1.556s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/hiep0247/hiep_ros2/install/local_setup.zsh'
+[1.556s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/hiep0247/hiep_ros2/install/setup.zsh'

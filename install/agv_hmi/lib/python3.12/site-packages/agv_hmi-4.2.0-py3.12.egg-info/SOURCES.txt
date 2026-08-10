@@ -11,6 +11,8 @@ setup.py
 agv_hmi/__init__.py
 agv_hmi/main.py
 agv_hmi/version.py
+agv_hmi/fleet/__init__.py
+agv_hmi/fleet/map_registry.py
 agv_hmi/ros/__init__.py
 agv_hmi/ros/debug_tf_clock.py
 agv_hmi/ros/map_saver.py

@@ -27,14 +27,20 @@ class FleetMapWidget(QWidget):
         self._resolution = 0.05
         self._map_w = 0
         self._map_h = 0
-        # Metadata thực tế nhận từ topic /map.
-        # Dùng để đồng bộ hệ tọa độ Fleet với AMCL/Nav2.
+
+        # Metadata live của OccupancyGrid /map. Fleet vẫn có thể dùng PGM
+        # để vẽ, nhưng phép đổi world -> pixel ưu tiên metadata runtime khi
+        # kích thước và resolution khớp map đang hiển thị.
         self._runtime_origin_x: float | None = None
         self._runtime_origin_y: float | None = None
         self._runtime_resolution: float | None = None
         self._runtime_map_w = 0
         self._runtime_map_h = 0
+        self._runtime_frame_id = ""
+        self._last_coordinate_source = "yaml"
+
         self._robot_screen_positions: dict[str, QPointF] = {}
+        self._outside_warned: set[tuple[str, str]] = set()
 
     def set_map_id(self, map_id: str) -> None:
         map_id = str(map_id or "").strip()
@@ -61,11 +67,15 @@ class FleetMapWidget(QWidget):
     def set_selected_robot(self, robot_id: str) -> None:
         self._selected_robot_id = str(robot_id or "")
         self.update()
+
     def set_runtime_map_info(self, msg) -> None:
-        """Nhận metadata thực tế từ nav_msgs/OccupancyGrid topic /map."""
+        """Receive live metadata from nav_msgs/OccupancyGrid topic /map.
+
+        The image can still come from active.yaml/maps.pgm. Only coordinate
+        metadata is synchronized, and only when geometry matches the image.
+        """
         try:
             info = msg.info
-
             width = int(info.width)
             height = int(info.height)
             resolution = float(info.resolution)
@@ -74,7 +84,7 @@ class FleetMapWidget(QWidget):
 
             if width <= 0 or height <= 0 or resolution <= 0.0:
                 print(
-                    "[FleetMapWidget] Bỏ qua /map info không hợp lệ: "
+                    "[FleetMapWidget] Ignore invalid runtime /map info: "
                     f"{width}x{height}, resolution={resolution}"
                 )
                 return
@@ -84,81 +94,67 @@ class FleetMapWidget(QWidget):
             self._runtime_resolution = resolution
             self._runtime_map_w = width
             self._runtime_map_h = height
+            self._runtime_frame_id = str(
+                getattr(getattr(msg, "header", None), "frame_id", "") or ""
+            )
+            self._outside_warned.clear()
 
+            source = "runtime" if self._runtime_matches_loaded_map() else "yaml"
             print(
                 "[FleetMapWidget] Runtime /map info: "
+                f"frame={self._runtime_frame_id or 'map'}, "
                 f"origin=({origin_x:.6f}, {origin_y:.6f}), "
-                f"size={width}x{height}, "
-                f"resolution={resolution:.9f}"
+                f"size={width}x{height}, resolution={resolution:.9f}, "
+                f"coordinate_source={source}"
             )
-
-            if self._map_w > 0 and self._map_h > 0:
-                geometry_matches = (
-                    width == self._map_w
-                    and height == self._map_h
-                    and math.isclose(
-                        resolution,
-                        self._resolution,
-                        rel_tol=1e-6,
-                        abs_tol=1e-9,
-                    )
-                )
-
-                if not geometry_matches:
-                    print(
-                        "[FleetMapWidget] CẢNH BÁO: /map không khớp PGM. "
-                        f"/map={width}x{height}@{resolution}, "
-                        f"PGM={self._map_w}x{self._map_h}@{self._resolution}. "
-                        "Fleet tiếp tục dùng metadata YAML."
-                    )
-
             self.update()
-
         except Exception as exc:
-            print(f"[FleetMapWidget] Không đọc được runtime /map info: {exc}")
+            print(f"[FleetMapWidget] Cannot read runtime /map info: {exc}")
 
+    def _runtime_matches_loaded_map(self) -> bool:
+        if (
+            self._runtime_origin_x is None
+            or self._runtime_origin_y is None
+            or self._runtime_resolution is None
+            or self._runtime_map_w <= 0
+            or self._runtime_map_h <= 0
+            or self._map_w <= 0
+            or self._map_h <= 0
+        ):
+            return False
 
-    def _coordinate_map_info(
-        self,
-    ) -> tuple[float, float, float, int, int]:
-        """Chọn metadata dùng để chuyển world coordinate sang pixel."""
-
-        runtime_ready = (
-            self._runtime_origin_x is not None
-            and self._runtime_origin_y is not None
-            and self._runtime_resolution is not None
-            and self._runtime_map_w > 0
-            and self._runtime_map_h > 0
-        )
-
-        runtime_matches_image = (
-            runtime_ready
-            and self._runtime_map_w == self._map_w
+        return (
+            self._runtime_map_w == self._map_w
             and self._runtime_map_h == self._map_h
             and math.isclose(
                 float(self._runtime_resolution),
-                self._resolution,
+                float(self._resolution),
                 rel_tol=1e-6,
                 abs_tol=1e-9,
             )
         )
 
-        if runtime_matches_image:
+    def _coordinate_map_info(self) -> tuple[float, float, float, int, int, str]:
+        """Return metadata used for world -> map conversion."""
+        if self._runtime_matches_loaded_map():
+            self._last_coordinate_source = "runtime /map"
             return (
                 float(self._runtime_origin_x),
                 float(self._runtime_origin_y),
                 float(self._runtime_resolution),
-                self._runtime_map_w,
-                self._runtime_map_h,
+                int(self._runtime_map_w),
+                int(self._runtime_map_h),
+                self._last_coordinate_source,
             )
 
-        # Fallback khi chưa có /map hoặc /map không khớp file PGM.
+        self._last_coordinate_source = "active.yaml"
         return (
-            self._origin_x,
-            self._origin_y,
-            self._resolution,
-            self._map_w,
-            self._map_h,
+            float(self._origin_x),
+            float(self._origin_y),
+            float(self._resolution),
+            int(self._map_w),
+            int(self._map_h),
+            self._last_coordinate_source,
         )
 
     def load_map_file(self, yaml_path: str) -> bool:
@@ -196,10 +192,15 @@ class FleetMapWidget(QWidget):
                 QImage.Format.Format_RGB888,
             ).copy()
             self._pixmap = QPixmap.fromImage(qimg)
+            self._outside_warned.clear()
+            coordinate_source = (
+                "runtime /map" if self._runtime_matches_loaded_map() else "active.yaml"
+            )
             print(
                 f"[FleetMapWidget] Loaded map: {path} "
                 f"({self._map_w}x{self._map_h}, "
-                f"resolution={self._resolution})"
+                f"resolution={self._resolution}, "
+                f"coordinate_source={coordinate_source})"
             )
             self.update()
             return True
@@ -254,6 +255,9 @@ class FleetMapWidget(QWidget):
             painter.setPen(QColor("#8B949E"))
             painter.setFont(QFont("Sans", 10))
             caption = self._map_id or "No map selected"
+            if self._pixmap is not None and not self._pixmap.isNull():
+                self._coordinate_map_info()
+                caption += f"  |  coord: {self._last_coordinate_source}"
             painter.drawText(12, 22, caption)
         except Exception as exc:
             # Keep the Qt paint loop alive and make the error visible instead of
@@ -291,63 +295,44 @@ class FleetMapWidget(QWidget):
         x: float,
         y: float,
         rect: QRectF,
+        robot_id: str = "",
     ) -> QPointF:
-        # Mặc định dùng metadata lấy từ active.yaml.
-        origin_x = self._origin_x
-        origin_y = self._origin_y
-        resolution = self._resolution
-        map_w = self._map_w
-        map_h = self._map_h
-
-        # Chỉ dùng metadata runtime nếu các biến đã tồn tại và hợp lệ.
-        runtime_origin_x = getattr(self, "_runtime_origin_x", None)
-        runtime_origin_y = getattr(self, "_runtime_origin_y", None)
-        runtime_resolution = getattr(
-            self,
-            "_runtime_resolution",
-            None,
-        )
-        runtime_map_w = getattr(self, "_runtime_map_w", 0)
-        runtime_map_h = getattr(self, "_runtime_map_h", 0)
-
-        runtime_valid = (
-            runtime_origin_x is not None
-            and runtime_origin_y is not None
-            and runtime_resolution is not None
-            and float(runtime_resolution) > 0.0
-            and int(runtime_map_w) > 0
-            and int(runtime_map_h) > 0
-            and int(runtime_map_w) == self._map_w
-            and int(runtime_map_h) == self._map_h
-            and math.isclose(
-                float(runtime_resolution),
-                float(self._resolution),
-                rel_tol=1e-6,
-                abs_tol=1e-9,
-            )
-        )
-
-        if runtime_valid:
-            origin_x = float(runtime_origin_x)
-            origin_y = float(runtime_origin_y)
-            resolution = float(runtime_resolution)
-            map_w = int(runtime_map_w)
-            map_h = int(runtime_map_h)
+        (
+            origin_x,
+            origin_y,
+            resolution,
+            map_w,
+            map_h,
+            source,
+        ) = self._coordinate_map_info()
 
         if resolution <= 0.0 or map_w <= 0 or map_h <= 0:
             return rect.center()
 
+        # ROS map coordinate: origin is the lower-left world coordinate.
         map_x = (x - origin_x) / resolution
         map_y = (y - origin_y) / resolution
 
+        # PGM/QImage screen Y grows downward, so invert map Y.
         pixel_x = map_x
         pixel_y = map_h - map_y
 
+        if robot_id and not (0.0 <= map_x < map_w and 0.0 <= map_y < map_h):
+            warning_key = (robot_id, source)
+            if warning_key not in self._outside_warned:
+                self._outside_warned.add(warning_key)
+                print(
+                    f"[FleetMapWidget] Robot {robot_id} outside displayed map "
+                    f"using {source}: world=({x:.3f}, {y:.3f}), "
+                    f"map_cell=({map_x:.1f}, {map_y:.1f}), "
+                    f"map_size={map_w}x{map_h}, "
+                    f"origin=({origin_x:.6f}, {origin_y:.6f}), "
+                    f"resolution={resolution:.9f}"
+                )
+
         return QPointF(
-            rect.left()
-            + pixel_x / map_w * rect.width(),
-            rect.top()
-            + pixel_y / map_h * rect.height(),
+            rect.left() + pixel_x / map_w * rect.width(),
+            rect.top() + pixel_y / map_h * rect.height(),
         )
 
     def _draw_robots_on_map(self, painter: QPainter, rect: QRectF) -> None:
@@ -356,6 +341,7 @@ class FleetMapWidget(QWidget):
                 float(robot.get("x", 0.0)),
                 float(robot.get("y", 0.0)),
                 rect,
+                str(robot.get("robot_id", "")),
             )
             self._draw_robot(painter, robot, pos)
 

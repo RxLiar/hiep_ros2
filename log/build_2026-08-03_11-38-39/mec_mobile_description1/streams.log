@@ -1,0 +1,38 @@
+[0.410s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j12 -l12
+[0.446s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j12 -l12
+[0.446s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description1
+[0.451s] -- Install configuration: ""
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/robot.urdf.xacro
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/wheel.urdf.xacro
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/lidar.urdf.xacro
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/imu.urdf.xacro
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/base.urdf.xacro
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes
+[0.452s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_right.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/camera.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_bckup.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/lidar.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/imu.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base_bckup.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_left.stl
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch/display.launch.py
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/package_run_dependencies/mec_mobile_description1
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/parent_prefix_path/mec_mobile_description1
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/ament_prefix_path.sh
+[0.453s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/ament_prefix_path.dsv
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/path.sh
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/path.dsv
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.bash
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.sh
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.zsh
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.dsv
+[0.454s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.dsv
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/packages/mec_mobile_description1
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/cmake/mec_mobile_description1Config.cmake
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/cmake/mec_mobile_description1Config-version.cmake
+[0.454s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.xml
+[0.478s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description1

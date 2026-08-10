@@ -17,7 +17,10 @@ FIX v4.3.3 — Fleet Monitor:
 
 import json
 import math
+import os
+import re
 import threading
+import time
 
 import rclpy
 from rclpy.node import Node
@@ -43,6 +46,26 @@ from PyQt6.QtCore import QObject, pyqtSignal
 
 # Khoảng lùi timestamp khi lookup TF (giây).
 _TF_LOOKBACK_SEC = 0.02
+_ROBOT_ID_RE = re.compile(r"^[A-Z][A-Z0-9_-]{2,31}$")
+
+
+def _load_local_robot_id() -> str:
+    """Read the local AGV ID used to target /fleet/map_context."""
+    candidates = [str(os.environ.get("AGV_ROBOT_ID", "")).strip()]
+    config_path = os.path.expanduser("~/.agv_hmi/config.json")
+    try:
+        with open(config_path, "r", encoding="utf-8") as handle:
+            config = json.load(handle)
+        if isinstance(config, dict):
+            candidates.append(str(config.get("robot_id", "")).strip())
+    except Exception:
+        pass
+    candidates.append("AGV001")
+    for value in candidates:
+        robot_id = value.upper()
+        if _ROBOT_ID_RE.fullmatch(robot_id):
+            return robot_id
+    return "AGV001"
 
 
 def _yaw_from_quat(q):
@@ -117,6 +140,7 @@ class RosInterface(QObject):
         # Fleet snapshot diagnostics
         self._fleet_snapshot_count = 0
         self._fleet_snapshot_invalid_count = 0
+        self._fleet_robot_id = _load_local_robot_id()
 
         # ── QoS ───────────────────────────────────────────────────
         sensor_qos = QoSProfile(
@@ -198,6 +222,20 @@ class RosInterface(QObject):
             fleet_snapshot_qos,
         )
 
+        # Durable map/route context. Fleet Agent can start before or after HMI
+        # and still receive the latest context for its robot_id.
+        fleet_context_qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=20,
+        )
+        self._fleet_map_context_pub = self.node.create_publisher(
+            String,
+            "/fleet/map_context",
+            fleet_context_qos,
+        )
+
         # ── Publishers ────────────────────────────────────────────
         self._cmd_pub = self.node.create_publisher(
             Twist, "/cmd_vel", 10)
@@ -221,7 +259,8 @@ class RosInterface(QObject):
         self._spin_thread.start()
 
         self.node.get_logger().info(
-            "AGV HMI node started (spin thread active, fleet snapshot enabled)"
+            "AGV HMI node started "
+            f"(spin thread active, fleet enabled, robot_id={self._fleet_robot_id})"
         )
 
     def _spin_loop(self):
@@ -525,6 +564,47 @@ class RosInterface(QObject):
                 self.node.get_logger().info(f"[HMI] /conveyor_cmd -> {msg.data}")
             except Exception:
                 pass
+
+    def publish_fleet_map_context(self, payload: dict) -> bool:
+        """Publish the active route map for this local AGV.
+
+        ``AGV_ROBOT_ID`` (or ``robot_id`` in ~/.agv_hmi/config.json) must
+        match the ``robot_id`` used to start Fleet Agent.
+        """
+        if not self._ros_context_alive():
+            return False
+        try:
+            data = dict(payload or {})
+            robot_id = str(data.get("robot_id") or self._fleet_robot_id).strip().upper()
+            if not _ROBOT_ID_RE.fullmatch(robot_id):
+                raise ValueError(f"robot_id không hợp lệ: {robot_id!r}")
+            map_id = str(data.get("map_id", "")).strip().upper()
+            if not re.fullmatch(r"M\d{5}", map_id):
+                raise ValueError(f"map_id không hợp lệ: {map_id!r}")
+            data["robot_id"] = robot_id
+            data["map_id"] = map_id
+            data["map_version"] = max(1, int(data.get("map_version", 1)))
+            data["frame_id"] = str(data.get("frame_id") or "map")
+            data["stamp"] = float(data.get("stamp") or time.time())
+            msg = String()
+            msg.data = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+            ok = self._safe_publish(self._fleet_map_context_pub, msg)
+            if ok:
+                try:
+                    self.node.get_logger().info(
+                        "[HMI] /fleet/map_context -> "
+                        f"robot={robot_id}, map={map_id} v{data['map_version']}, "
+                        f"route={data.get('route_name') or data.get('route_id') or '-'}"
+                    )
+                except Exception:
+                    pass
+            return ok
+        except Exception as exc:
+            try:
+                self.node.get_logger().warn(f"Fleet map context publish failed: {exc}")
+            except Exception:
+                pass
+            return False
 
     def spin_once(self):
         pass  # spin thread handles everything

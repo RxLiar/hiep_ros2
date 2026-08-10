@@ -248,7 +248,7 @@ class HomePage(QWidget):
                 )
                 return
 
-        self._logo_lbl.setText("Pacific")
+        self._logo_lbl.setText("TBD")
         self._logo_lbl.setStyleSheet(
             "background:#185FA5;"
             "border-radius:12px;"

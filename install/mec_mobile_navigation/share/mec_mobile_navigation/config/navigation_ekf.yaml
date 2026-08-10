@@ -2,7 +2,7 @@ bt_navigator:
   ros__parameters:
     global_frame: map
     robot_base_frame: base_footprint
-    odom_topic: /odometry/filtered
+    odom_topic: /odom
     bt_loop_duration: 10
     default_server_timeout: 20
     wait_for_service_timeout: 1000
@@ -18,7 +18,7 @@ bt_navigator:
 
 controller_server:
   ros__parameters:
-    odom_topic: /odometry/filtered
+    odom_topic: /odom
     controller_frequency: 20.0
     costmap_update_timeout: 0.30
     min_x_velocity_threshold: 0.001
@@ -48,7 +48,7 @@ controller_server:
       min_lookahead_dist: 0.8
       max_lookahead_dist: 2.5
       lookahead_time: 1.5
-      rotate_to_heading_angular_vel: 0.8
+      rotate_to_heading_angular_vel: 0.6
       transform_tolerance: 0.5
       use_velocity_scaled_lookahead_dist: true
       min_approach_linear_velocity: 0.1
@@ -63,7 +63,7 @@ controller_server:
       regulated_linear_scaling_min_speed: 0.25
       use_rotate_to_heading: true
       allow_reversing: true
-      rotate_to_heading_min_angle: 0.785
+      rotate_to_heading_min_angle: 0.45
       max_angular_accel: 1.0
       max_robot_pose_search_dist: 10.0
 
@@ -83,8 +83,8 @@ local_costmap:
       plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 7.0
-        inflation_radius: 0.6
+        cost_scaling_factor: 3.0
+        inflation_radius: 1.2
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
@@ -115,7 +115,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_footprint
       footprint: "[[0.95, 0.40], [0.95, -0.40], [-0.95, -0.40], [-0.95, 0.40]]"
-      footprint_padding: 0.15
+      footprint_padding: 0.05
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
@@ -138,8 +138,8 @@ global_costmap:
         map_subscribe_transient_local: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 7.0
-        inflation_radius: 0.6
+        cost_scaling_factor: 3.0
+        inflation_radius: 1.2
       always_send_full_costmap: True
 
 planner_server:
@@ -226,7 +226,7 @@ velocity_smoother:
     min_velocity: [-0.5, 0.0, -1.0]
     max_accel: [1.0, 0.0, 1.0]
     max_decel: [-1.0, 0.0, -1.0]
-    odom_topic: /odometry/filtered
+    odom_topic: "odom"
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
@@ -282,7 +282,7 @@ docking_server:
       use_battery_status: false
       use_stall_detection: false
       external_detection_timeout: 1.0
-      external_detection_translation_x: -0.18
+      external_detection_translation_x: -0.18 
       external_detection_translation_y: 0.0
       external_detection_rotation_roll: -1.57
       external_detection_rotation_pitch: -1.57

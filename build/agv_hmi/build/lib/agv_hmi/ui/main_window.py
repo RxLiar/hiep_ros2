@@ -1,5 +1,5 @@
 """
-main_window.py — AMR Pacific Autonomous Robot v4.3.0
+main_window.py — AMR Pacific Autonomous Robot v4.3.4
 
 Giữ nguyên hoàn toàn v4.2.6 (threading fix qua _nav_result_signal /
 _nav_feedback_signal, wire velocity/pose_estimate từ RoutesPage,
@@ -78,6 +78,7 @@ from agv_hmi.ui.map_library_page import MapLibraryPage
 from agv_hmi.ui.settings_page import SettingsPage
 from agv_hmi.ui.fleet_page import FleetPage
 import agv_hmi.ui.route_manager as RM
+from agv_hmi.fleet.map_registry import HmiFleetMapRegistry
 
 NAV_CMD = ['ros2', 'launch', 'mec_mobile_navigation', 'navigation.launch.py']
 NAV_KILL_PATTERNS = [
@@ -262,6 +263,8 @@ class MainWindow(QMainWindow):
         self.nav_client       = None
         self.map_saver        = None
         self._conveyor_cmd_cb = None
+        self._fleet_map_context_cb = None
+        self._fleet_map_registry = HmiFleetMapRegistry()
 
         self._mission_wps:     list[dict] = []
         self._mission_idx:     int  = 0
@@ -448,6 +451,11 @@ class MainWindow(QMainWindow):
         self._titlebar.set_page_title(titles.get(idx, ""))
         if idx == Sidebar.IDX_ROUTES: self._routes.refresh()
         if idx == Sidebar.IDX_MAPLIB: self._maplib.refresh()
+        if idx == Sidebar.IDX_FLEET:
+            try:
+                self._fleet.refresh_registered_maps()
+            except Exception:
+                pass
 
     def _cleanup_leaving_page(self, old_idx: int, new_idx: int):
         """Cleanup resources when changing pages.
@@ -705,6 +713,66 @@ class MainWindow(QMainWindow):
 
     # ── Conveyor ─────────────────────────────────────────────────────
 
+    def set_fleet_map_context_callback(self, cb):
+        """Set ROS publisher callback for /fleet/map_context."""
+        self._fleet_map_context_cb = cb
+
+    def _ensure_route_map_record(self, route: dict) -> dict:
+        """Register legacy/new route map and return its canonical Fleet record."""
+        mp = self._normalize_map_path(route.get("map_path", ""))
+        if not mp or not os.path.exists(mp):
+            raise FileNotFoundError(
+                f"Route thiếu map .yaml hợp lệ: {route.get('map_path', '(trống)')}"
+            )
+
+        record = self._fleet_map_registry.ensure_registered(
+            mp,
+            name=str(route.get("name") or os.path.splitext(os.path.basename(mp))[0]),
+            preferred_map_id=str(route.get("map_id", "") or ""),
+        )
+        route["map_id"] = record["map_id"]
+        route["map_version"] = int(record.get("map_version", 1))
+        route["map_checksum"] = str(record.get("checksum", ""))
+        # Canonical Fleet YAML is also used by Nav2, guaranteeing that RViz,
+        # Routes and Fleet Monitor read the same origin/resolution/image pair.
+        route["map_path"] = str(record["active_yaml"])
+
+        route_id = str(route.get("id", "") or "")
+        if route_id:
+            try:
+                RM.attach_map_context(
+                    route_id,
+                    map_id=route["map_id"],
+                    map_version=route["map_version"],
+                    map_path=route["map_path"],
+                    map_checksum=route["map_checksum"],
+                )
+            except Exception as exc:
+                print(f"[Fleet auto map] Không migrate được route {route_id}: {exc}")
+        return record
+
+    def _publish_fleet_route_context(self, route: dict, record: dict) -> bool:
+        cb = self._fleet_map_context_cb
+        if cb is None:
+            print("[Fleet auto map] Chưa gắn callback /fleet/map_context")
+            return False
+        payload = {
+            "map_id": str(record["map_id"]),
+            "map_version": int(record.get("map_version", 1)),
+            "map_checksum": str(record.get("checksum", "")),
+            "map_path": str(record["active_yaml"]),
+            "route_id": str(route.get("id", "")),
+            "route_name": str(route.get("name", "")),
+            "waypoint_current": 0,
+            "waypoint_total": len(route.get("waypoints", []) or []),
+            "frame_id": "map",
+        }
+        try:
+            return bool(cb(payload))
+        except Exception as exc:
+            print(f"[Fleet auto map] Publish map context lỗi: {exc}")
+            return False
+
     def set_conveyor_cmd_callback(self, cb):
         self._conveyor_cmd_cb = cb
 
@@ -747,12 +815,32 @@ class MainWindow(QMainWindow):
     # ── Map save ──────────────────────────────────────────────────────
 
     def _do_save_map(self, path: str):
-        if not self.map_saver: return
+        if not self.map_saver:
+            return
         ok = self.map_saver.save(path)
+        record = None
         if ok:
-            MapLibraryPage.save_thumbnail(path + ".yaml", self._mapping.map_widget)
-        self._sidebar.set_ros_status(
-            tr("map_saved") if ok else tr("map_save_fail"), ok)
+            yaml_path = path if str(path).lower().endswith(".yaml") else path + ".yaml"
+            MapLibraryPage.save_thumbnail(yaml_path, self._mapping.map_widget)
+            try:
+                # Every newly created Mapping result receives a new random Mxxxxx ID.
+                record = self._fleet_map_registry.register_new_map(
+                    yaml_path,
+                    name=os.path.splitext(os.path.basename(yaml_path))[0],
+                )
+            except Exception as exc:
+                print(f"[Fleet auto map] Đăng ký map mới thất bại: {exc}")
+
+        if ok and record:
+            self._sidebar.set_ros_status(
+                f"{tr('map_saved')}: {record['map_id']} v{record.get('map_version', 1)}",
+                True,
+            )
+        else:
+            self._sidebar.set_ros_status(
+                tr("map_saved") if ok else tr("map_save_fail"),
+                ok,
+            )
         self._maplib.refresh()
 
     def _load_map_to_nav(self, path: str):
@@ -784,36 +872,80 @@ class MainWindow(QMainWindow):
             self._sidebar.set_ros_status(
                 "Không lưu: route thiếu map hợp lệ", ok=False)
             return
+
+        try:
+            record = self._fleet_map_registry.ensure_registered(
+                mp,
+                name=os.path.splitext(os.path.basename(mp))[0],
+            )
+        except Exception as exc:
+            self._sidebar.set_ros_status(
+                f"Không đăng ký được map Fleet: {exc}", ok=False)
+            return
+
+        canonical_mp = str(record["active_yaml"])
+        map_id = str(record["map_id"])
+        map_version = int(record.get("map_version", 1))
+        map_checksum = str(record.get("checksum", ""))
+
         if route_id:
-            ok = RM.update_route(route_id, name, mp, wps)
+            ok = RM.update_route(
+                route_id,
+                name,
+                canonical_mp,
+                wps,
+                map_id=map_id,
+                map_version=map_version,
+                map_checksum=map_checksum,
+            )
             route = RM.get_route(route_id) or {
-                "id": route_id, "name": name,
-                "map_path": mp, "waypoints": wps}
+                "id": route_id,
+                "name": name,
+                "map_path": canonical_mp,
+                "map_id": map_id,
+                "map_version": map_version,
+                "map_checksum": map_checksum,
+                "waypoints": wps,
+            }
             if not ok:
                 self._sidebar.set_ros_status(
                     f"Không cập nhật được: {name}", ok=False)
                 return
         else:
-            route = RM.create_route(name, mp, wps)
+            route = RM.create_route(
+                name,
+                canonical_mp,
+                wps,
+                map_id=map_id,
+                map_version=map_version,
+                map_checksum=map_checksum,
+            )
+
         try:
             thumb_dir = os.path.expanduser("~/.agv_hmi/route_thumbnails")
             os.makedirs(thumb_dir, exist_ok=True)
             thumb_path = os.path.join(thumb_dir, f"{route['id']}.png")
             pix = self._nav.map_widget.grab()
             if not pix.isNull():
-                pix = pix.scaled(240, 160,
+                pix = pix.scaled(
+                    240,
+                    160,
                     Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation)
+                    Qt.TransformationMode.SmoothTransformation,
+                )
                 pix.save(thumb_path, "PNG")
                 routes = RM.load_all()
-                for r in routes:
-                    if r.get("id") == route.get("id"):
-                        r["thumbnail_path"] = thumb_path; break
+                for saved_route in routes:
+                    if saved_route.get("id") == route.get("id"):
+                        saved_route["thumbnail_path"] = thumb_path
+                        break
                 RM.save_all(routes)
-        except Exception as e:
-            print(f"[Route thumbnail] save failed: {e}")
+        except Exception as exc:
+            print(f"[Route thumbnail] save failed: {exc}")
+
         action = "Đã cập nhật" if route_id else "Đã lưu"
-        self._sidebar.set_ros_status(f"{action}: {name}", ok=True)
+        self._sidebar.set_ros_status(
+            f"{action}: {name} | Map {map_id} v{map_version}", ok=True)
         self._routes.refresh()
 
     def _edit_route(self, route: dict):
@@ -831,34 +963,29 @@ class MainWindow(QMainWindow):
     # ── Route run from list ───────────────────────────────────────────
 
     def _run_route_from_list(self, route: dict):
-        """
-        Nhận signal từ RoutesPage._on_start().
-
-        [+] Đảm bảo Nav2 chạy với ĐÚNG map của route này thông qua
-        _ensure_nav_running(mp) — nếu Nav2 đang chạy với map khác,
-        sẽ tự stop() + start() lại với map đúng, tránh lệch vị trí
-        robot giữa RViz và app khi chạy Routes.
-
-        [D][E] mission_source = "routes" — bật Stuck-handling và
-        Auto/Manual cho mission này.
-        """
+        """Run a saved route and automatically activate its Fleet map."""
         self._mission_source = "routes"
         route = copy.deepcopy(route or {})
-        mp = self._normalize_map_path(route.get("map_path", ""))
-        if not mp or not os.path.exists(mp):
-            self._routes.set_status(
-                f"Route thiếu map .yaml hợp lệ.\n"
-                f"path: {route.get('map_path', '(trống)')}")
+
+        try:
+            record = self._ensure_route_map_record(route)
+        except Exception as exc:
+            self._routes.set_status(str(exc))
             self._sidebar.set_ros_status("Route thiếu map hợp lệ", ok=False)
-            try: self._routes.set_mission_done()
-            except Exception: pass
+            try:
+                self._routes.set_mission_done()
+            except Exception:
+                pass
             return
 
+        mp = self._normalize_map_path(route.get("map_path", ""))
         wps = copy.deepcopy(route.get("waypoints", []))
         if not wps:
             self._routes.set_status("Route không có waypoint.")
-            try: self._routes.set_mission_done()
-            except Exception: pass
+            try:
+                self._routes.set_mission_done()
+            except Exception:
+                pass
             return
 
         token = self._new_mission_token()
@@ -867,18 +994,32 @@ class MainWindow(QMainWindow):
         self._cancel_reason = None
         self._stop_nav_retry()
 
-        # [+] Đảm bảo Nav2 chạy đúng map của route (restart nếu cần)
+        # Nav2 receives the canonical active.yaml also used by Fleet Monitor.
         ok, msg = self._ensure_nav_running(mp)
-        try: self._nav.set_nav_launch_running(ok, msg)
-        except Exception: pass
+        try:
+            self._nav.set_nav_launch_running(ok, msg)
+        except Exception:
+            pass
         self._sidebar.set_ros_status(msg, ok=ok)
         if not ok:
             self._routes.set_status(msg)
-            try: self._routes.set_mission_done()
-            except Exception: pass
+            try:
+                self._routes.set_mission_done()
+            except Exception:
+                pass
             return
 
-        self._routes.set_status("Đang chờ Nav2 action server sẵn sàng...")
+        published = self._publish_fleet_route_context(route, record)
+        if published:
+            self._routes.set_status(
+                f"Đã kích hoạt Fleet map {record['map_id']} "
+                f"v{record.get('map_version', 1)}. Đang chờ Nav2..."
+            )
+        else:
+            self._routes.set_status(
+                "Map đã đăng ký nhưng chưa publish được Fleet context. "
+                "Đang chờ Nav2..."
+            )
         self._start_nav_retry(wps, token, max_attempts=60)
 
     # ── Single-timer retry ────────────────────────────────────────────
