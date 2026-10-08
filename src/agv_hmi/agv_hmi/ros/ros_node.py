@@ -38,6 +38,9 @@ from nav_msgs.msg import Odometry, OccupancyGrid, Path
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
 from std_msgs.msg import String, Int32, Bool
+from sensor_msgs.msg import Joy
+from rcl_interfaces.msg import Log
+from std_srvs.srv import SetBool
 from action_msgs.msg import GoalStatusArray
 
 from tf2_ros import Buffer, TransformListener
@@ -113,6 +116,22 @@ class RosInterface(QObject):
     sensor_signal          = pyqtSignal(int, bool)
     bumper_signal          = pyqtSignal(str, bool)
     path_signal            = pyqtSignal(list)   # list of (x, y) world coords
+
+    # Hardware layer (hiep_robot2)
+    plc_connection_signal  = pyqtSignal(str)    # "online" | "offline" (/plc_connection_status)
+    emergency_stop_signal  = pyqtSignal(bool)   # /emergency_stop from the Mega2560 PLC
+    driver_status_signal   = pyqtSignal(str)    # JSON from /keya_driver_status
+    # (requested_enable, success, message) for the /motor_enable call
+    motor_enable_result_signal = pyqtSignal(bool, bool, str)
+
+    # Diagnostics / safety (4.5.0)
+    topic_stats_signal     = pyqtSignal(dict)   # {topic: Hz} once per second
+    amcl_cov_signal        = pyqtSignal(float)  # sqrt(max(var_x, var_y)) in metres
+    rosout_signal          = pyqtSignal(int, str, str, float)  # level, node, text, stamp
+    cmd_vel_signal         = pyqtSignal(float, float)          # observed /cmd_vel
+    joy_signal             = pyqtSignal(list, list)            # axes, buttons
+    safety_state_signal    = pyqtSignal(str)                   # JSON from /safety_state
+    scan_raw_signal        = pyqtSignal(float, float, float, float, list)  # angle_min, inc, rmin, rmax, ranges
 
     # Nav2 planner/controller status → ErrorHeader trong nav/routes
     # payload: JSON string {"level":"ok|warn|error","message":"..."}
@@ -197,6 +216,19 @@ class RosInterface(QObject):
             String,  "/sensor_states",     self._sensor_cb,        best_effort)
         self.node.create_subscription(
             String,  "/bumper_states",     self._bumper_cb,        best_effort)
+        # Hardware layer. RELIABLE so a single e-stop edge is never dropped.
+        reliable_10 = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10,
+        )
+        self.node.create_subscription(
+            String, "/plc_connection_status", self._plc_connection_cb, reliable_10)
+        self.node.create_subscription(
+            Bool,   "/emergency_stop",        self._estop_cb,          reliable_10)
+        self.node.create_subscription(
+            String, "/keya_driver_status",    self._driver_status_cb,  reliable_10)
+        self._motor_enable_cli = self.node.create_client(SetBool, "/motor_enable")
         # ── Nav2 action status ─────────────────────────────────────
         # GoalStatusArray được publish bởi action server navigate_to_pose
         self.node.create_subscription(
@@ -251,6 +283,27 @@ class RosInterface(QObject):
             10,
         )
 
+        # ── Diagnostics (topic rates, /rosout, /cmd_vel, /joy) ─────
+        self._rate_lock = threading.Lock()
+        self._rate_counts: dict[str, int] = {}
+        self._rate_t0 = time.monotonic()
+        sensor_qos = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST, depth=5)
+        self.node.create_subscription(
+            Odometry, "/wheel/odom", lambda m: self._count("/wheel/odom"), sensor_qos)
+        self.node.create_subscription(Twist, "/cmd_vel", self._cmd_vel_cb, 10)
+        self.node.create_subscription(Log, "/rosout", self._rosout_cb, 50)
+        self.node.create_subscription(Joy, "/joy", self._joy_cb, 10)
+        self._light_pub = self.node.create_publisher(String, "/light_cmd", 10)
+        latched = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE, durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST, depth=1)
+        self._safety_cfg_pub = self.node.create_publisher(String, "/safety_config", latched)
+        self.node.create_subscription(String, "/safety_state", self._safety_state_cb, 10)
+        self._scan_raw_t = 0.0
+        self.node.create_timer(1.0, self._publish_rates)
+
         # ── Spin thread ───────────────────────────────────────────
         self._executor = SingleThreadedExecutor()
         self._executor.add_node(self.node)
@@ -297,7 +350,61 @@ class RosInterface(QObject):
 
     # ── Callbacks ─────────────────────────────────────────────────
 
+    # ── Diagnostics helpers ───────────────────────────────────────
+
+    def _count(self, topic: str):
+        with self._rate_lock:
+            self._rate_counts[topic] = self._rate_counts.get(topic, 0) + 1
+
+    def _publish_rates(self):
+        now = time.monotonic()
+        with self._rate_lock:
+            counts, self._rate_counts = self._rate_counts, {}
+        dt = max(1e-3, now - self._rate_t0)
+        self._rate_t0 = now
+        names = ("/scan", "/odom", "/wheel/odom", "/amcl_pose", "/cmd_vel")
+        self.topic_stats_signal.emit({n: counts.get(n, 0) / dt for n in names})
+
+    def _cmd_vel_cb(self, msg: Twist):
+        self._count("/cmd_vel")
+        self.cmd_vel_signal.emit(float(msg.linear.x), float(msg.angular.z))
+
+    def _rosout_cb(self, msg: Log):
+        self.rosout_signal.emit(
+            int(msg.level), str(msg.name), str(msg.msg),
+            float(msg.stamp.sec) + msg.stamp.nanosec * 1e-9)
+
+    def _joy_cb(self, msg: Joy):
+        self.joy_signal.emit(list(msg.axes), list(msg.buttons))
+
+    def _safety_state_cb(self, msg: String):
+        self.safety_state_signal.emit(msg.data)
+
+    def publish_safety_config(self, payload: str):
+        """Robot size / lidar pose / zones for the hiep_robot2 safety_monitor (latched JSON)."""
+        if not self._ros_context_alive():
+            return
+        self._safe_publish(self._safety_cfg_pub, String(data=payload))
+
+    def publish_light_mask(self, mask: int):
+        """Tower lights on the Mega2560 PLC (bit0..3 = left_1, left_2, right_1, right_2)."""
+        if not self._ros_context_alive():
+            return
+        import json as _json
+        self._safe_publish(self._light_pub, String(data=_json.dumps({"mask": int(mask) & 0x0F})))
+
+    def soft_estop(self):
+        """Software emergency stop: zero velocity burst + motors disabled."""
+        if not self._ros_context_alive():
+            return
+        for _ in range(5):
+            self.publish_velocity(0.0, 0.0)
+        self.set_motor_enable(False)
+
     def _amcl_cb(self, msg: PoseWithCovarianceStamped):
+        self._count("/amcl_pose")
+        cov = msg.pose.covariance
+        self.amcl_cov_signal.emit(float(max(max(cov[0], 0.0), max(cov[7], 0.0)) ** 0.5))
         p = msg.pose.pose
         self.pose_signal.emit(
             float(p.position.x),
@@ -306,6 +413,7 @@ class RosInterface(QObject):
         )
 
     def _odom_cb(self, msg: Odometry):
+        self._count("/odom")
         p = msg.pose.pose
         self.odom_signal.emit(
             float(p.position.x),
@@ -321,6 +429,12 @@ class RosInterface(QObject):
         self.map_signal.emit(msg)
 
     def _scan_cb(self, msg: LaserScan):
+        self._count("/scan")
+        _now = time.monotonic()
+        if _now - self._scan_raw_t >= 0.2:          # 5 Hz copy for the safety page
+            self._scan_raw_t = _now
+            self.scan_raw_signal.emit(float(msg.angle_min), float(msg.angle_increment),
+                                      float(msg.range_min), float(msg.range_max), list(msg.ranges))
         src_frame = msg.header.frame_id.strip().lstrip("/")
         if not src_frame:
             return
@@ -496,6 +610,16 @@ class RosInterface(QObject):
         except Exception:
             pass
 
+    def _plc_connection_cb(self, msg: String):
+        state = msg.data.lower().strip()
+        self.plc_connection_signal.emit("online" if state == "online" else "offline")
+
+    def _estop_cb(self, msg: Bool):
+        self.emergency_stop_signal.emit(bool(msg.data))
+
+    def _driver_status_cb(self, msg: String):
+        self.driver_status_signal.emit(msg.data)
+
     def _bumper_cb(self, msg: String):
         try:
             d = json.loads(msg.data)
@@ -536,6 +660,28 @@ class RosInterface(QObject):
         t.linear.x = float(linear)
         t.angular.z = float(angular)
         self._safe_publish(self._cmd_pub, t)
+
+    def set_motor_enable(self, enable: bool):
+        """Call std_srvs/SetBool /motor_enable on the KEYA bridge (non-blocking)."""
+        if not self._ros_context_alive():
+            return
+        enable = bool(enable)
+        if not self._motor_enable_cli.service_is_ready():
+            self.motor_enable_result_signal.emit(enable, False, "__no_service__")
+            return
+        req = SetBool.Request()
+        req.data = enable
+        future = self._motor_enable_cli.call_async(req)
+
+        def _done(fut):
+            try:
+                res = fut.result()
+                self.motor_enable_result_signal.emit(
+                    enable, bool(res.success), str(res.message))
+            except Exception as exc:
+                self.motor_enable_result_signal.emit(enable, False, str(exc))
+
+        future.add_done_callback(_done)
 
     def publish_initial_pose(self, x: float, y: float, yaw: float):
         if not self._ros_context_alive():

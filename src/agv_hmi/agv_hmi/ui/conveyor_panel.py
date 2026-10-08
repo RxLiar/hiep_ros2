@@ -212,7 +212,8 @@ class ConveyorPage(QWidget):
         sensor_box = QGroupBox(tr("sensor_title"))
         sg = QGridLayout(sensor_box)
         sg.setSpacing(10)
-        for i in range(12):
+        # PLC hardware: 4 conveyors x 2 end sensors = 8 (ids 1..8).
+        for i in range(8):
             cell = SensorCell(i + 1)
             self._sensors.append(cell)
             sg.addWidget(cell, i // 4, i % 4)
@@ -224,7 +225,7 @@ class ConveyorPage(QWidget):
 
     def update_sensor(self, sensor_id: int, on: bool):
         # chấp nhận cả 0-index và 1-index
-        idx = sensor_id - 1 if 1 <= sensor_id <= 12 else sensor_id
+        idx = sensor_id - 1 if 1 <= sensor_id <= 8 else sensor_id
         if 0 <= idx < len(self._sensors):
             self._sensors[idx].set_state(on)
 

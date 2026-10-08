@@ -1,0 +1,42 @@
+[0.507s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_description1 -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_description1
+[0.529s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.744s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.834s] -- Configuring done (0.3s)
+[0.844s] -- Generating done (0.0s)
+[0.845s] -- Build files have been written to: /home/hiep0247/hiep_ros2/build/mec_mobile_description1
+[0.851s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_description1 -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_description1
+[0.852s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j16 -l16
+[0.890s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_description1 -- -j16 -l16
+[0.891s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_description1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_description1
+[0.901s] -- Install configuration: ""
+[0.901s] -- Execute custom install script
+[0.901s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/base.urdf.xacro
+[0.910s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/imu.urdf.xacro
+[0.918s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/lidar.urdf.xacro
+[0.926s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/robot.urdf.xacro
+[0.933s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/urdf/wheel.urdf.xacro
+[0.939s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base.stl
+[0.946s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/base_bckup.stl
+[0.957s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/camera.stl
+[0.967s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/imu.stl
+[0.975s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/lidar.stl
+[0.984s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel.stl
+[0.994s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_bckup.stl
+[1.001s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_left.stl
+[1.007s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/meshes/wheel_right.stl
+[1.016s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/launch/display.launch.py
+[1.021s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/package_run_dependencies/mec_mobile_description1
+[1.028s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/parent_prefix_path/mec_mobile_description1
+[1.034s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/ament_prefix_path.sh
+[1.040s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/ament_prefix_path.dsv
+[1.046s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/path.sh
+[1.054s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/environment/path.dsv
+[1.067s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.bash
+[1.075s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.sh
+[1.085s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.zsh
+[1.095s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/local_setup.dsv
+[1.103s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.dsv
+[1.109s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/ament_index/resource_index/packages/mec_mobile_description1
+[1.117s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/cmake/mec_mobile_description1Config.cmake
+[1.123s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/cmake/mec_mobile_description1Config-version.cmake
+[1.133s] -- Symlinking: /home/hiep0247/hiep_ros2/install/mec_mobile_description1/share/mec_mobile_description1/package.xml

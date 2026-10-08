@@ -1,1 +1,1 @@
-geometry_msgs:rclpy:std_msgs
+ament_index_python:geometry_msgs:launch:launch_ros:nav_msgs:python3-numpy:python3-serial:rcl_interfaces:rclpy:sensor_msgs:std_msgs:std_srvs

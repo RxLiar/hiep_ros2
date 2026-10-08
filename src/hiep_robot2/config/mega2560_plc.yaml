@@ -1,0 +1,28 @@
+mega2560_plc_bridge:
+  ros__parameters:
+    # Serial auto-detection. The PLC firmware periodically emits
+    # ID,AGV_PLC_MEGA2560,... and PSTAT frames, so no ttyUSB number is fixed.
+    serial_port: "auto"
+    baudrate: 115200
+    serial_timeout: 0.05
+    auto_detect_serial: true
+    probe_timeout: 1.5
+    expected_device_id: "AGV_PLC_MEGA2560"
+    preferred_usb_serial: ""
+    reconnect_period: 2.0
+    telemetry_timeout: 0.8
+
+    # Existing agv_hmi already publishes /conveyor_cmd and consumes
+    # /conveyor_cargo, /sensor_states, /bumper_states.
+    conveyor_cmd_topic: "/conveyor_cmd"
+    light_cmd_topic: "/light_cmd"
+    sensor_states_topic: "/sensor_states"
+    conveyor_cargo_topic: "/conveyor_cargo"
+    conveyor_status_topic: "/conveyor_status"
+    bumper_states_topic: "/bumper_states"
+    emergency_stop_topic: "/emergency_stop"
+    start_button_topic: "/start_button"
+    stop_button_topic: "/stop_button"
+    plc_status_topic: "/plc_status"
+    plc_connection_topic: "/plc_connection_status"
+    signal_light_states_topic: "/signal_light_states"

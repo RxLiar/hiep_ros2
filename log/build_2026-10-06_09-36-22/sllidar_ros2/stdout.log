@@ -1,0 +1,4 @@
+[  5%] [32m[1mLinking CXX executable sllidar_client[0m
+[ 10%] [32m[1mLinking CXX executable sllidar_node[0m
+[ 95%] Built target sllidar_node
+[100%] Built target sllidar_client

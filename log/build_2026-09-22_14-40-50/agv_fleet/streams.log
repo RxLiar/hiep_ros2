@@ -1,0 +1,24 @@
+[1.812s] Invoking command in '/home/hiep0247/hiep_ros2/src/agv_fleet': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet/install.log --install-scripts $base/lib/agv_fleet --single-version-externally-managed install_data
+[2.097s] running egg_info
+[2.118s] writing ../../build/agv_fleet/agv_fleet.egg-info/PKG-INFO
+[2.118s] writing dependency_links to ../../build/agv_fleet/agv_fleet.egg-info/dependency_links.txt
+[2.118s] writing entry points to ../../build/agv_fleet/agv_fleet.egg-info/entry_points.txt
+[2.118s] writing requirements to ../../build/agv_fleet/agv_fleet.egg-info/requires.txt
+[2.118s] writing top-level names to ../../build/agv_fleet/agv_fleet.egg-info/top_level.txt
+[2.148s] reading manifest file '../../build/agv_fleet/agv_fleet.egg-info/SOURCES.txt'
+[2.149s] writing manifest file '../../build/agv_fleet/agv_fleet.egg-info/SOURCES.txt'
+[2.149s] running build
+[2.149s] running build_py
+[2.149s] running install
+[2.155s] running install_lib
+[2.172s] running install_data
+[2.172s] running install_egg_info
+[2.188s] removing '/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet-0.1.0-py3.12.egg-info' (and everything under it)
+[2.189s] Copying ../../build/agv_fleet/agv_fleet.egg-info to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet-0.1.0-py3.12.egg-info
+[2.191s] running install_scripts
+[2.307s] Installing fleet_agent script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[2.309s] Installing fleet_map_id script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[2.309s] Installing fleet_server script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[2.309s] Installing fleet_simulator script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[2.310s] writing list of installed files to '/home/hiep0247/hiep_ros2/build/agv_fleet/install.log'
+[2.368s] Invoked command in '/home/hiep0247/hiep_ros2/src/agv_fleet' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet/install.log --install-scripts $base/lib/agv_fleet --single-version-externally-managed install_data

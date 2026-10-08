@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: agv-fleet-domains
+Version: 1.0.0
+Summary: ROS domain isolation and selective bridges for the AGV fleet
+Maintainer: hiep0247
+Maintainer-email: gaphan247@gmail.com
+License: Apache-2.0

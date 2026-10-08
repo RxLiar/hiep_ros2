@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 
+from agv_hmi.ui.system_settings import SystemSettingsBox
 from agv_hmi.ui.i18n import tr
 from agv_hmi.ui.language_selector import LanguageSelector
 from agv_hmi.ui.login_dialog import (
@@ -155,6 +156,9 @@ class SettingsPage(QWidget):
         self._password_box.setVisible(self._role == "engineer")
         content.addWidget(self._password_box)
 
+        self._sys_box = SystemSettingsBox(self._role)
+        content.addWidget(self._sys_box)
+
         self._future_box = QGroupBox(tr("settings_future"))
         future_layout = QVBoxLayout(self._future_box)
         placeholder = QLabel("—")
@@ -248,3 +252,4 @@ class SettingsPage(QWidget):
         self._pw_conf_label.setText(tr("settings_pw_conf"))
         self._save_password_button.setText(tr("settings_pw_save"))
         self._future_box.setTitle(tr("settings_future"))
+        self._sys_box.retranslate()

@@ -56,6 +56,20 @@ import copy
 import json
 
 from agv_hmi.ui.process_manager import ManagedLaunch
+from agv_hmi.core.alarm_manager import AlarmManager
+from agv_hmi.core.health_model import HealthModel
+from agv_hmi.core import audit_log, prefs
+from agv_hmi.ui.alarm_center import AlarmCenterPage
+from agv_hmi.ui.diagnostics_page import DiagnosticsPage
+from agv_hmi.ui.preflight import PreflightDialog
+from agv_hmi.ui.toast import ToastManager
+from agv_hmi.ui.reports_page import ReportsPage
+from agv_hmi.ui.stations_page import StationsPage
+from agv_hmi.ui.schedule_page import SchedulePage
+from agv_hmi.ui.dashboard import DashboardWidget
+from agv_hmi.ui.safety_page import SafetyPage
+from agv_hmi.ui.map_widget import MapWidget
+_json = json
 from agv_hmi.version import full_label
 
 from PyQt6.QtWidgets import (
@@ -109,6 +123,12 @@ class Sidebar(QWidget):
     IDX_MAPLIB   = 5
     IDX_SETTINGS = 6
     IDX_FLEET    = 7
+    IDX_ALARMS   = 8
+    IDX_DIAG     = 9
+    IDX_REPORTS  = 10
+    IDX_STATIONS = 11
+    IDX_SCHEDULE = 12
+    IDX_SAFETY   = 13
 
     def __init__(self, role: str = "operator"):
         super().__init__()
@@ -175,7 +195,7 @@ class Sidebar(QWidget):
             if item.widget(): item.widget().deleteLater()
         self._btns.clear()
 
-        engineer_only = {self.IDX_MAPPING, self.IDX_MAPLIB}
+        engineer_only = {self.IDX_MAPPING, self.IDX_MAPLIB, self.IDX_DIAG, self.IDX_SCHEDULE, self.IDX_SAFETY}
         pages = [
             ("⌂",  "page_home",       self.IDX_HOME),
             ("◉",  "page_fleet",      self.IDX_FLEET),
@@ -184,6 +204,12 @@ class Sidebar(QWidget):
             ("≡",  "page_routes",     self.IDX_ROUTES),
             ("⟳",  "page_conveyors",  self.IDX_CONVEYOR),
             ("🗺", "page_maplib",     self.IDX_MAPLIB),
+            ("🔔", "page_alarms",     self.IDX_ALARMS),
+            ("📍", "page_stations",   self.IDX_STATIONS),
+            ("🗓", "page_schedule",   self.IDX_SCHEDULE),
+            ("🛡", "page_safety",     self.IDX_SAFETY),
+            ("📊", "page_reports",    self.IDX_REPORTS),
+            ("🩺", "page_diag",       self.IDX_DIAG),
             ("⚙",  "page_settings",   self.IDX_SETTINGS),
         ]
         for icon, key, idx in pages:
@@ -195,6 +221,10 @@ class Sidebar(QWidget):
             self._nav_lay.addWidget(b)
             self._btns.append((b, idx, key))
         self._nav_lay.addStretch()
+
+    def set_touch(self, on: bool):
+        for b, _, _ in self._btns:
+            b.setFixedHeight(54 if on else 38)
 
     def switch(self, idx: int):
         for b, bidx, _ in self._btns:
@@ -229,6 +259,10 @@ class Sidebar(QWidget):
 class MainWindow(QMainWindow):
     velocity_signal      = pyqtSignal(float, float)
     pose_estimate_signal = pyqtSignal(float, float, float)
+    motor_enable_signal  = pyqtSignal(bool)   # -> RosInterface.set_motor_enable
+    soft_estop_signal    = pyqtSignal()       # -> RosInterface.soft_estop
+    light_mask_signal    = pyqtSignal(int)    # -> RosInterface.publish_light_mask
+    safety_config_signal = pyqtSignal(str)    # -> RosInterface.publish_safety_config
 
     # [NEW] Đổi người vận hành: quay về màn hình Login, ROS node vẫn sống.
     switch_user_signal   = pyqtSignal()
@@ -254,6 +288,20 @@ class MainWindow(QMainWindow):
         # Cleanup có thể được gọi từ closeEvent() và aboutToQuit.
         # Guard này bảo đảm Mapping/Nav2 chỉ bị stop đúng một lần.
         self._shutdown_done = False
+
+        # 4.5.0: alarms / health / safety state
+        self.alarms = AlarmManager()
+        self.health = HealthModel()
+        audit_log.set_user(role, role)
+        self._scan_seen = False
+        self._scan_low_ticks = 0
+        self._loc_bad_ticks = 0
+        self._estop_active = False
+        self._joy_active = False
+        self._last_tower_mask = None
+        self._skip_preflight_once = False
+        self._queue_run_active = False
+        self._housekeeping_ticks = 0
 
         self.setWindowTitle(tr("app_name"))
         self.setMinimumSize(1024, 600)
@@ -330,6 +378,14 @@ class MainWindow(QMainWindow):
         self._nav_feedback_signal.connect(self._on_feedback)
 
         self._sidebar.switch(Sidebar.IDX_HOME)
+        if prefs.get("operator_kiosk"):
+            QTimer.singleShot(0, lambda: self.apply_touch_mode(True))
+
+        self._housekeeping_timer = QTimer(self)
+        self._housekeeping_timer.timeout.connect(self._housekeeping)
+        self._housekeeping_timer.start(1000)
+        QTimer.singleShot(2500, self.publish_saved_safety_config)
+        audit_log.audit("app_start")
 
     # ── Build ────────────────────────────────────────────────────────
 
@@ -341,6 +397,13 @@ class MainWindow(QMainWindow):
 
         self._titlebar = TitleBar(self)
         root.addWidget(self._titlebar)
+
+        self._estop_banner = QLabel(tr("estop_banner"))
+        self._estop_banner.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._estop_banner.setStyleSheet(
+            "background:#B62324;color:white;font-size:15px;font-weight:800;padding:8px;")
+        self._estop_banner.setVisible(False)
+        root.addWidget(self._estop_banner)
 
         body = QWidget()
         body_lay = QHBoxLayout(body)
@@ -358,13 +421,27 @@ class MainWindow(QMainWindow):
         self._maplib   = MapLibraryPage()
         self._settings = SettingsPage(role=self._role, theme_mgr=self._theme_mgr)
         self._fleet    = FleetPage()
+        self._alarm_page = AlarmCenterPage(self.alarms)
+        self._diag     = DiagnosticsPage(self.health)
+        self._reports  = ReportsPage(role=self._role)
+        self._stations = StationsPage()
+        self._schedule = SchedulePage()
+        self._safety   = SafetyPage()
 
         for p in (self._home, self._mapping, self._nav, self._routes,
-                  self._conveyor, self._maplib, self._settings, self._fleet):
+                  self._conveyor, self._maplib, self._settings, self._fleet,
+                  self._alarm_page, self._diag, self._reports,
+                  self._stations, self._schedule, self._safety):
             self._pages.addWidget(p)
 
         body_lay.addWidget(self._pages)
         root.addWidget(body)
+
+        self._toasts = ToastManager(central)
+
+        self._dashboard = DashboardWidget()
+        self._home.add_dashboard(self._dashboard)
+        self._apply_robot_profile(self._safety.active_profile())
 
     # ── Wire ─────────────────────────────────────────────────────────
 
@@ -376,10 +453,23 @@ class MainWindow(QMainWindow):
             self._titlebar.language_changed.connect(
                 lambda _: self._retranslate_all())
 
+        self._titlebar.estop_clicked.connect(self._on_soft_estop)
+        self._titlebar.alarms_clicked.connect(
+            lambda: self._sidebar.switch(Sidebar.IDX_ALARMS))
+        self._safety.profile_applied.connect(self._on_profile_applied)
+        self._stations.set_pose_requested.connect(self.pose_estimate_signal)
+        self._stations.goto_requested.connect(self._goto_station)
+        self._schedule.run_queue_requested.connect(lambda: self._try_run_queue(manual=True))
+        self._settings._sys_box.touch_mode_changed.connect(self.apply_touch_mode)
+        self.alarms.changed.connect(self._on_alarms_changed)
+        self.alarms.raised.connect(self._on_alarm_raised)
+        self.alarms.raised.connect(self._diag.on_alarm)
+
         self._sidebar.page_changed.connect(self._switch_page)
         self._sidebar.retranslate_requested.connect(self._retranslate_all)
 
         self._home.connection_toggle.connect(self._on_connection_toggle)
+        self._home.motor_enable_requested.connect(self.motor_enable_signal)
         # [NEW] Nút đổi người vận hành trên Home
         self._home.switch_user_requested.connect(self._on_switch_user_clicked)
 
@@ -447,6 +537,12 @@ class MainWindow(QMainWindow):
             Sidebar.IDX_MAPLIB:   tr("maplib_title"),
             Sidebar.IDX_SETTINGS: tr("settings_title"),
             Sidebar.IDX_FLEET:    tr("page_fleet"),
+            Sidebar.IDX_ALARMS:   tr("page_alarms"),
+            Sidebar.IDX_DIAG:     tr("page_diag"),
+            Sidebar.IDX_REPORTS:  tr("page_reports"),
+            Sidebar.IDX_STATIONS: tr("page_stations"),
+            Sidebar.IDX_SCHEDULE: tr("page_schedule"),
+            Sidebar.IDX_SAFETY:   tr("page_safety"),
         }
         self._titlebar.set_page_title(titles.get(idx, ""))
         if idx == Sidebar.IDX_ROUTES: self._routes.refresh()
@@ -572,6 +668,8 @@ class MainWindow(QMainWindow):
         Auto/Manual KHÔNG áp dụng cho luồng này, giữ nguyên hành vi cũ.
         """
         self._mission_source = "navigation"
+        if not self._preflight():
+            return
         map_path = getattr(self._nav, "_selected_map_path", "") or ""
         ok, msg = self._ensure_nav_running(map_path)
         try:
@@ -626,6 +724,11 @@ class MainWindow(QMainWindow):
             print(f"[Shutdown] Mapping cleanup failed: {e}")
 
         try:
+            self._diag.shutdown()
+        except Exception as e:
+            print(f"[Shutdown] Diagnostics cleanup failed: {e}")
+
+        try:
             self._stop_nav_launch()
         except Exception as e:
             print(f"[Shutdown] Nav2 cleanup failed: {e}")
@@ -638,6 +741,7 @@ class MainWindow(QMainWindow):
 
     def on_pose_update(self, x: float, y: float, yaw: float):
         self._last_x = x; self._last_y = y; self._last_yaw = yaw
+        self._stations.set_current_pose(x, y, yaw)
         self._nav.update_pose_on_map(x, y, yaw)
         self._routes.update_pose(x, y, yaw)
         self._sidebar.set_ros_status(tr("status_amcl"), ok=True)
@@ -648,6 +752,8 @@ class MainWindow(QMainWindow):
 
     def on_odom_twist_update(self, linear: float, angular: float):
         self._routes.update_velocity(linear, angular)
+        self._diag.feed_odom_twist(linear, angular)
+        self._dashboard.set_speed(linear, angular)
 
     def on_map_update(self, msg):
         self._mapping.update_map(msg)
@@ -669,9 +775,14 @@ class MainWindow(QMainWindow):
 
     def on_battery_update(self, pct: int):
         self._titlebar.set_battery(pct)
+        self.health.battery_pct = int(pct)
+        self._dashboard.set_battery(int(pct))
+        self.alarms.set_condition("battery.low", pct < 15, "warn", tr("al_battery", pct), "Battery")
 
     def on_connection_update(self, state: str):
         self._titlebar.set_connection(state)
+        self.health.ros_online = (state != "offline")
+        self.alarms.set_condition("ros.offline", state == "offline", "error", tr("al_ros"), "ROS")
         self._home.update_connection(state)
         self._sidebar.set_ros_status(
             tr(f"status_{state}"), ok=(state != "offline"))
@@ -681,12 +792,60 @@ class MainWindow(QMainWindow):
 
     def on_conveyor_cargo_update(self, belt_id: int, has_cargo: bool):
         self._home.update_conveyor_cargo(belt_id, has_cargo)
+        self._dashboard.diagram.set_cargo(belt_id + 1, has_cargo)   # signal is 0-based
 
     def on_sensor_update(self, sensor_id: int, on: bool):
         self._conveyor.update_sensor(sensor_id, on)
+        self._dashboard.diagram.set_sensor(sensor_id, on)
 
     def on_bumper_update(self, side: str, triggered: bool):
         self._routes.update_bumper(side, triggered)
+        self._dashboard.diagram.set_bumper(side, triggered)
+        self.alarms.set_condition(
+            f"bumper.{side}", triggered, "error",
+            tr("al_bumper", tr("side_left") if side == "left" else tr("side_right")), "Bumper")
+
+    def on_plc_connection_update(self, state: str):
+        self._home.update_plc_connection(state)
+        online = (state == "online")
+        self.health.set_plc(online)
+        self.alarms.set_condition("plc.offline", not online, "error", tr("al_plc_offline"), "PLC")
+
+    def on_estop_update(self, active: bool):
+        self._home.update_estop(active)
+        self.health.estop = bool(active)
+        self.alarms.set_condition("estop", active, "critical", tr("al_estop"), "E-stop")
+        self._estop_banner.setVisible(bool(active))
+        if active and not self._estop_active:
+            audit_log.audit("estop_pressed")
+            if self._mission_running:
+                self._stop_mission("cancelled")
+                self._toasts.show_toast(tr("estop_mission_cancelled"), "error", 6000)
+        self._estop_active = bool(active)
+
+    def on_driver_status_update(self, payload: str):
+        self._home.update_driver_status(payload)
+        self.health.set_driver_payload(payload)
+        d = self.health.driver
+        online = bool(d.get("online"))
+        try:
+            faults = [int(x) for x in (d.get("fault") or [0, 0])]
+        except (TypeError, ValueError):
+            faults = [0, 0]
+        self.alarms.set_condition("driver.offline", not online, "error", tr("al_driver_offline"), "KEYA")
+        self.alarms.set_condition(
+            "driver.fault", online and any(faults), "critical",
+            tr("al_driver_fault", "/".join(f"{c:04X}" for c in faults)), "KEYA")
+
+    def on_motor_enable_result(self, requested: bool, success: bool, message: str):
+        self._home.motor_request_done()
+        audit_log.audit("motor_enable" if requested else "motor_disable", "ok" if success else message)
+        if success:
+            if requested:
+                self.alarms.clear_alarm("estop.soft")
+            return
+        detail = tr("home_motor_no_service") if message == "__no_service__" else message
+        QMessageBox.warning(self, tr("home_motor"), tr("home_motor_failed", detail))
 
     def on_robot_status_update(self, msg: str):
         self._mapping.error_header.update_from_ros(msg)
@@ -703,6 +862,10 @@ class MainWindow(QMainWindow):
         except Exception:
             message = str(status_msg or "").strip()
             level   = "error" if message else "ok"
+        _ok = level in ("ok", "normal", "none", "0", "false")
+        self.alarms.set_condition(
+            "nav2", not _ok, "warn" if level in ("warn", "warning", "1") else "error",
+            tr("al_nav2", message or level), "Nav2")
         for header in (self._nav.error_header, self._routes.error_header):
             if level in ("ok", "normal", "none", "0", "false"):
                 header.clear_nav2()
@@ -710,6 +873,200 @@ class MainWindow(QMainWindow):
                 header.set_nav2_warning(message or "Nav2 cảnh báo")
             else:
                 header.set_nav2_error(message or "Nav2 lỗi")
+
+    # ── 4.5.0: diagnostics, safety, alarms ───────────────────────────
+
+    def on_topic_stats(self, rates: dict):
+        self._diag.update_rates(rates)
+        scan = float(rates.get("/scan", 0.0))
+        if scan > 0.0:
+            self._scan_seen = True
+            self._scan_low_ticks = 0
+        elif self._scan_seen:
+            self._scan_low_ticks += 1
+        self.alarms.set_condition("lidar.lost", self._scan_seen and self._scan_low_ticks >= 3,
+                                  "error", tr("al_lidar"), "Lidar")
+
+    def on_amcl_cov(self, sigma: float):
+        self.health.set_amcl_cov(sigma)
+        if sigma > 0.5:
+            self.alarms.raise_alarm("loc.poor", "warn", tr("al_loc", sigma), "AMCL")
+        elif sigma <= 0.35:
+            self.alarms.clear_alarm("loc.poor")
+
+    def on_rosout(self, level: int, node: str, text: str, stamp: float):
+        self._diag.feed_rosout(level, node, text, stamp)
+
+    def on_cmd_vel(self, lin: float, ang: float):
+        self._diag.feed_cmd_vel(lin, ang)
+
+    def on_joy(self, axes: list, buttons: list):
+        """Gamepad teleop with a dead-man button (release = stop)."""
+        if not prefs.get("joy_enabled"):
+            return
+        db = int(prefs.get("joy_deadman_button"))
+        if 0 <= db < len(buttons) and buttons[db]:
+            la, aa = int(prefs.get("joy_lin_axis")), int(prefs.get("joy_ang_axis"))
+            lin = axes[la] * float(prefs.get("joy_max_lin")) if 0 <= la < len(axes) else 0.0
+            ang = axes[aa] * float(prefs.get("joy_max_ang")) if 0 <= aa < len(axes) else 0.0
+            self._joy_active = True
+            self.velocity_signal.emit(lin, ang)
+        elif self._joy_active:
+            self._joy_active = False
+            self.velocity_signal.emit(0.0, 0.0)
+
+    def _on_soft_estop(self):
+        """Soft stop: zero velocity, motors off, running mission cancelled."""
+        audit_log.audit("soft_estop")
+        self.soft_estop_signal.emit()
+        if self._mission_running:
+            self._stop_mission("cancelled")
+        else:
+            self.velocity_signal.emit(0.0, 0.0)
+        self.alarms.raise_alarm("estop.soft", "error", tr("estop_soft_done"), "Soft stop")
+        self._toasts.show_toast(tr("estop_soft_done"), "warn", 5000)
+
+    def _preflight(self) -> bool:
+        """True when the mission may start. Shows the checklist only if something fails."""
+        if self._skip_preflight_once:
+            self._skip_preflight_once = False
+            return True
+        if not prefs.get("preflight_enabled"):
+            return True
+        checks = self.health.checks()
+        if all(c.ok or not c.blocking for c in checks):
+            return True
+        dlg = PreflightDialog(self.health, allow_override=(self._role == "engineer"), parent=self)
+        ok = dlg.exec() == PreflightDialog.DialogCode.Accepted
+        audit_log.audit("preflight", "accepted" if ok else "cancelled")
+        return ok
+
+    def _on_alarms_changed(self):
+        self._titlebar.set_alarm_badge(self.alarms.unacked_count(), self.alarms.worst_active_level())
+        self._dashboard.set_alarm_count(len(self.alarms.active()))
+        self._update_tower()
+
+    def _on_alarm_raised(self, alarm: dict):
+        if alarm.get("level") in ("error", "critical"):
+            self._toasts.show_toast(f"{alarm['source']}: {alarm['message']}", alarm["level"], 6000)
+            if prefs.get("sound_enabled"):
+                QApplication.beep()
+
+    def _update_tower(self):
+        if not prefs.get("tower_enabled"):
+            return
+        worst = self.alarms.worst_active_level()
+        if worst in ("error", "critical"):
+            state = "error"
+        elif self._mission_running and self._mission_paused:
+            state = "paused"
+        elif self._mission_running:
+            state = "running"
+        else:
+            state = "idle"
+        mask = int(prefs.get(f"tower_mask_{state}"))
+        if mask != self._last_tower_mask:
+            self._last_tower_mask = mask
+            self.light_mask_signal.emit(mask)
+
+    # ── Robot profile + safety monitor ──────────────────────────────
+
+    def _apply_robot_profile(self, p: dict):
+        """Use the configured size on every map and show the zones around the robot."""
+        for mw in self.findChildren(MapWidget):
+            mw.set_robot_size(p["length_m"], p["width_m"], p["center_x_m"])
+            mw.set_safety_overlay(p if p.get("safety_enabled") else None)
+
+    def _on_profile_applied(self, p: dict):
+        audit_log.audit("robot_profile", f"{p['name']} {p['length_m']}x{p['width_m']}")
+        self._apply_robot_profile(p)
+        self.safety_config_signal.emit(_json.dumps(p))
+        self._toasts.show_toast("🛡 " + p["name"], "ok")
+
+    def publish_saved_safety_config(self):
+        """Send the saved profile to ROS (the topic is latched, so a late node still gets it)."""
+        self.safety_config_signal.emit(_json.dumps(self._safety.active_profile()))
+
+    def on_safety_state(self, payload: str):
+        try:
+            d = _json.loads(payload)
+        except ValueError:
+            return
+        state = str(d.get("state", ""))
+        self.health.set_safety(state)
+        self._safety.feed_state(payload)
+        self._dashboard.set_safety(state)
+        self.alarms.set_condition("safety.stop", state == "stop", "warn", tr("al_safety_stop"), "Safety")
+        self.alarms.set_condition("safety.noscan", state == "no_scan", "error", tr("al_safety_noscan"), "Safety")
+
+    def on_scan_raw(self, angle_min: float, inc: float, rmin: float, rmax: float, ranges: list):
+        if self._pages.currentIndex() == Sidebar.IDX_SAFETY:        # only while the page is open
+            self._safety.feed_scan(angle_min, inc, rmin, rmax, ranges)
+
+    def _housekeeping(self):
+        self._update_tower()
+        if self.health.safety_ever and not self.health.safety_fresh():
+            self._safety.mark_state_stale()
+            self._dashboard.set_safety(None)
+        self._housekeeping_ticks += 1
+        if self._housekeeping_ticks % 15 == 0:
+            self._schedule_tick()
+
+    # ── Stations, schedule, queue, touch mode ───────────────────────
+
+    def _goto_station(self, st: dict):
+        if self._mission_running:
+            self._toasts.show_toast(tr("st_busy"), "warn")
+            return
+        audit_log.audit("goto_station", str(st.get("name", "")))
+        self._toasts.show_toast("📍 " + str(st.get("name", "")), "info")
+        self._run_navigation_mission([{"label": st["name"], "x": st["x"], "y": st["y"], "tasks": []}])
+
+    def _schedule_tick(self):
+        if not self._schedule.auto_enabled():
+            return
+        for job in self._schedule.scheduler.due():
+            route = RM.get_route(job["route_id"])
+            if route:
+                audit_log.audit("schedule_due", job.get("route_name", ""))
+                self._schedule.enqueue(route)
+        self._try_run_queue()
+
+    def _try_run_queue(self, manual: bool = False):
+        """Run the next queued route. Automatic runs never bypass the safety checks."""
+        if self._mission_running or not self._schedule.queue:
+            if not self._schedule.queue:
+                self._queue_run_active = False
+            return
+        if manual:
+            self._queue_run_active = True
+        elif not (self._queue_run_active or self._schedule.auto_enabled()):
+            return
+        if not manual:
+            blocked = self._estop_active or any(
+                (not c.ok) and c.blocking for c in self.health.checks())
+            if blocked:
+                self.alarms.raise_alarm("schedule.blocked", "warn", tr("sc_blocked"), "Schedule")
+                return
+            self.alarms.clear_alarm("schedule.blocked")
+            self._skip_preflight_once = True      # checks were just verified above
+        route = self._schedule.pop_next()
+        if route is None:
+            return
+        audit_log.audit("queue_run", str(route.get("name", "")))
+        self._toasts.show_toast(tr("sc_started", route.get("name", "")), "info", 5000)
+        self._run_route_from_list(route)
+
+    def apply_touch_mode(self, on: bool):
+        qss = ("QPushButton{min-height:44px;font-size:15px;} QComboBox{min-height:40px;font-size:15px;}"
+               "QLineEdit,QSpinBox,QDoubleSpinBox,QTimeEdit{min-height:38px;font-size:15px;}"
+               "QCheckBox{font-size:15px;spacing:10px;} QTableWidget{font-size:14px;}") if on else ""
+        self.setStyleSheet(qss)
+        self._sidebar.set_touch(on)
+        if on:
+            self.showFullScreen()
+        elif self.isFullScreen():
+            self.showNormal()
 
     # ── Conveyor ─────────────────────────────────────────────────────
 
@@ -786,6 +1143,7 @@ class MainWindow(QMainWindow):
     # ── [NEW] Đổi người vận hành ─────────────────────────────────────
 
     def _on_switch_user_clicked(self):
+        audit_log.audit("switch_user")
         """
         Nút "Đổi người vận hành" trên Home. Nếu mission đang chạy, hỏi
         xác nhận trước vì đổi user sẽ dừng mission (tránh robot chạy vô
@@ -815,6 +1173,7 @@ class MainWindow(QMainWindow):
     # ── Map save ──────────────────────────────────────────────────────
 
     def _do_save_map(self, path: str):
+        audit_log.audit("map_save", path)
         if not self.map_saver:
             return
         ok = self.map_saver.save(path)
@@ -965,6 +1324,12 @@ class MainWindow(QMainWindow):
     def _run_route_from_list(self, route: dict):
         """Run a saved route and automatically activate its Fleet map."""
         self._mission_source = "routes"
+        if not self._preflight():
+            try:
+                self._routes.set_mission_done()
+            except Exception:
+                pass
+            return
         route = copy.deepcopy(route or {})
 
         try:
@@ -980,6 +1345,7 @@ class MainWindow(QMainWindow):
 
         mp = self._normalize_map_path(route.get("map_path", ""))
         wps = copy.deepcopy(route.get("waypoints", []))
+        audit_log.audit("mission_start", str(route.get("name", "")))
         if not wps:
             self._routes.set_status("Route không có waypoint.")
             try:
@@ -1529,6 +1895,8 @@ class MainWindow(QMainWindow):
         self._nav.set_mission_running(False)
         self._nav.map_widget.clear_nav_path()
 
+        if source == "routes" and self._schedule.queue:
+            QTimer.singleShot(2500, self._try_run_queue)
         if source == "routes":
             self._routes.set_status(tr("nav_done"))
             self._routes.map_widget.clear_nav_path()
@@ -1577,6 +1945,9 @@ class MainWindow(QMainWindow):
     def _stop_mission(self, log_status: str = "cancelled"):
         source = self._mission_source
         was_running = self._mission_running
+        if was_running:
+            audit_log.audit("mission_stop", log_status)
+        self._queue_run_active = False
         self._cancel_reason = "stop"
         self._new_mission_token()
         self._stop_nav_retry()
@@ -1646,6 +2017,8 @@ class MainWindow(QMainWindow):
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
+        if hasattr(self, "_toasts"):
+            self._toasts.reposition()
         w = ev.size().width()
         collapsed = w < 900
         if collapsed != getattr(self, '_sb_collapsed', False):
@@ -1685,5 +2058,10 @@ class MainWindow(QMainWindow):
         self._nav.retranslate(); self._routes.retranslate()
         self._conveyor.retranslate(); self._maplib.retranslate()
         self._settings.retranslate(); self._fleet.retranslate()
+        self._alarm_page.retranslate(); self._diag.retranslate()
+        self._reports.retranslate(); self._stations.retranslate(); self._schedule.retranslate()
+        self._safety.retranslate()
+        self._dashboard.retranslate()
+        self._estop_banner.setText(tr("estop_banner"))
         self.setWindowTitle(tr("app_name"))
         self._switch_page(self._pages.currentIndex())

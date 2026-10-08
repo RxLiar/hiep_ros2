@@ -1,0 +1,20 @@
+[0.502s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_navigation -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_navigation
+[0.520s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.726s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.735s] -- Found rclpy: 7.1.11 (/opt/ros/jazzy/share/rclpy/cmake)
+[0.811s] -- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)
+[0.908s] -- Added test 'flake8' to check Python code syntax and style conventions
+[0.908s] -- Configured 'flake8' exclude dirs and/or files: 
+[0.909s] -- Added test 'lint_cmake' to check CMake code style
+[0.909s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[0.910s] -- Added test 'xmllint' to check XML markup files
+[0.912s] -- Configuring done (0.4s)
+[0.918s] -- Generating done (0.0s)
+[0.919s] -- Build files have been written to: /home/hiep0247/hiep_ros2/build/mec_mobile_navigation
+[0.922s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_navigation -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_navigation
+[0.923s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j16 -l16
+[0.956s] failed to create symbolic link '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_python/mec_mobile_navigation/mec_mobile_navigation' because existing path cannot be removed: Is a directory
+[0.956s] gmake[2]: *** [CMakeFiles/ament_cmake_python_symlink_mec_mobile_navigation.dir/build.make:70: CMakeFiles/ament_cmake_python_symlink_mec_mobile_navigation] Error 1
+[0.956s] gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/ament_cmake_python_symlink_mec_mobile_navigation.dir/all] Error 2
+[0.957s] gmake: *** [Makefile:146: all] Error 2
+[0.958s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j16 -l16

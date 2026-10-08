@@ -1,0 +1,4 @@
+failed to create symbolic link '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation/ament_cmake_python/mec_mobile_navigation/mec_mobile_navigation' because existing path cannot be removed: Is a directory
+gmake[2]: *** [CMakeFiles/ament_cmake_python_symlink_mec_mobile_navigation.dir/build.make:70: CMakeFiles/ament_cmake_python_symlink_mec_mobile_navigation] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/ament_cmake_python_symlink_mec_mobile_navigation.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

@@ -1,0 +1,15 @@
+# Lidar slow/stop gate. Size, lidar pose and zones are read from the HMI profile
+# (profile_file) and can be changed live from the HMI "Robot & Safety" page.
+safety_monitor:
+  ros__parameters:
+    profile_file: ~/.agv_hmi/robot_profile.json
+    scan_topic: /scan
+    input_topic: /cmd_vel          # Nav2 + HMI joystick publish here
+    output_topic: /cmd_vel_safe    # the motor bridge must listen here
+    config_topic: /safety_config
+    rate_hz: 30.0
+    scan_timeout_s: 0.5            # no /scan for this long => output zero (if require_scan)
+    cmd_timeout_s: 0.5
+    hold_s: 0.3                    # keep a zone "occupied" this long after the last hit
+    block_rotation_in_stop: true
+    apply_nav2_footprint: true     # push footprint to /local_costmap and /global_costmap

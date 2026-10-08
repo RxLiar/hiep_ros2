@@ -1,0 +1,53 @@
+# Only Fleet topics cross the domain boundary.
+# Navigation topics such as /cmd_vel, /amcl_pose, /odom, /scan,
+# /map, /tf and /tf_static are intentionally NOT bridged.
+name: agv001_fleet_bridge
+from_domain: 21
+to_domain: 20
+
+topics:
+  /fleet/robot_state:
+    type: std_msgs/msg/String
+    qos:
+      reliability: best_effort
+      durability: volatile
+      history: keep_last
+      depth: 50
+
+  /fleet/events:
+    type: std_msgs/msg/String
+    qos:
+      reliability: reliable
+      durability: volatile
+      history: keep_last
+      depth: 20
+
+  # Fleet Server -> local AGV HMI Fleet Monitor
+  /fleet/snapshot:
+    type: std_msgs/msg/String
+    reversed: true
+    qos:
+      reliability: reliable
+      durability: transient_local
+      history: keep_last
+      depth: 1
+
+  # Optional central Fleet command -> local Fleet Agent
+  /fleet/map_context:
+    type: std_msgs/msg/String
+    reversed: true
+    qos:
+      reliability: reliable
+      durability: transient_local
+      history: keep_last
+      depth: 20
+
+  # Reserved for future pause/resume/cancel commands.
+  /fleet/command:
+    type: std_msgs/msg/String
+    reversed: true
+    qos:
+      reliability: reliable
+      durability: volatile
+      history: keep_last
+      depth: 10

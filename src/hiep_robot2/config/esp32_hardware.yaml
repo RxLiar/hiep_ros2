@@ -1,0 +1,41 @@
+hardware_bridge:
+  ros__parameters:
+    # AUTO mode: no /dev/ttyUSB0 or /dev/ttyUSB1 is hard-coded.
+    # ROS passively scans serial devices and accepts only the port that emits
+    # the AGV ESP32 ID/TEL protocol. No probe bytes are sent to unknown ports.
+    serial_port: auto
+    baudrate: 115200
+    serial_timeout: 0.05
+    auto_detect_serial: true
+    probe_timeout: 1.5
+    expected_device_id: AGV_ESP32
+
+    # Optional. Leave empty normally. If you later have more than one AGV ESP32
+    # on the same PC, set the USB serial number here to prioritize one board.
+    preferred_usb_serial: ""
+
+    reconnect_period: 2.0
+    telemetry_timeout: 0.5
+
+    # ROS sends wheel velocity setpoints at a fixed rate.
+    command_rate: 50.0
+    command_timeout: 0.25
+    max_linear_speed: 0.5
+    max_angular_speed: 1.0
+    max_wheel_speed: 0.6
+
+    # STARTER VALUES copied from the legacy robot. Measure/tune on the real robot.
+    wheel_radius: 0.024
+    wheel_separation: 0.20
+    encoder_ticks_per_rev: 2970.0
+    left_encoder_sign: 1.0
+    right_encoder_sign: 1.0
+
+    # During Phase 1 this can remain /cmd_vel.
+    # Later, after twist_mux/collision_monitor, point it to /cmd_vel_safe.
+    cmd_vel_topic: /cmd_vel
+    wheel_odom_topic: /wheel/odom
+
+    # hardware_bridge publishes Odometry messages only; it does NOT publish TF.
+    odom_frame: odom
+    base_frame: base_footprint

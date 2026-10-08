@@ -1,0 +1,49 @@
+running egg_info
+creating ../../build/agv_fleet_domains/agv_fleet_domains.egg-info
+writing ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/PKG-INFO
+writing dependency_links to ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/dependency_links.txt
+writing requirements to ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/requires.txt
+writing top-level names to ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/top_level.txt
+writing manifest file '../../build/agv_fleet_domains/agv_fleet_domains.egg-info/SOURCES.txt'
+reading manifest file '../../build/agv_fleet_domains/agv_fleet_domains.egg-info/SOURCES.txt'
+writing manifest file '../../build/agv_fleet_domains/agv_fleet_domains.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build
+creating /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib
+creating /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains
+copying agv_fleet_domains/launch_helpers.py -> /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains
+copying agv_fleet_domains/__init__.py -> /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains
+running install
+running install_lib
+creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains
+copying /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains/launch_helpers.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains
+copying /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains/__init__.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains/launch_helpers.py to launch_helpers.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains/__init__.py to __init__.cpython-312.pyc
+running install_data
+creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index
+creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index/resource_index
+creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index/resource_index/packages
+copying resource/agv_fleet_domains -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index/resource_index/packages
+copying package.xml -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains
+creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+copying launch/agv002_fleet_side.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+copying launch/agv001_bridge_only.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+copying launch/fleet_server_domain20.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+copying launch/agv001_fleet_side.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+copying launch/agv002_bridge_only.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/config
+copying config/agv001_fleet_bridge.yaml -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/config
+copying config/agv002_fleet_bridge.yaml -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/config
+creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+copying env/agv001_domain21.fish -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+copying env/agv002_domain22.fish -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+copying env/agv002_domain22.bash -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+copying env/fleet_domain20.fish -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+copying env/agv001_domain21.bash -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+copying env/fleet_domain20.bash -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+running install_egg_info
+Copying ../../build/agv_fleet_domains/agv_fleet_domains.egg-info to /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains-1.0.0-py3.12.egg-info
+running install_scripts
+writing list of installed files to '/home/hiep0247/hiep_ros2/build/agv_fleet_domains/install.log'

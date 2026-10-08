@@ -1,1 +1,1 @@
-geometry_msgs:nav2_msgs:nav_msgs:rclpy:std_msgs
+geometry_msgs:nav2_msgs:nav_msgs:python3-numpy:python3-scipy:python3-yaml:rcl_interfaces:rclpy:sensor_msgs:std_msgs:std_srvs

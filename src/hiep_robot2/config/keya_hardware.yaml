@@ -1,0 +1,58 @@
+keya_driver_bridge:
+  ros__parameters:
+    # Real robot: ROS -> USB-RS485 adapter -> KEYA driver (no Mega in the traction path).
+    # The byte protocol implemented here comes from the KYDAS4850-1E RS232 manual;
+    # CONFIRM in your exact driver manual that the RS485 port uses the same frames/baud.
+    # Recommended Linux setup: create udev alias /dev/keya_driver for the adapter.
+    serial_port: /dev/keya_driver
+    baudrate: 115200
+    serial_timeout: 0.03
+    reconnect_period: 2.0
+    telemetry_timeout: 0.7
+    transport: rs485              # rs232 | rs485
+    # Set true only if your USB-RS485 adapter echoes TX bytes back on RX.
+    rs485_echo_filter: false
+
+    # Manual specifies continuous command interval >20 ms and <500 ms.
+    # 40 Hz = 25 ms.
+    command_rate: 40.0
+    command_timeout: 0.25
+    # false = motors stay disabled until the HMI "Motor enable" button (or
+    # `ros2 service call /motor_enable std_srvs/srv/SetBool "{data: true}"`).
+    arm_on_start: false
+
+    # Software e-stop interlock published by the Mega2560 PLC bridge. Pressing it
+    # disables + latches the output; an operator must re-enable. The real
+    # e-stop must still cut driver power in hardware.
+    estop_topic: /emergency_stop
+
+    # Ignore encoder deltas implying a wheel speed above this (m/s) - driver reset.
+    encoder_jump_speed_limit: 2.0
+
+    max_linear_speed: 0.5
+    max_angular_speed: 1.0
+    max_wheel_speed: 0.6
+
+    # MUST BE MEASURED / confirmed from the actual robot and KEYA motor+gearbox.
+    wheel_radius: 0.10
+    wheel_separation: 0.50
+    gear_ratio: 1.0                 # motor revolutions / wheel revolution
+    rated_speed_rpm: 1500.0         # must match value configured in KEYA software
+
+    # V1.8 manual example: 2500 PPR encoder x4 = 10000 counts/rev.
+    # Confirm the actual KEYA motor encoder and driver configuration.
+    encoder_counts_per_motor_rev: 10000.0
+
+    # Flip a sign to -1.0 if installation direction is opposite.
+    motor1_command_sign: 1.0
+    motor2_command_sign: 1.0
+    motor1_encoder_sign: 1.0
+    motor2_encoder_sign: 1.0
+
+    encoder_poll_rate: 20.0
+    diagnostic_poll_rate: 1.0
+
+    cmd_vel_topic: /cmd_vel
+    wheel_odom_topic: /wheel/odom
+    odom_frame: odom
+    base_frame: base_footprint

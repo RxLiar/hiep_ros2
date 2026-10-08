@@ -1,0 +1,20 @@
+running develop
+running egg_info
+writing hiep_robot2.egg-info/PKG-INFO
+writing dependency_links to hiep_robot2.egg-info/dependency_links.txt
+writing entry points to hiep_robot2.egg-info/entry_points.txt
+writing requirements to hiep_robot2.egg-info/requires.txt
+writing top-level names to hiep_robot2.egg-info/top_level.txt
+reading manifest file 'hiep_robot2.egg-info/SOURCES.txt'
+writing manifest file 'hiep_robot2.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep-robot2.egg-link (link to .)
+Installing esp32_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+Installing keya_driver_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+Installing mega2560_plc_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+
+Installed /home/hiep0247/hiep_ros2/build/hiep_robot2
+running symlink_data
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/resource/hiep_robot2 -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index/resource_index/packages
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/package.xml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/launch/hardware_selector.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch

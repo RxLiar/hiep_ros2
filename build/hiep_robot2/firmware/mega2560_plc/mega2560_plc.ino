@@ -1,0 +1,1 @@
+/home/hiep0247/hiep_ros2/src/hiep_robot2/firmware/mega2560_plc/mega2560_plc.ino

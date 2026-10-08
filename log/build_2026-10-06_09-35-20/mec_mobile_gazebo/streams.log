@@ -1,0 +1,20 @@
+[0.410s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_gazebo': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/mec_mobile_gazebo -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo
+[0.428s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.676s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.683s] -- Found ros_gz_sim: 1.0.22 (/opt/ros/jazzy/share/ros_gz_sim/cmake)
+[0.724s] -- Found rosidl_generator_c: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[0.734s] -- Found rosidl_generator_cpp: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[0.753s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.775s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.851s] -- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+[0.853s] -- Found rmw_fastrtps_cpp: 8.4.4 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+[0.928s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[1.184s] -- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)
+[1.254s] -- Added test 'flake8' to check Python code syntax and style conventions
+[1.254s] -- Configured 'flake8' exclude dirs and/or files: 
+[1.254s] -- Added test 'lint_cmake' to check CMake code style
+[1.254s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[1.254s] -- Added test 'xmllint' to check XML markup files
+[1.255s] -- Configuring done (0.8s)
+[1.259s] -- Generating done (0.0s)
+[1.261s] -- Build files have been written to: /home/hiep0247/hiep_ros2/build/mec_mobile_gazebo

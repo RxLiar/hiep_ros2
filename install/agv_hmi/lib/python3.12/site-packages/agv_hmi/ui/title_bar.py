@@ -21,6 +21,8 @@ class TitleBar(QWidget):
     maximize_clicked = pyqtSignal()
     close_clicked = pyqtSignal()
     language_changed = pyqtSignal(str)
+    estop_clicked = pyqtSignal()
+    alarms_clicked = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -91,6 +93,25 @@ class TitleBar(QWidget):
         sep2 = QLabel("|")
         sep2.setStyleSheet("color:#30363D;background:transparent;")
         lay.addWidget(sep2)
+
+        self._alarm_btn = QPushButton("🔔")
+        self._alarm_btn.setFixedHeight(30)
+        self._alarm_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._alarm_btn.clicked.connect(self.alarms_clicked)
+        self._alarm_btn.setStyleSheet(
+            "QPushButton{background:#21262D;color:#8B949E;border:none;border-radius:6px;padding:0 10px;}"
+            "QPushButton:hover{background:#30363D;}")
+        lay.addWidget(self._alarm_btn)
+
+        self._estop_btn = QPushButton(tr("estop_btn"))
+        self._estop_btn.setFixedHeight(30)
+        self._estop_btn.setToolTip(tr("estop_tip"))
+        self._estop_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._estop_btn.setStyleSheet(
+            "QPushButton{background:#DA3633;color:white;font-weight:800;border:none;"
+            "border-radius:6px;padding:0 14px;}QPushButton:hover{background:#F85149;}")
+        self._estop_btn.clicked.connect(self.estop_clicked)
+        lay.addWidget(self._estop_btn)
 
         self._lang_selector = LanguageSelector(compact=True)
         self._lang_selector.language_changed.connect(self.language_changed)
@@ -185,7 +206,19 @@ class TitleBar(QWidget):
         self._conn_lbl.setText(labels.get(state, state))
         self._conn_lbl.setStyleSheet(f"font-size:11px;color:{color};background:transparent;")
 
+    _BADGE = {"info": "#79B8FF", "warn": "#E3B341", "error": "#FF7B72", "critical": "#FF4D4D"}
+
+    def set_alarm_badge(self, count: int, worst):
+        color = self._BADGE.get(worst, "#8B949E")
+        self._alarm_btn.setText(f"🔔 {count}" if count else "🔔")
+        self._alarm_btn.setStyleSheet(
+            "QPushButton{background:#21262D;border:none;border-radius:6px;padding:0 10px;"
+            f"color:{color};font-weight:{'800' if count else '400'};}}"
+            "QPushButton:hover{background:#30363D;}")
+
     def retranslate(self):
+        self._estop_btn.setText(tr("estop_btn"))
+        self._estop_btn.setToolTip(tr("estop_tip"))
         self._name_lbl.setText(tr("app_name"))
         self.set_connection(self._connection_state)
         self._lang_selector.retranslate()

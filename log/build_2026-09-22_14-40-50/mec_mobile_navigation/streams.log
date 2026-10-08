@@ -1,0 +1,66 @@
+[0.433s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j16 -l16
+[0.489s] Built target ament_cmake_python_copy_mec_mobile_navigation
+[0.879s] running egg_info
+[0.908s] writing mec_mobile_navigation.egg-info/PKG-INFO
+[0.910s] writing dependency_links to mec_mobile_navigation.egg-info/dependency_links.txt
+[0.911s] writing top-level names to mec_mobile_navigation.egg-info/top_level.txt
+[1.050s] reading manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+[1.051s] writing manifest file 'mec_mobile_navigation.egg-info/SOURCES.txt'
+[1.226s] Built target ament_cmake_python_build_mec_mobile_navigation_egg
+[1.270s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/mec_mobile_navigation -- -j16 -l16
+[1.274s] Invoking command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_navigation
+[1.315s] -- Install configuration: ""
+[1.316s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/environment/pythonpath.sh
+[1.316s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/environment/pythonpath.dsv
+[1.316s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation-0.0.0-py3.12.egg-info
+[1.317s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation-0.0.0-py3.12.egg-info/dependency_links.txt
+[1.320s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation-0.0.0-py3.12.egg-info/PKG-INFO
+[1.320s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation-0.0.0-py3.12.egg-info/SOURCES.txt
+[1.321s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation-0.0.0-py3.12.egg-info/top_level.txt
+[1.321s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation
+[1.321s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation/laser_merger_node.py
+[1.321s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation/__init__.py
+[1.502s] Listing '/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages/mec_mobile_navigation'...
+[1.524s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/mec_mobile_navigation/laser_merger_node.py
+[1.524s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch/navigation_amcl.launch.py
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch/mapping.launch.py
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch/navigation.launch.py
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch/mapping_bckup.launch.py
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch/spawn_robot_navigation.launch.py
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch/navigation_bckup_260630.launch.py
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/launch/localization.launch.py
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/gz_bridge.yaml
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/ekf.yaml
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/amcl_localization.yaml
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/slam_toolbox_mapping.yaml
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/slam_toolbox_mapping_bckup260527.yaml
+[1.525s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/navigation.yaml
+[1.526s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/amcl_localization_ekf.yaml
+[1.526s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/slam_toolbox_localization.yaml
+[1.526s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/config/navigation_ekf.yaml
+[1.526s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/rviz
+[1.527s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/rviz/localization.rviz
+[1.527s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/rviz/navigation.rviz
+[1.527s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/rviz/mapping.rviz
+[1.527s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/rviz/navigation_amcl.rviz
+[1.527s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/maps
+[1.527s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/maps/my_map.yaml
+[1.528s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/maps/my_map.pgm
+[1.528s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/ament_index/resource_index/package_run_dependencies/mec_mobile_navigation
+[1.528s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/ament_index/resource_index/parent_prefix_path/mec_mobile_navigation
+[1.529s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/environment/ament_prefix_path.sh
+[1.529s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/environment/ament_prefix_path.dsv
+[1.529s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/environment/path.sh
+[1.529s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/environment/path.dsv
+[1.529s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/local_setup.bash
+[1.529s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/local_setup.sh
+[1.530s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/local_setup.zsh
+[1.530s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/local_setup.dsv
+[1.530s] -- Installing: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.dsv
+[1.530s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/ament_index/resource_index/packages/mec_mobile_navigation
+[1.530s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/cmake/mec_mobile_navigationConfig.cmake
+[1.530s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/cmake/mec_mobile_navigationConfig-version.cmake
+[1.530s] -- Up-to-date: /home/hiep0247/hiep_ros2/install/mec_mobile_navigation/share/mec_mobile_navigation/package.xml
+[1.544s] Invoked command in '/home/hiep0247/hiep_ros2/build/mec_mobile_navigation' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/hiep0247/hiep_ros2/build/mec_mobile_navigation

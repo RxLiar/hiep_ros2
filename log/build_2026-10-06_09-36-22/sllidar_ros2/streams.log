@@ -1,0 +1,5 @@
+[0.397s] Invoking command in '/home/hiep0247/hiep_ros2/build/sllidar_ros2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/hiep0247/hiep_ros2/build/sllidar_ros2 -- -j16 -l16
+[0.451s] [  5%] [32m[1mLinking CXX executable sllidar_client[0m
+[0.462s] [ 10%] [32m[1mLinking CXX executable sllidar_node[0m
+[0.722s] [ 95%] Built target sllidar_node
+[0.742s] [100%] Built target sllidar_client

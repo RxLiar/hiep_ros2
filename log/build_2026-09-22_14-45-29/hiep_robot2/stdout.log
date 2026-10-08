@@ -1,0 +1,33 @@
+running develop
+running egg_info
+creating hiep_robot2.egg-info
+writing hiep_robot2.egg-info/PKG-INFO
+writing dependency_links to hiep_robot2.egg-info/dependency_links.txt
+writing entry points to hiep_robot2.egg-info/entry_points.txt
+writing requirements to hiep_robot2.egg-info/requires.txt
+writing top-level names to hiep_robot2.egg-info/top_level.txt
+writing manifest file 'hiep_robot2.egg-info/SOURCES.txt'
+reading manifest file 'hiep_robot2.egg-info/SOURCES.txt'
+writing manifest file 'hiep_robot2.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep-robot2.egg-link (link to .)
+Installing esp32_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+Installing keya_driver_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+
+Installed /home/hiep0247/hiep_ros2/build/hiep_robot2
+running symlink_data
+creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index
+creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index/resource_index
+creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index/resource_index/packages
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/resource/hiep_robot2 -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index/resource_index/packages
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/package.xml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2
+creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/launch/hardware_selector.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/launch/esp32_hardware.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/launch/keya_hardware.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/config/keya_hardware.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/config/esp32_hardware.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware
+creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/agv_esp32
+symbolically linking /home/hiep0247/hiep_ros2/build/hiep_robot2/firmware/agv_esp32/agv_esp32.ino -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/agv_esp32

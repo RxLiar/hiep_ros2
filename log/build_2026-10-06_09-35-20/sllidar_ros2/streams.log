@@ -1,0 +1,16 @@
+[0.421s] Invoking command in '/home/hiep0247/hiep_ros2/build/sllidar_ros2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/hiep_ros2/install/agv_fleet:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/hiep0247/hiep_ros2/src/sllidar_ros2 -DCMAKE_INSTALL_PREFIX=/home/hiep0247/hiep_ros2/install/sllidar_ros2
+[0.423s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.660s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.667s] -- Found rclcpp: 28.1.21 (/opt/ros/jazzy/share/rclcpp/cmake)
+[0.719s] -- Found rosidl_generator_c: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[0.730s] -- Found rosidl_generator_cpp: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[0.749s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.770s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.842s] -- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+[0.844s] -- Found rmw_fastrtps_cpp: 8.4.4 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+[0.925s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[1.006s] -- Found sensor_msgs: 5.3.8 (/opt/ros/jazzy/share/sensor_msgs/cmake)
+[1.064s] -- Found std_srvs: 5.3.8 (/opt/ros/jazzy/share/std_srvs/cmake)
+[1.170s] -- Configuring done (0.8s)
+[1.188s] -- Generating done (0.0s)
+[1.191s] -- Build files have been written to: /home/hiep0247/hiep_ros2/build/sllidar_ros2

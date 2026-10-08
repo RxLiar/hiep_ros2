@@ -1,0 +1,43 @@
+[1.806s] Invoking command in '/home/hiep0247/hiep_ros2/src/hiep_robot2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --install-scripts $base/lib/hiep_robot2 --single-version-externally-managed install_data
+[2.083s] running egg_info
+[2.097s] writing ../../build/hiep_robot2/hiep_robot2.egg-info/PKG-INFO
+[2.097s] writing dependency_links to ../../build/hiep_robot2/hiep_robot2.egg-info/dependency_links.txt
+[2.098s] writing entry points to ../../build/hiep_robot2/hiep_robot2.egg-info/entry_points.txt
+[2.098s] writing requirements to ../../build/hiep_robot2/hiep_robot2.egg-info/requires.txt
+[2.098s] writing top-level names to ../../build/hiep_robot2/hiep_robot2.egg-info/top_level.txt
+[2.125s] reading manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[2.126s] writing manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[2.126s] running build
+[2.126s] running build_py
+[2.126s] copying hiep_robot2/protocol.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[2.126s] copying hiep_robot2/keya_driver_bridge_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[2.126s] copying hiep_robot2/esp32_bridge_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[2.127s] copying hiep_robot2/keya_protocol.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[2.127s] running install
+[2.132s] running install_lib
+[2.146s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/protocol.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[2.146s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/keya_driver_bridge_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[2.146s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/esp32_bridge_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[2.146s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/keya_protocol.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[2.147s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/protocol.py to protocol.cpython-312.pyc
+[2.147s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/keya_driver_bridge_node.py to keya_driver_bridge_node.cpython-312.pyc
+[2.154s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/esp32_bridge_node.py to esp32_bridge_node.cpython-312.pyc
+[2.157s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/keya_protocol.py to keya_protocol.cpython-312.pyc
+[2.158s] running install_data
+[2.158s] copying package.xml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2
+[2.158s] copying launch/hardware_selector.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[2.158s] copying launch/esp32_hardware.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[2.158s] copying launch/keya_hardware.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[2.158s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[2.158s] copying config/keya_hardware.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[2.158s] copying config/esp32_hardware.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[2.158s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware
+[2.159s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/agv_esp32
+[2.159s] copying firmware/agv_esp32/agv_esp32.ino -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/agv_esp32
+[2.159s] running install_egg_info
+[2.175s] Copying ../../build/hiep_robot2/hiep_robot2.egg-info to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2-0.2.0-py3.12.egg-info
+[2.176s] running install_scripts
+[2.322s] Installing esp32_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[2.323s] Installing keya_driver_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[2.323s] writing list of installed files to '/home/hiep0247/hiep_ros2/build/hiep_robot2/install.log'
+[2.575s] Invoked command in '/home/hiep0247/hiep_ros2/src/hiep_robot2' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --install-scripts $base/lib/hiep_robot2 --single-version-externally-managed install_data

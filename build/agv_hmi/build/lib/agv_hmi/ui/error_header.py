@@ -171,7 +171,7 @@ class ErrorHeader(QWidget):
 
         elif level == "warn":
             self._icon.setText("🟡")
-            self._msg.setText("Cảnh báo: " + main_msg)
+            self._msg.setText(tr("warning_prefix") + main_msg)
             self._msg.setStyleSheet(
                 "font-size:12px;font-weight:600;"
                 "color:#E3B341;background:transparent;")

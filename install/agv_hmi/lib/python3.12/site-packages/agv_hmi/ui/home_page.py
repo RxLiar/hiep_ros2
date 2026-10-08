@@ -1,6 +1,8 @@
+import json
 import os
 
 from PyQt6.QtWidgets import (
+    QScrollArea,
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
@@ -13,6 +15,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QPixmap
 
 from agv_hmi.ui.i18n import tr
+from agv_hmi.ui.hold_button import HoldButton
 
 LOGO_PATH = "/home/hiep0247/Downloads/TBD_logo.png"
 
@@ -72,6 +75,7 @@ class _StatusCard(QFrame):
         lay.addWidget(self._title_lbl)
 
         self._value_lbl = QLabel(value)
+        self._value_lbl.setWordWrap(True)
         self._value_lbl.setStyleSheet(
             "font-size:18px;"
             "font-weight:700;"
@@ -123,14 +127,27 @@ class HomePage(QWidget):
     connection_toggle = pyqtSignal()
     # [NEW] Nút "Đổi người vận hành" — quay về màn hình Login.
     switch_user_requested = pyqtSignal()
+    # True = enable drive motors, False = disable (std_srvs/SetBool /motor_enable).
+    motor_enable_requested = pyqtSignal(bool)
 
     def __init__(self):
         super().__init__()
         self._conn_state = CONN_OFFLINE
         self._agv_moving = False
         self._cargo = [False, False, False, False]
+        self._motor_armed = False
+        self._plc_online = False
+        self._estop = False
 
         self._build()
+
+        # No update for a few seconds => treat the source as gone.
+        self._plc_timer = QTimer()
+        self._plc_timer.setSingleShot(True)
+        self._plc_timer.timeout.connect(self._on_plc_timeout)
+        self._driver_timer = QTimer()
+        self._driver_timer.setSingleShot(True)
+        self._driver_timer.timeout.connect(self._on_driver_timeout)
 
         self._conn_timer = QTimer()
         self._conn_timer.setSingleShot(True)
@@ -138,7 +155,18 @@ class HomePage(QWidget):
         self._conn_timer.start(5000)
 
     def _build(self):
-        root = QVBoxLayout(self)
+        # Scrollable page: the dashboard sits below the status cards on small screens.
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setStyleSheet("QScrollArea{background:transparent;border:none;}"
+                             "QScrollArea > QWidget > QWidget{background:transparent;}")
+        inner = QWidget()
+        scroll.setWidget(inner)
+        outer.addWidget(scroll)
+        root = QVBoxLayout(inner)
         root.setContentsMargins(28, 24, 28, 28)
         root.setSpacing(22)
 
@@ -189,6 +217,15 @@ class HomePage(QWidget):
         hero_lay.addLayout(title_col)
         hero_lay.addStretch()
 
+        # Motor enable / disable (KEYA bridge starts with motors disabled).
+        self._motor_btn = HoldButton("⏻  " + tr("home_motor_enable"), hold_ms=1000)
+        self._motor_btn.confirmed.connect(self._on_motor_hold_confirmed)
+        self._motor_btn.setObjectName("BtnPrimary")
+        self._motor_btn.setFixedHeight(38)
+        self._motor_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._motor_btn.clicked.connect(self._on_motor_btn_clicked)
+        hero_lay.addWidget(self._motor_btn, alignment=Qt.AlignmentFlag.AlignVCenter)
+
         # [NEW] Nút đổi người vận hành, đặt góc phải của hero card.
         self._switch_user_btn = QPushButton("🔄  " + tr("home_switch_user"))
         self._switch_user_btn.setObjectName("BtnPrimary")
@@ -231,7 +268,16 @@ class HomePage(QWidget):
             self._conv_cards.append(c)
             grid.addWidget(c, 1 + i // 2, i % 2)
 
+        self._motor_card = _StatusCard(
+            "⚙️", tr("home_motor"), tr("home_motor_unknown"), accent="#30363D")
+        grid.addWidget(self._motor_card, 3, 0)
+
+        self._safety_card = _StatusCard(
+            "📡", tr("home_plc_estop"), tr("home_plc_offline"), accent="#E3B341")
+        grid.addWidget(self._safety_card, 3, 1)
+
         root.addLayout(grid)
+        self._root_lay = root
         root.addStretch()
 
     def _load_logo(self):
@@ -328,8 +374,121 @@ class HomePage(QWidget):
                 )
                 c.set_icon("⬜")
 
+    def add_dashboard(self, widget):
+        """Insert the live dashboard above the stretch at the bottom of the page."""
+        self._root_lay.insertWidget(self._root_lay.count() - 1, widget)
+
+    # ── Hardware layer: PLC / e-stop / drive motors ──────────────────
+
+    def _on_motor_btn_clicked(self):
+        # Disabling is immediate; ENABLING needs a 1 s hold (see HoldButton).
+        if not self._motor_armed:
+            return
+        self._motor_btn.setEnabled(False)
+        QTimer.singleShot(3000, lambda: self._motor_btn.setEnabled(True))
+        self.motor_enable_requested.emit(False)
+
+    def _on_motor_hold_confirmed(self):
+        if self._motor_armed:
+            return
+        self._motor_btn.setEnabled(False)
+        QTimer.singleShot(3000, lambda: self._motor_btn.setEnabled(True))
+        self.motor_enable_requested.emit(True)
+
+    def motor_request_done(self):
+        self._motor_btn.setEnabled(True)
+
+    def _sync_motor_button(self):
+        key = "home_motor_disable" if self._motor_armed else "home_motor_enable"
+        self._motor_btn.setText("⏻  " + tr(key))
+
+    def update_plc_connection(self, state: str):
+        self._plc_online = (state == CONN_ONLINE)
+        self._plc_timer.stop()
+        if self._plc_online:
+            self._plc_timer.start(5000)
+        self._refresh_safety_card()
+
+    def update_estop(self, active: bool):
+        self._estop = bool(active)
+        self._refresh_safety_card()
+
+    def _on_plc_timeout(self):
+        self._plc_online = False
+        self._refresh_safety_card()
+
+    def _refresh_safety_card(self):
+        if not self._plc_online:
+            # With the PLC gone the e-stop state is unknown: never show "OK".
+            self._safety_card.set_value(
+                tr("home_plc_offline"), color="#E3B341", bg="#2E2000", accent="#E3B341")
+            self._safety_card.set_icon("📡")
+        elif self._estop:
+            self._safety_card.set_value(
+                tr("home_estop_active"), color="#F85149", bg="#3D1515", accent="#F85149")
+            self._safety_card.set_icon("🛑")
+        else:
+            self._safety_card.set_value(
+                tr("home_estop_ok"), color="#3FB950", bg="#1B3629", accent="#3FB950")
+            self._safety_card.set_icon("✅")
+
+    def update_driver_status(self, payload: str):
+        try:
+            d = json.loads(payload or "{}")
+            if not isinstance(d, dict):
+                return
+        except Exception:
+            return
+        self._driver_timer.stop()
+        self._driver_timer.start(3000)
+
+        online = bool(d.get("online"))
+        armed = bool(d.get("armed"))
+        estop = bool(d.get("estop"))
+        fault = d.get("fault") or [0, 0]
+        try:
+            fault_codes = [int(x) for x in fault]
+        except (TypeError, ValueError):
+            fault_codes = [0, 0]
+        self._motor_armed = armed and online
+
+        if not online:
+            self._motor_card.set_value(
+                tr("home_motor_driver_offline"), color="#F85149", bg="#3D1515", accent="#F85149")
+            self._motor_card.set_icon("⚠️")
+        elif any(fault_codes):
+            codes = "/".join(f"{c:04X}" for c in fault_codes)
+            self._motor_card.set_value(
+                f"{tr('home_motor_fault')} {codes}", color="#F85149", bg="#3D1515", accent="#F85149")
+            self._motor_card.set_icon("⚠️")
+        elif estop:
+            self._motor_card.set_value(
+                tr("home_estop_active"), color="#F85149", bg="#3D1515", accent="#F85149")
+            self._motor_card.set_icon("🛑")
+        elif armed:
+            self._motor_card.set_value(
+                tr("home_motor_on"), color="#3FB950", bg="#1B3629", accent="#3FB950")
+            self._motor_card.set_icon("⚙️")
+        else:
+            self._motor_card.set_value(
+                tr("home_motor_off"), color="#E3B341", bg="#2E2000", accent="#E3B341")
+            self._motor_card.set_icon("⚙️")
+        self._sync_motor_button()
+
+    def _on_driver_timeout(self):
+        # No /keya_driver_status (e.g. ESP32 test model): unknown, not "off".
+        self._motor_armed = False
+        self._motor_card.set_value(
+            tr("home_motor_unknown"), color="#8B949E", bg="#161B22", accent="#30363D")
+        self._motor_card.set_icon("⚙️")
+        self._sync_motor_button()
+
     def retranslate(self):
         self._title_lbl.setText(tr("app_name"))
+        self._motor_card.set_title(tr("home_motor"))
+        self._safety_card.set_title(tr("home_plc_estop"))
+        self._sync_motor_button()
+        self._refresh_safety_card()
         self._conn_card.set_title(tr("home_connection"))
         self._agv_card.set_title(tr("home_agv_status"))
         self._switch_user_btn.setText("🔄  " + tr("home_switch_user"))

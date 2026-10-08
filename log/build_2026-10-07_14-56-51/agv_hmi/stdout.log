@@ -1,0 +1,121 @@
+running egg_info
+writing ../../build/agv_hmi/agv_hmi.egg-info/PKG-INFO
+writing dependency_links to ../../build/agv_hmi/agv_hmi.egg-info/dependency_links.txt
+writing entry points to ../../build/agv_hmi/agv_hmi.egg-info/entry_points.txt
+writing requirements to ../../build/agv_hmi/agv_hmi.egg-info/requires.txt
+writing top-level names to ../../build/agv_hmi/agv_hmi.egg-info/top_level.txt
+reading manifest file '../../build/agv_hmi/agv_hmi.egg-info/SOURCES.txt'
+writing manifest file '../../build/agv_hmi/agv_hmi.egg-info/SOURCES.txt'
+running build
+running build_py
+copying agv_hmi/main.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi
+copying agv_hmi/version.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi
+creating /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/health_model.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/map_cleaner.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/zones.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/backup.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/alarm_manager.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/prefs.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/map_io.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/scheduler.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/audit_log.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/stations.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/core/__init__.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core
+copying agv_hmi/ros/ros_node.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ros
+copying agv_hmi/ui/system_settings.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/alarm_center.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/map_widget.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/toast.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/stations_page.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/diagnostics_page.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/dashboard.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/hold_button.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/vehicle_diagram.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/reports_page.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/i18n_extra.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/i18n.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/settings_page.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/schedule_page.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/home_page.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/title_bar.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/preflight.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/main_window.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+copying agv_hmi/ui/mapping_page.py -> /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui
+running install
+running install_lib
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/main.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi
+creating /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/health_model.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/map_cleaner.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/zones.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/backup.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/alarm_manager.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/prefs.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/map_io.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/scheduler.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/audit_log.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/stations.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/core/__init__.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ros/ros_node.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ros
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/system_settings.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/alarm_center.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/map_widget.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/toast.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/stations_page.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/diagnostics_page.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/dashboard.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/hold_button.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/vehicle_diagram.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/reports_page.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/i18n_extra.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/i18n.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/settings_page.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/schedule_page.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/home_page.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/title_bar.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/preflight.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/main_window.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/ui/mapping_page.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui
+copying /home/hiep0247/hiep_ros2/build/agv_hmi/build/lib/agv_hmi/version.py -> /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/main.py to main.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/health_model.py to health_model.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/map_cleaner.py to map_cleaner.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/zones.py to zones.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/backup.py to backup.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/alarm_manager.py to alarm_manager.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/prefs.py to prefs.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/map_io.py to map_io.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/scheduler.py to scheduler.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/audit_log.py to audit_log.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/stations.py to stations.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/core/__init__.py to __init__.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ros/ros_node.py to ros_node.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/system_settings.py to system_settings.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/alarm_center.py to alarm_center.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/map_widget.py to map_widget.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/toast.py to toast.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/stations_page.py to stations_page.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/diagnostics_page.py to diagnostics_page.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/dashboard.py to dashboard.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/hold_button.py to hold_button.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/vehicle_diagram.py to vehicle_diagram.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/reports_page.py to reports_page.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/i18n_extra.py to i18n_extra.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/i18n.py to i18n.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/settings_page.py to settings_page.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/schedule_page.py to schedule_page.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/home_page.py to home_page.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/title_bar.py to title_bar.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/preflight.py to preflight.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/main_window.py to main_window.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/ui/mapping_page.py to mapping_page.cpython-312.pyc
+byte-compiling /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi/version.py to version.cpython-312.pyc
+running install_data
+copying package.xml -> /home/hiep0247/hiep_ros2/install/agv_hmi/share/agv_hmi
+running install_egg_info
+removing '/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi-4.2.0-py3.12.egg-info' (and everything under it)
+Copying ../../build/agv_hmi/agv_hmi.egg-info to /home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages/agv_hmi-4.2.0-py3.12.egg-info
+running install_scripts
+Installing hmi script to /home/hiep0247/hiep_ros2/install/agv_hmi/lib/agv_hmi
+writing list of installed files to '/home/hiep0247/hiep_ros2/build/agv_hmi/install.log'

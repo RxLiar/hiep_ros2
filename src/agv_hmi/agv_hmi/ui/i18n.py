@@ -951,6 +951,111 @@ _S = {
         "ja": "センサー{}",
         "zh": "传感器 {}"
     },
+    "home_motor": {
+        "vi": "Motor di chuyển",
+        "en": "Drive motors",
+        "ko": "구동 모터",
+        "ja": "走行モーター",
+        "zh": "驱动电机"
+    },
+    "home_motor_enable": {
+        "vi": "Bật motor",
+        "en": "Enable motors",
+        "ko": "모터 켜기",
+        "ja": "モーター有効",
+        "zh": "启用电机"
+    },
+    "home_motor_disable": {
+        "vi": "Tắt motor",
+        "en": "Disable motors",
+        "ko": "모터 끄기",
+        "ja": "モーター無効",
+        "zh": "禁用电机"
+    },
+    "home_motor_on": {
+        "vi": "Đang bật",
+        "en": "Enabled",
+        "ko": "켜짐",
+        "ja": "有効",
+        "zh": "已启用"
+    },
+    "home_motor_off": {
+        "vi": "Đang tắt",
+        "en": "Disabled",
+        "ko": "꺼짐",
+        "ja": "無効",
+        "zh": "已禁用"
+    },
+    "home_motor_unknown": {
+        "vi": "Chưa có dữ liệu",
+        "en": "No data",
+        "ko": "데이터 없음",
+        "ja": "データなし",
+        "zh": "无数据"
+    },
+    "home_motor_driver_offline": {
+        "vi": "Driver offline",
+        "en": "Driver offline",
+        "ko": "드라이버 오프라인",
+        "ja": "ドライバーオフライン",
+        "zh": "驱动器离线"
+    },
+    "home_motor_fault": {
+        "vi": "Lỗi driver",
+        "en": "Driver fault",
+        "ko": "드라이버 오류",
+        "ja": "ドライバー異常",
+        "zh": "驱动器故障"
+    },
+    "home_motor_failed": {
+        "vi": "Không đổi được trạng thái motor:\n{}",
+        "en": "Cannot change motor output:\n{}",
+        "ko": "모터 상태를 변경할 수 없습니다:\n{}",
+        "ja": "モーター状態を変更できません:\n{}",
+        "zh": "无法更改电机状态:\n{}"
+    },
+    "home_motor_no_service": {
+        "vi": "Không thấy dịch vụ /motor_enable. Bridge KEYA đã chạy chưa?",
+        "en": "Service /motor_enable not found. Is the KEYA bridge running?",
+        "ko": "/motor_enable 서비스를 찾을 수 없습니다. KEYA 브리지가 실행 중입니까?",
+        "ja": "/motor_enable サービスが見つかりません。KEYAブリッジは起動していますか？",
+        "zh": "未找到 /motor_enable 服务。KEYA 桥接节点是否已运行？"
+    },
+    "home_plc_estop": {
+        "vi": "PLC · Dừng khẩn cấp",
+        "en": "PLC · Emergency stop",
+        "ko": "PLC · 비상 정지",
+        "ja": "PLC・非常停止",
+        "zh": "PLC · 紧急停止"
+    },
+    "home_plc_offline": {
+        "vi": "PLC offline",
+        "en": "PLC offline",
+        "ko": "PLC 오프라인",
+        "ja": "PLC オフライン",
+        "zh": "PLC 离线"
+    },
+    "home_estop_ok": {
+        "vi": "Bình thường",
+        "en": "Normal",
+        "ko": "정상",
+        "ja": "正常",
+        "zh": "正常"
+    },
+    "home_estop_active": {
+        "vi": "E-STOP NHẤN",
+        "en": "E-STOP PRESSED",
+        "ko": "비상정지",
+        "ja": "非常停止",
+        "zh": "急停按下"
+    },
+    "warning_prefix": {
+        "vi": "Cảnh báo: ",
+        "en": "Warning: ",
+        "ko": "경고: ",
+        "ja": "警告：",
+        "zh": "警告："
+    },
     "routes_select": {
         "vi": "Chọn lộ trình để chạy:",
         "en": "Select route to run:",
@@ -1383,3 +1488,7 @@ def tr(key: str, *args) -> str:
         except (IndexError, KeyError, ValueError):
             pass
     return text
+
+
+# Extra strings (4.5.0 features) are registered by i18n_extra; import last.
+from agv_hmi.ui import i18n_extra  # noqa: E402,F401
