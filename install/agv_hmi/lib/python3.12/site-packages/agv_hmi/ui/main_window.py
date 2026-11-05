@@ -68,6 +68,10 @@ from agv_hmi.ui.stations_page import StationsPage
 from agv_hmi.ui.schedule_page import SchedulePage
 from agv_hmi.ui.dashboard import DashboardWidget
 from agv_hmi.ui.safety_page import SafetyPage
+from agv_hmi.ui.forklift_page import ForkliftPage
+from agv_hmi.core import robot_profile as RP
+import time as _time
+import uuid as _uuid
 from agv_hmi.ui.map_widget import MapWidget
 _json = json
 from agv_hmi.version import full_label
@@ -76,9 +80,14 @@ from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QStackedWidget, QLabel, QPushButton, QMessageBox, QApplication
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer, QVariantAnimation, QEvent
+from PyQt6.QtGui import QKeySequence, QShortcut
 
 from agv_hmi.ui.i18n import tr, set_lang, get_lang, LANGUAGES
+from agv_hmi.ui import anim
+from agv_hmi.ui.anim import AnimatedStack
+from agv_hmi.ui.collapsible import CollapsiblePanel, collapse_panels
+from agv_hmi.ui.nav_button import NavButton
 from agv_hmi.ui.title_bar import TitleBar
 from agv_hmi.ui.language_selector import LanguageSelector
 from agv_hmi.ui.home_page import HomePage
@@ -112,8 +121,10 @@ NAV_KILL_PATTERNS = [
 # ── Sidebar ──────────────────────────────────────────────────────────
 
 class Sidebar(QWidget):
+    """Main navigation. Animated: expanded (labels) <-> compact icon rail <-> hidden (focus mode)."""
     page_changed          = pyqtSignal(int)
     retranslate_requested = pyqtSignal()
+    toggle_requested      = pyqtSignal()      # user clicked the collapse button
 
     IDX_HOME     = 0
     IDX_MAPPING  = 1
@@ -129,13 +140,24 @@ class Sidebar(QWidget):
     IDX_STATIONS = 11
     IDX_SCHEDULE = 12
     IDX_SAFETY   = 13
+    IDX_FORKLIFT = 14
+
+    EXPANDED_W = 210
+    COMPACT_W  = 64
 
     def __init__(self, role: str = "operator"):
         super().__init__()
         self.setObjectName("Sidebar")
-        self.setFixedWidth(210)
         self._role = role
-        self._btns: list[tuple[QPushButton, int, str]] = []
+        self._btns: list[tuple[NavButton, int, str]] = []
+        self._compact = False
+        self._hidden = False
+        self._touch = False
+        self._width_anim = QVariantAnimation(self)
+        self._width_anim.setEasingCurve(anim.EASE_INOUT)
+        self._width_anim.valueChanged.connect(lambda v: self.setFixedWidth(int(v)))
+        self._width_anim.finished.connect(self._after_width)
+        self.setFixedWidth(self.EXPANDED_W)
         self._build()
 
     def _build(self):
@@ -151,7 +173,7 @@ class Sidebar(QWidget):
         self._logo.setStyleSheet(
             "background:#185FA5;border-radius:8px;font-size:20px;"
             "qproperty-alignment:AlignCenter;")
-        txt = QWidget(); tl = QVBoxLayout(txt)
+        self._txt = QWidget(); tl = QVBoxLayout(self._txt)
         tl.setContentsMargins(0, 0, 0, 0); tl.setSpacing(1)
         self._app_lbl = QLabel(tr("app_name"))
         self._app_lbl.setObjectName("AppTitle")
@@ -159,18 +181,25 @@ class Sidebar(QWidget):
         self._ver_lbl = QLabel(full_label())
         self._ver_lbl.setObjectName("AppVersion")
         tl.addWidget(self._app_lbl); tl.addWidget(self._ver_lbl)
-        ll.addWidget(self._logo); ll.addSpacing(8); ll.addWidget(txt)
+        ll.addWidget(self._logo); ll.addSpacing(8); ll.addWidget(self._txt, 1)
         lay.addWidget(logo_w)
 
-        nav_w = QWidget(); nav_w.setContentsMargins(8, 10, 8, 0)
+        nav_w = QWidget()
         self._nav_lay = QVBoxLayout(nav_w)
-        self._nav_lay.setContentsMargins(0, 0, 0, 0)
+        self._nav_lay.setContentsMargins(0, 10, 0, 0)
         self._nav_lay.setSpacing(2)
         lay.addWidget(nav_w)
         lay.addStretch()
 
-        bot = QWidget(); bot.setFixedHeight(96)
-        bl = QVBoxLayout(bot); bl.setContentsMargins(12, 4, 12, 8); bl.setSpacing(5)
+        self._collapse_btn = NavButton("«", tr("sb_collapse"))
+        self._collapse_btn.setObjectName("NavBtnAnim")
+        self._collapse_btn.clicked.connect(self.toggle_requested)
+        cw = QWidget(); cl = QVBoxLayout(cw); cl.setContentsMargins(0, 0, 0, 4)
+        cl.addWidget(self._collapse_btn)
+        lay.addWidget(cw)
+
+        self._bot = QWidget()
+        bl = QVBoxLayout(self._bot); bl.setContentsMargins(12, 4, 12, 10); bl.setSpacing(5)
         self._lang_selector = LanguageSelector(compact=True)
         self._lang_selector.language_changed.connect(
             lambda _: self.retranslate_requested.emit())
@@ -184,7 +213,7 @@ class Sidebar(QWidget):
         self._stxt = QLabel("ROS2"); self._stxt.setObjectName("StatusLabel")
         sr.addWidget(self._dot); sr.addWidget(self._stxt); sr.addStretch()
         bl.addLayout(sr)
-        lay.addWidget(bot)
+        lay.addWidget(self._bot)
 
         self._rebuild_nav()
         self._update_mode()
@@ -195,7 +224,7 @@ class Sidebar(QWidget):
             if item.widget(): item.widget().deleteLater()
         self._btns.clear()
 
-        engineer_only = {self.IDX_MAPPING, self.IDX_MAPLIB, self.IDX_DIAG, self.IDX_SCHEDULE, self.IDX_SAFETY}
+        engineer_only = {self.IDX_MAPPING, self.IDX_MAPLIB, self.IDX_DIAG, self.IDX_SCHEDULE, self.IDX_SAFETY, self.IDX_FORKLIFT}
         pages = [
             ("⌂",  "page_home",       self.IDX_HOME),
             ("◉",  "page_fleet",      self.IDX_FLEET),
@@ -208,6 +237,7 @@ class Sidebar(QWidget):
             ("📍", "page_stations",   self.IDX_STATIONS),
             ("🗓", "page_schedule",   self.IDX_SCHEDULE),
             ("🛡", "page_safety",     self.IDX_SAFETY),
+            ("🏗", "page_forklift",   self.IDX_FORKLIFT),
             ("📊", "page_reports",    self.IDX_REPORTS),
             ("🩺", "page_diag",       self.IDX_DIAG),
             ("⚙",  "page_settings",   self.IDX_SETTINGS),
@@ -215,32 +245,106 @@ class Sidebar(QWidget):
         for icon, key, idx in pages:
             if idx in engineer_only and self._role != "engineer":
                 continue
-            b = QPushButton(f"  {icon}  {tr(key)}")
-            b.setObjectName("NavBtn"); b.setFixedHeight(38)
+            b = NavButton(icon, tr(key))
+            b.setFixedHeight(54 if self._touch else 38)
+            b.set_compact(self._compact)
             b.clicked.connect(lambda _, i=idx: self.switch(i))
             self._nav_lay.addWidget(b)
             self._btns.append((b, idx, key))
         self._nav_lay.addStretch()
 
+    # ── state ────────────────────────────────────────────────────────
+    def is_compact(self) -> bool:
+        return self._compact
+
+    def is_hidden_rail(self) -> bool:
+        return self._hidden
+
     def set_touch(self, on: bool):
+        self._touch = bool(on)
         for b, _, _ in self._btns:
             b.setFixedHeight(54 if on else 38)
+        self._collapse_btn.setFixedHeight(54 if on else 38)
+
+    def set_compact(self, compact: bool, animate: bool = True):
+        compact = bool(compact)
+        if compact == self._compact:
+            return
+        self._compact = compact
+        for b, _, _ in self._btns:
+            b.set_compact(compact)
+        self._collapse_btn.set_compact(compact)
+        self._collapse_btn.set_icon_text("»" if compact else "«")
+        self._collapse_btn.set_label(tr("sb_expand") if compact else tr("sb_collapse"))
+        if compact:
+            self._set_texts_visible(False)
+        else:
+            d = anim.dur(anim.DUR_MED) if animate else 0
+            if d == 0:
+                self._set_texts_visible(True)
+            else:   # let the rail grow a little before the labels appear
+                QTimer.singleShot(int(d * 0.55), self._show_texts_if_expanded)
+        self._update_mode()
+        self._apply_width(animate)
+
+    def set_hidden(self, hidden: bool, animate: bool = True):
+        hidden = bool(hidden)
+        if hidden == self._hidden:
+            return
+        self._hidden = hidden
+        if not hidden:
+            self.show()
+        self._apply_width(animate)
+
+    def _target_width(self) -> int:
+        if self._hidden:
+            return 0
+        return self.COMPACT_W if self._compact else self.EXPANDED_W
+
+    def _apply_width(self, animate: bool):
+        target = self._target_width()
+        self._width_anim.stop()
+        d = anim.dur(anim.DUR_MED) if animate else 0
+        if d == 0:
+            self.setFixedWidth(target)
+            self._after_width()
+            return
+        self._width_anim.setDuration(d)
+        self._width_anim.setStartValue(self.width())
+        self._width_anim.setEndValue(target)
+        self._width_anim.start()
+
+    def _after_width(self):
+        if self._hidden:
+            self.hide()
+
+    def _show_texts_if_expanded(self):
+        if not self._compact:
+            self._set_texts_visible(True)
+
+    def _set_texts_visible(self, vis: bool):
+        self._txt.setVisible(vis)
+        self._lang_selector.setVisible(vis)
+        self._stxt.setVisible(vis)
 
     def switch(self, idx: int):
         for b, bidx, _ in self._btns:
-            b.setProperty("active", str(bidx == idx).lower())
-            b.style().unpolish(b); b.style().polish(b)
+            b.set_active(bidx == idx)
         self.page_changed.emit(idx)
 
     def set_ros_status(self, txt: str, ok: bool = True):
         self._dot.setStyleSheet(
             f"color:{'#3FB950' if ok else '#E3B341'};font-size:10px;")
         self._stxt.setText(txt)
+        self._dot.setToolTip(txt)
 
     def _update_mode(self):
         mode  = tr("mode_engineer") if self._role == "engineer" else tr("mode_operator")
         color = "#58A6FF" if self._role == "engineer" else "#3FB950"
-        self._mode_lbl.setText(f"● {mode}")
+        self._mode_lbl.setText("●" if self._compact else f"● {mode}")
+        self._mode_lbl.setToolTip(mode)
+        self._mode_lbl.setAlignment(
+            Qt.AlignmentFlag.AlignCenter if self._compact else Qt.AlignmentFlag.AlignLeft)
         self._mode_lbl.setStyleSheet(
             f"color:{color};font-size:10px;font-weight:600;")
 
@@ -248,8 +352,8 @@ class Sidebar(QWidget):
         self._app_lbl.setText(tr("app_name"))
         self._update_mode()
         for b, _, key in self._btns:
-            icon = b.text().strip().split("  ")[0]
-            b.setText(f"  {icon}  {tr(key)}")
+            b.set_label(tr(key))
+        self._collapse_btn.set_label(tr("sb_expand") if self._compact else tr("sb_collapse"))
         if hasattr(self, "_lang_selector"):
             self._lang_selector.retranslate()
 
@@ -263,6 +367,7 @@ class MainWindow(QMainWindow):
     soft_estop_signal    = pyqtSignal()       # -> RosInterface.soft_estop
     light_mask_signal    = pyqtSignal(int)    # -> RosInterface.publish_light_mask
     safety_config_signal = pyqtSignal(str)    # -> RosInterface.publish_safety_config
+    forklift_cmd_signal  = pyqtSignal(str)    # -> RosInterface.publish_forklift_command
 
     # [NEW] Đổi người vận hành: quay về màn hình Login, ROS node vẫn sống.
     switch_user_signal   = pyqtSignal()
@@ -302,6 +407,8 @@ class MainWindow(QMainWindow):
         self._skip_preflight_once = False
         self._queue_run_active = False
         self._housekeeping_ticks = 0
+        self._fork_wait = None        # task waiting for the forklift node: dict
+        self._fork_seen_status = 0.0
 
         self.setWindowTitle(tr("app_name"))
         self.setMinimumSize(1024, 600)
@@ -369,8 +476,15 @@ class MainWindow(QMainWindow):
         self._nav_launcher     = ManagedLaunch(
             "Navigation", NAV_CMD, kill_patterns=NAV_KILL_PATTERNS)
 
+        # 4.7.0: sidebar / focus mode state
+        self._sb_user_compact = bool(prefs.get("ui_sidebar_compact"))
+        self._sb_auto_compact = False
+        self._focus_mode = False
+        self._focus_collapsed: list = []
+
         self._build()
         self._wire()
+        self._init_ui_extras()
 
         # FIX threading: connect signal nội bộ — Qt tự dùng
         # QueuedConnection khi emit từ thread khác main thread.
@@ -412,7 +526,7 @@ class MainWindow(QMainWindow):
         self._sidebar = Sidebar(role=self._role)
         body_lay.addWidget(self._sidebar)
 
-        self._pages    = QStackedWidget()
+        self._pages    = AnimatedStack()
         self._home     = HomePage()
         self._mapping  = MappingPage()
         self._nav      = NavigationPage(role=self._role)
@@ -427,11 +541,12 @@ class MainWindow(QMainWindow):
         self._stations = StationsPage()
         self._schedule = SchedulePage()
         self._safety   = SafetyPage()
+        self._forklift = ForkliftPage()
 
         for p in (self._home, self._mapping, self._nav, self._routes,
                   self._conveyor, self._maplib, self._settings, self._fleet,
                   self._alarm_page, self._diag, self._reports,
-                  self._stations, self._schedule, self._safety):
+                  self._stations, self._schedule, self._safety, self._forklift):
             self._pages.addWidget(p)
 
         body_lay.addWidget(self._pages)
@@ -442,6 +557,7 @@ class MainWindow(QMainWindow):
         self._dashboard = DashboardWidget()
         self._home.add_dashboard(self._dashboard)
         self._apply_robot_profile(self._safety.active_profile())
+        self._nav.set_robot_type(self._safety.active_profile().get("robot_type", "agv"))
 
     # ── Wire ─────────────────────────────────────────────────────────
 
@@ -457,6 +573,8 @@ class MainWindow(QMainWindow):
         self._titlebar.alarms_clicked.connect(
             lambda: self._sidebar.switch(Sidebar.IDX_ALARMS))
         self._safety.profile_applied.connect(self._on_profile_applied)
+        self._forklift.command_requested.connect(self.forklift_cmd_signal)
+        self._forklift.params_save_requested.connect(self._safety.apply_external)
         self._stations.set_pose_requested.connect(self.pose_estimate_signal)
         self._stations.goto_requested.connect(self._goto_station)
         self._schedule.run_queue_requested.connect(lambda: self._try_run_queue(manual=True))
@@ -467,6 +585,9 @@ class MainWindow(QMainWindow):
 
         self._sidebar.page_changed.connect(self._switch_page)
         self._sidebar.retranslate_requested.connect(self._retranslate_all)
+        self._sidebar.toggle_requested.connect(self.toggle_sidebar)
+        self._titlebar.menu_clicked.connect(self.toggle_sidebar)
+        self._titlebar.focus_clicked.connect(self.toggle_focus_mode)
 
         self._home.connection_toggle.connect(self._on_connection_toggle)
         self._home.motor_enable_requested.connect(self.motor_enable_signal)
@@ -543,8 +664,12 @@ class MainWindow(QMainWindow):
             Sidebar.IDX_STATIONS: tr("page_stations"),
             Sidebar.IDX_SCHEDULE: tr("page_schedule"),
             Sidebar.IDX_SAFETY:   tr("page_safety"),
+            Sidebar.IDX_FORKLIFT: tr("page_forklift"),
         }
         self._titlebar.set_page_title(titles.get(idx, ""))
+        if self._focus_mode:
+            self._focus_collapsed += collapse_panels(
+                self._pages.currentWidget(), True, animate=False)
         if idx == Sidebar.IDX_ROUTES: self._routes.refresh()
         if idx == Sidebar.IDX_MAPLIB: self._maplib.refresh()
         if idx == Sidebar.IDX_FLEET:
@@ -668,6 +793,8 @@ class MainWindow(QMainWindow):
         Auto/Manual KHÔNG áp dụng cho luồng này, giữ nguyên hành vi cũ.
         """
         self._mission_source = "navigation"
+        if not self._robot_type_ok(wps):
+            return
         if not self._preflight():
             return
         map_path = getattr(self._nav, "_selected_map_path", "") or ""
@@ -818,6 +945,7 @@ class MainWindow(QMainWindow):
         self._estop_banner.setVisible(bool(active))
         if active and not self._estop_active:
             audit_log.audit("estop_pressed")
+            self._abort_fork_wait(send_stop=True)
             if self._mission_running:
                 self._stop_mission("cancelled")
                 self._toasts.show_toast(tr("estop_mission_cancelled"), "error", 6000)
@@ -919,6 +1047,7 @@ class MainWindow(QMainWindow):
         """Soft stop: zero velocity, motors off, running mission cancelled."""
         audit_log.audit("soft_estop")
         self.soft_estop_signal.emit()
+        self._abort_fork_wait(send_stop=True)
         if self._mission_running:
             self._stop_mission("cancelled")
         else:
@@ -980,6 +1109,7 @@ class MainWindow(QMainWindow):
     def _on_profile_applied(self, p: dict):
         audit_log.audit("robot_profile", f"{p['name']} {p['length_m']}x{p['width_m']}")
         self._apply_robot_profile(p)
+        self._forklift.set_profile(p)
         self.safety_config_signal.emit(_json.dumps(p))
         self._toasts.show_toast("🛡 " + p["name"], "ok")
 
@@ -996,6 +1126,7 @@ class MainWindow(QMainWindow):
         self.health.set_safety(state)
         self._safety.feed_state(payload)
         self._dashboard.set_safety(state)
+        self._forklift.feed_bypass(d.get("bypass", []))
         self.alarms.set_condition("safety.stop", state == "stop", "warn", tr("al_safety_stop"), "Safety")
         self.alarms.set_condition("safety.noscan", state == "no_scan", "error", tr("al_safety_noscan"), "Safety")
 
@@ -1009,8 +1140,82 @@ class MainWindow(QMainWindow):
             self._safety.mark_state_stale()
             self._dashboard.set_safety(None)
         self._housekeeping_ticks += 1
+        self._check_fork_watchdog()
+        self._forklift.set_node_alive(_time.monotonic() - self._fork_seen_status < 3.0 if self._fork_seen_status else False)
         if self._housekeeping_ticks % 15 == 0:
             self._schedule_tick()
+
+    # ── Fork lift tasks ─────────────────────────────────────────────
+
+    def _robot_type_ok(self, wps: list) -> bool:
+        """Fork tasks need a fork-lift robot profile (and the other way round is a warning only)."""
+        has_fork = any(str(t.get("type", "")).startswith("fork_")
+                       for wp in wps for t in wp.get("tasks", []))
+        prof_type = self._safety.active_profile().get("robot_type", "agv")
+        if has_fork and prof_type != "forklift":
+            self._toasts.show_toast(tr("rt_mismatch", tr("rt_forklift"), tr("rt_" + prof_type)), "error", 7000)
+            return False
+        return True
+
+    def _start_fork_task(self, task: dict, tasks: list, next_idx: int, on_done, token):
+        cmd = {k: v for k, v in task.items() if k not in ("type", "order")}
+        cmd["cmd"] = str(task["type"])[5:]                       # fork_pick -> pick
+        cmd["id"] = _uuid.uuid4().hex[:10]
+        self._fork_wait = {"id": cmd["id"], "tasks": tasks, "next": next_idx, "on_done": on_done,
+                           "token": token, "t0": _time.monotonic(), "seen": False,
+                           "label": tr("task_" + str(task["type"]))}
+        audit_log.audit("fork_task", f"{cmd['cmd']} {json.dumps({k: v for k, v in cmd.items() if k not in ('id', 'cmd')})}")
+        self._routes.set_task_status(tr("fk_waiting", self._fork_wait["label"]))
+        self.forklift_cmd_signal.emit(_json.dumps(cmd))
+
+    def _abort_fork_wait(self, send_stop: bool = False):
+        had = self._fork_wait is not None
+        self._fork_wait = None
+        if send_stop and (had or self._forklift.is_running()):
+            self.forklift_cmd_signal.emit(_json.dumps({"cmd": "stop"}))
+
+    def _fail_fork_task(self, message: str):
+        self._abort_fork_wait(send_stop=True)
+        self._toasts.show_toast(tr("fk_failed", message), "error", 8000)
+        self.alarms.raise_alarm("forklift.error", "error", tr("al_forklift", message), "Fork lift")
+        audit_log.audit("fork_task_failed", message)
+        if self._mission_running:
+            self._stop_mission("failed")
+
+    def on_forklift_status(self, payload: str):
+        try:
+            st = _json.loads(payload)
+        except ValueError:
+            return
+        self._fork_seen_status = _time.monotonic()
+        self._forklift.feed_status(st)
+        state = st.get("state")
+        if state == "error":
+            self.alarms.raise_alarm("forklift.error", "error", tr("al_forklift", st.get("message", "")), "Fork lift")
+        else:
+            self.alarms.clear_alarm("forklift.error")
+        w = self._fork_wait
+        if not w or st.get("id") != w["id"]:
+            return
+        w["seen"] = True
+        if state == "done":
+            self._fork_wait = None
+            if self._mission_active(w["token"]):
+                self._run_sequential(w["tasks"], w["next"], w["on_done"], token=w["token"])
+        elif state == "error":
+            self._fail_fork_task(str(st.get("message", "")))
+        else:
+            self._routes.set_task_status(tr("fk_waiting", f"{w['label']} - {st.get('step', '')} {int(100 * float(st.get('progress', 0)))}%"))
+
+    def _check_fork_watchdog(self):
+        w = self._fork_wait
+        if not w:
+            return
+        age = _time.monotonic() - w["t0"]
+        if not w["seen"] and age > 5.0:
+            self._fail_fork_task(tr("fk_no_node"))
+        elif age > 300.0:
+            self._fail_fork_task("timeout")
 
     # ── Stations, schedule, queue, touch mode ───────────────────────
 
@@ -1281,6 +1486,11 @@ class MainWindow(QMainWindow):
             )
 
         try:
+            RM.set_route_field(route["id"], "robot_type", self._nav.robot_type())
+        except Exception as exc:
+            print(f"[Route] robot_type not saved: {exc}")
+
+        try:
             thumb_dir = os.path.expanduser("~/.agv_hmi/route_thumbnails")
             os.makedirs(thumb_dir, exist_ok=True)
             thumb_path = os.path.join(thumb_dir, f"{route['id']}.png")
@@ -1346,6 +1556,12 @@ class MainWindow(QMainWindow):
         mp = self._normalize_map_path(route.get("map_path", ""))
         wps = copy.deepcopy(route.get("waypoints", []))
         audit_log.audit("mission_start", str(route.get("name", "")))
+        if not self._robot_type_ok(wps):
+            try:
+                self._routes.set_mission_done()
+            except Exception:
+                pass
+            return
         if not wps:
             self._routes.set_status("Route không có waypoint.")
             try:
@@ -1672,10 +1888,12 @@ class MainWindow(QMainWindow):
         sequential = [
             t for t in tasks
             if t.get("order") != "parallel" or t.get("type") == "confirm"
+            or str(t.get("type", "")).startswith("fork_")
         ]
         parallel = [
             t for t in tasks
             if t.get("order") == "parallel" and t.get("type") != "confirm"
+            and not str(t.get("type", "")).startswith("fork_")
         ]
         delays = []
         for task in parallel:
@@ -1704,6 +1922,9 @@ class MainWindow(QMainWindow):
             self._routes.set_status(
                 "⏸ Chờ người vận hành xác nhận để tiếp tục.")
             self._request_route_confirm(); return
+        if str(task.get("type", "")).startswith("fork_"):
+            self._start_fork_task(task, tasks, idx + 1, on_done, token)
+            return
         delay = self._execute_single_task(task, token=token)
         if delay is None: return
         self._schedule_mission_timer(
@@ -1948,6 +2169,7 @@ class MainWindow(QMainWindow):
         if was_running:
             audit_log.audit("mission_stop", log_status)
         self._queue_run_active = False
+        self._abort_fork_wait(send_stop=True)
         self._cancel_reason = "stop"
         self._new_mission_token()
         self._stop_nav_retry()
@@ -2019,25 +2241,53 @@ class MainWindow(QMainWindow):
         super().resizeEvent(ev)
         if hasattr(self, "_toasts"):
             self._toasts.reposition()
-        w = ev.size().width()
-        collapsed = w < 900
-        if collapsed != getattr(self, '_sb_collapsed', False):
-            self._sb_collapsed = collapsed
-            if collapsed:
-                self._sidebar.setFixedWidth(52)
-                if hasattr(self._sidebar, "_lang_selector"):
-                    self._sidebar._lang_selector.setVisible(False)
-                for b, _, _ in self._sidebar._btns:
-                    icon = b.text().strip().split("  ")[0]
-                    b.setText(f" {icon} ")
-            else:
-                self._sidebar.setFixedWidth(210)
-                if hasattr(self._sidebar, "_lang_selector"):
-                    self._sidebar._lang_selector.setVisible(True)
-                for b, _, key in self._sidebar._btns:
-                    icon = b.text().strip()[0]
-                    b.setText(f"  {icon}  {tr(key)}")
+        auto = ev.size().width() < 900
+        if auto != self._sb_auto_compact:
+            self._sb_auto_compact = auto
+            self._apply_sidebar(animate=self.isVisible())
 
+    def changeEvent(self, ev):
+        super().changeEvent(ev)
+        if ev.type() == QEvent.Type.WindowStateChange and hasattr(self, "_titlebar"):
+            self._titlebar.set_maximized(self.isMaximized())
+
+    # ── 4.7.0: sidebar / focus mode ──────────────────────────────────
+
+    def _init_ui_extras(self):
+        self._apply_sidebar(animate=False)
+        QShortcut(QKeySequence("Ctrl+B"), self, activated=self.toggle_sidebar)
+        QShortcut(QKeySequence("F11"), self, activated=self.toggle_focus_mode)
+        QShortcut(QKeySequence("Esc"), self, activated=self._exit_focus_mode)
+
+    def _apply_sidebar(self, animate: bool = True):
+        self._sidebar.set_compact(self._sb_user_compact or self._sb_auto_compact, animate)
+
+    def toggle_sidebar(self):
+        """Collapse the sidebar to an icon rail / expand it again (remembered)."""
+        if self._focus_mode:
+            self.toggle_focus_mode()
+            return
+        self._sb_user_compact = not (self._sidebar.is_compact())
+        prefs.set("ui_sidebar_compact", self._sb_user_compact)
+        self._sb_auto_compact = False if not self._sb_user_compact else self._sb_auto_compact
+        self._apply_sidebar()
+
+    def _exit_focus_mode(self):
+        if self._focus_mode:
+            self.toggle_focus_mode()
+
+    def toggle_focus_mode(self):
+        """Hide the sidebar and every side panel of the current page (maximum map); toggle back."""
+        self._focus_mode = not self._focus_mode
+        if self._focus_mode:
+            self._focus_collapsed = collapse_panels(self._pages.currentWidget(), True)
+            self._sidebar.set_hidden(True)
+        else:
+            self._sidebar.set_hidden(False)
+            collapse_panels(self._pages, False,
+                            only=[p for p in self._focus_collapsed if p is not None])
+            self._focus_collapsed = []
+        self._titlebar.set_focus_mode(self._focus_mode)
 
     # draw path on map widget 
        
@@ -2060,8 +2310,10 @@ class MainWindow(QMainWindow):
         self._settings.retranslate(); self._fleet.retranslate()
         self._alarm_page.retranslate(); self._diag.retranslate()
         self._reports.retranslate(); self._stations.retranslate(); self._schedule.retranslate()
-        self._safety.retranslate()
+        self._safety.retranslate(); self._forklift.retranslate()
         self._dashboard.retranslate()
+        for panel in self.findChildren(CollapsiblePanel):
+            panel.retranslate()
         self._estop_banner.setText(tr("estop_banner"))
         self.setWindowTitle(tr("app_name"))
         self._switch_page(self._pages.currentIndex())

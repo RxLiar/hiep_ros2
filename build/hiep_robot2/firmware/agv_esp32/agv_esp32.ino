@@ -1,1 +1,0 @@
-/home/hiep0247/hiep_ros2/src/hiep_robot2/firmware/agv_esp32/agv_esp32.ino

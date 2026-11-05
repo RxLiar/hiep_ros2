@@ -132,6 +132,7 @@ class RosInterface(QObject):
     joy_signal             = pyqtSignal(list, list)            # axes, buttons
     safety_state_signal    = pyqtSignal(str)                   # JSON from /safety_state
     scan_raw_signal        = pyqtSignal(float, float, float, float, list)  # angle_min, inc, rmin, rmax, ranges
+    forklift_status_signal = pyqtSignal(str)                   # JSON from /forklift/status
 
     # Nav2 planner/controller status → ErrorHeader trong nav/routes
     # payload: JSON string {"level":"ok|warn|error","message":"..."}
@@ -300,6 +301,8 @@ class RosInterface(QObject):
             reliability=ReliabilityPolicy.RELIABLE, durability=DurabilityPolicy.TRANSIENT_LOCAL,
             history=HistoryPolicy.KEEP_LAST, depth=1)
         self._safety_cfg_pub = self.node.create_publisher(String, "/safety_config", latched)
+        self._forklift_cmd_pub = self.node.create_publisher(String, "/forklift/command", 10)
+        self.node.create_subscription(String, "/forklift/status", self._forklift_status_cb, 10)
         self.node.create_subscription(String, "/safety_state", self._safety_state_cb, 10)
         self._scan_raw_t = 0.0
         self.node.create_timer(1.0, self._publish_rates)
@@ -379,6 +382,15 @@ class RosInterface(QObject):
 
     def _safety_state_cb(self, msg: String):
         self.safety_state_signal.emit(msg.data)
+
+    def _forklift_status_cb(self, msg: String):
+        self.forklift_status_signal.emit(msg.data)
+
+    def publish_forklift_command(self, payload: str):
+        """JSON command for hiep_robot2/forklift_node (pick, drop, lift, lower, insert, retract, stop, reset, set_carrying)."""
+        if not self._ros_context_alive():
+            return
+        self._safe_publish(self._forklift_cmd_pub, String(data=payload))
 
     def publish_safety_config(self, payload: str):
         """Robot size / lidar pose / zones for the hiep_robot2 safety_monitor (latched JSON)."""

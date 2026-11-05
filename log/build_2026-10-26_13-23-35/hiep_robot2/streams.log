@@ -1,0 +1,93 @@
+[0.567s] Invoking command in '/home/hiep0247/hiep_ros2/src/hiep_robot2': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --install-scripts $base/lib/hiep_robot2 --single-version-externally-managed install_data
+[0.713s] running egg_info
+[0.713s] creating ../../build/hiep_robot2/hiep_robot2.egg-info
+[0.723s] writing ../../build/hiep_robot2/hiep_robot2.egg-info/PKG-INFO
+[0.723s] writing dependency_links to ../../build/hiep_robot2/hiep_robot2.egg-info/dependency_links.txt
+[0.723s] writing entry points to ../../build/hiep_robot2/hiep_robot2.egg-info/entry_points.txt
+[0.723s] writing requirements to ../../build/hiep_robot2/hiep_robot2.egg-info/requires.txt
+[0.723s] writing top-level names to ../../build/hiep_robot2/hiep_robot2.egg-info/top_level.txt
+[0.723s] writing manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[0.743s] reading manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[0.744s] writing manifest file '../../build/hiep_robot2/hiep_robot2.egg-info/SOURCES.txt'
+[0.744s] running build
+[0.744s] running build_py
+[0.744s] creating /home/hiep0247/hiep_ros2/build/hiep_robot2/build
+[0.744s] creating /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib
+[0.744s] creating /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.744s] copying hiep_robot2/safety_logic.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.751s] copying hiep_robot2/safety_check.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.751s] copying hiep_robot2/protocol.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.752s] copying hiep_robot2/plc_io_protocol.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.752s] copying hiep_robot2/keya_driver_bridge_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.752s] copying hiep_robot2/forklift_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.753s] copying hiep_robot2/esp32_bridge_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.753s] copying hiep_robot2/mega2560_plc_bridge_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.753s] copying hiep_robot2/safety_monitor_node.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.753s] copying hiep_robot2/keya_protocol.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.754s] copying hiep_robot2/forklift_logic.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.754s] copying hiep_robot2/__init__.py -> /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2
+[0.754s] running install
+[0.758s] running install_lib
+[0.770s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/safety_logic.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/safety_check.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/protocol.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/plc_io_protocol.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/keya_driver_bridge_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/forklift_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/esp32_bridge_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/mega2560_plc_bridge_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/safety_monitor_node.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/keya_protocol.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/forklift_logic.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] copying /home/hiep0247/hiep_ros2/build/hiep_robot2/build/lib/hiep_robot2/__init__.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2
+[0.770s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/safety_logic.py to safety_logic.cpython-312.pyc
+[0.773s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/safety_check.py to safety_check.cpython-312.pyc
+[0.774s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/protocol.py to protocol.cpython-312.pyc
+[0.775s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/plc_io_protocol.py to plc_io_protocol.cpython-312.pyc
+[0.776s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/keya_driver_bridge_node.py to keya_driver_bridge_node.cpython-312.pyc
+[0.779s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/forklift_node.py to forklift_node.cpython-312.pyc
+[0.780s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/esp32_bridge_node.py to esp32_bridge_node.cpython-312.pyc
+[0.783s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/mega2560_plc_bridge_node.py to mega2560_plc_bridge_node.cpython-312.pyc
+[0.786s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/safety_monitor_node.py to safety_monitor_node.cpython-312.pyc
+[0.788s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/keya_protocol.py to keya_protocol.cpython-312.pyc
+[0.789s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/forklift_logic.py to forklift_logic.cpython-312.pyc
+[0.790s] byte-compiling /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2/__init__.py to __init__.cpython-312.pyc
+[0.791s] running install_data
+[0.791s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index
+[0.791s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index/resource_index
+[0.791s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index/resource_index/packages
+[0.791s] copying resource/hiep_robot2 -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/ament_index/resource_index/packages
+[0.791s] copying package.xml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2
+[0.791s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.791s] copying launch/hardware_selector.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.791s] copying launch/keya_with_mega2560_plc.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.791s] copying launch/agv_hardware.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.791s] copying launch/esp32_hardware.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.791s] copying launch/mega2560_plc.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.792s] copying launch/esp32_with_mega2560_plc.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.792s] copying launch/keya_hardware.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.792s] copying launch/forklift.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.792s] copying launch/safety_monitor.launch.py -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/launch
+[0.792s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[0.792s] copying config/forklift.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[0.793s] copying config/safety_monitor.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[0.793s] copying config/keya_hardware.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[0.793s] copying config/esp32_hardware.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[0.793s] copying config/mega2560_plc.yaml -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/config
+[0.793s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware
+[0.793s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/agv_esp32
+[0.793s] copying firmware/agv_esp32/agv_esp32.ino -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/agv_esp32
+[0.793s] creating /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/mega2560_plc
+[0.793s] copying firmware/mega2560_plc/mega2560_plc.ino -> /home/hiep0247/hiep_ros2/install/hiep_robot2/share/hiep_robot2/firmware/mega2560_plc
+[0.793s] running install_egg_info
+[0.806s] Copying ../../build/hiep_robot2/hiep_robot2.egg-info to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages/hiep_robot2-0.7.0-py3.12.egg-info
+[0.806s] running install_scripts
+[0.884s] Installing esp32_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.884s] Installing forklift_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.885s] Installing keya_driver_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.885s] Installing mega2560_plc_bridge_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.885s] Installing safety_check script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.885s] Installing safety_monitor_node script to /home/hiep0247/hiep_ros2/install/hiep_robot2/lib/hiep_robot2
+[0.885s] writing list of installed files to '/home/hiep0247/hiep_ros2/build/hiep_robot2/install.log'
+[0.901s] Invoked command in '/home/hiep0247/hiep_ros2/src/hiep_robot2' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/hiep_robot2/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hiep_robot2 build --build-base /home/hiep0247/hiep_ros2/build/hiep_robot2/build install --record /home/hiep0247/hiep_ros2/build/hiep_robot2/install.log --install-scripts $base/lib/hiep_robot2 --single-version-externally-managed install_data

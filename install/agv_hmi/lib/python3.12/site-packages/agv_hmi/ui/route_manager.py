@@ -183,3 +183,15 @@ def make_waypoint(
         "conveyor_id": conveyor_id,
         "conveyor_mode": conveyor_mode,
     }
+
+
+def set_route_field(route_id: str, key: str, value) -> bool:
+    """Set one top-level field of a saved route (e.g. robot_type)."""
+    routes = load_all()
+    for route in routes:
+        if route.get("id") == route_id:
+            route[key] = value
+            route["modified"] = _now()
+            save_all(routes)
+            return True
+    return False

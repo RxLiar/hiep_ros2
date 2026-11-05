@@ -155,3 +155,24 @@ def parse_plc_status(line: str) -> Optional[PlcStatus]:
         led_mask=values[10] & 0x0F,
         modes=(values[11], values[12], values[13], values[14]),
     )
+
+
+# -- fork lift (optional hardware on the Mega2560) ------------------------------
+def encode_fork_command(sequence: int, direction: str, speed_percent: int) -> bytes:
+    """FORK,<seq>,<U|D|S>,<0..100>. The firmware stops the fork if it hears nothing for ~0.4 s."""
+    d = direction.upper()[:1]
+    if d not in ("U", "D", "S"):
+        raise ValueError("direction must be U, D or S")
+    return _line(f"FORK,{int(sequence)},{d},{max(0, min(100, int(speed_percent)))}")
+
+
+def parse_fork_status(line: str):
+    """FSTAT,<seq>,<height_counts>,<top>,<bottom>,<moving>,<fault> -> dict or None."""
+    parts = line.strip().split(",")
+    if len(parts) != 7 or parts[0] != "FSTAT":
+        return None
+    try:
+        return {"sequence": int(parts[1]), "height_counts": int(parts[2]), "top": parts[3] == "1",
+                "bottom": parts[4] == "1", "moving": parts[5] == "1", "fault": int(parts[6])}
+    except ValueError:
+        return None

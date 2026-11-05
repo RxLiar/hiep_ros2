@@ -9,6 +9,7 @@ and receives live changes on /safety_config.  Geometry is in the robot base fram
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import math
 import os
@@ -27,7 +28,29 @@ DEFAULT_PROFILE = {
     "slow": {"front": 1.00, "rear": 0.60, "left": 0.40, "right": 0.40},
     "slow_linear_mps": 0.15, "slow_angular_rps": 0.30,
     "safety_enabled": True, "require_scan": True, "min_points": 3,
+    # "agv" = conveyor AGV, "forklift" = fork lift (adds the fork block below)
+    "robot_type": "agv",
+    "fork_length_m": 1.10,         # fork tips back to the carriage / body
+    "fork_width_m": 0.90,          # overall width of the two forks
+    "load_width_m": 1.20,          # widest pallet carried
+    "max_height_mm": 1600.0,
+    "fork": {
+        "approach_height_mm": 80.0, "lift_height_mm": 200.0, "travel_height_mm": 150.0,
+        "release_clearance_mm": 60.0, "insert_depth_m": 1.00, "retract_m": 1.30,
+        "insert_speed_mps": 0.08, "retract_speed_mps": 0.10, "load_overhang_m": 0.10,
+        "bypass_ahead_m": 1.60, "bypass_margin_m": 0.10,
+        # advanced (fork motion control)
+        "height_tol_mm": 15.0, "max_fork_speed_pct": 70.0, "min_fork_speed_pct": 25.0, "slow_zone_mm": 80.0,
+        "stall_s": 2.5, "blocked_s": 4.0, "height_step_timeout_s": 60.0, "drive_step_timeout_s": 60.0,
+    },
 }
+
+ROBOT_TYPES = ("agv", "forklift")
+# starting point for a new fork-lift profile (the lidar position is a guess: set yours)
+FORKLIFT_PRESET = {"robot_type": "forklift", "length_m": 2.4, "width_m": 1.0, "center_x_m": 0.0,
+                   "lidar_x_m": -0.6, "lidar_y_m": 0.0,
+                   "stop": {"front": 0.30, "rear": 0.40, "left": 0.10, "right": 0.10},
+                   "slow": {"front": 1.00, "rear": 0.80, "left": 0.40, "right": 0.40}}
 
 
 def _num(d, key, lo, hi, default):
@@ -56,6 +79,19 @@ def normalize(d: dict | None) -> dict:
             out[zone][s] = _num(src, s, 0.0, 5.0, base[zone][s])
     for s in SIDES:                                    # the slow zone always contains the stop zone
         out["slow"][s] = max(out["slow"][s], out["stop"][s])
+    out["robot_type"] = d.get("robot_type") if d.get("robot_type") in ROBOT_TYPES else base["robot_type"]
+    for key, lo, hi in (("fork_length_m", 0.1, 5.0), ("fork_width_m", 0.1, 3.0), ("load_width_m", 0.1, 3.0),
+                        ("max_height_mm", 100.0, 8000.0)):
+        out[key] = _num(d, key, lo, hi, base[key])
+    fsrc = d.get("fork") if isinstance(d.get("fork"), dict) else {}
+    for key, lo, hi in (("approach_height_mm", 0, 8000), ("lift_height_mm", 0, 8000), ("travel_height_mm", 0, 8000),
+                        ("release_clearance_mm", 0, 500), ("insert_depth_m", 0.05, 3.0), ("retract_m", 0.05, 4.0),
+                        ("insert_speed_mps", 0.02, 0.30), ("retract_speed_mps", 0.02, 0.50),
+                        ("load_overhang_m", 0.0, 1.0), ("bypass_ahead_m", 0.2, 4.0), ("bypass_margin_m", 0.0, 0.5),
+                        ("height_tol_mm", 2, 100), ("max_fork_speed_pct", 10, 100), ("min_fork_speed_pct", 5, 100),
+                        ("slow_zone_mm", 10, 500), ("stall_s", 0.5, 10), ("blocked_s", 1, 20),
+                        ("height_step_timeout_s", 5, 300), ("drive_step_timeout_s", 5, 300)):
+        out["fork"][key] = _num(fsrc, key, lo, hi, base["fork"][key])
     out["safety_enabled"] = bool(d.get("safety_enabled", base["safety_enabled"]))
     out["require_scan"] = bool(d.get("require_scan", base["require_scan"]))
     try:
@@ -82,14 +118,15 @@ def nav2_footprint(p: dict) -> str:
     return "[" + ", ".join(f"[{x:.3f}, {y:.3f}]" for x, y in ((x1, y1), (x1, y0), (x0, y0), (x0, y1))) + "]"
 
 
-def scan_to_base(ranges, angle_min, angle_inc, range_min, range_max, p: dict) -> np.ndarray:
+def scan_to_base(ranges, angle_min, angle_inc, range_min, range_max, p: dict, pose=None) -> np.ndarray:
     r = np.asarray(ranges, dtype=float)
     ang = angle_min + angle_inc * np.arange(r.size)
     ok = np.isfinite(r) & (r >= max(range_min, 0.02)) & (r <= range_max)
     r, ang = r[ok], ang[ok]
-    yaw = math.radians(p["lidar_yaw_deg"]); c, s = math.cos(yaw), math.sin(yaw)
+    px, py, yaw = pose if pose is not None else (p["lidar_x_m"], p["lidar_y_m"], math.radians(p["lidar_yaw_deg"]))
+    c, s = math.cos(yaw), math.sin(yaw)
     lx, ly = r * np.cos(ang), r * np.sin(ang)
-    return np.stack([p["lidar_x_m"] + c * lx - s * ly, p["lidar_y_m"] + s * lx + c * ly], axis=1)
+    return np.stack([px + c * lx - s * ly, py + s * lx + c * ly], axis=1)
 
 
 def classify_points(pts: np.ndarray, p: dict, self_margin: float = 0.03):
@@ -132,3 +169,41 @@ def save_store(store: dict, path: str = PROFILE_FILE) -> None:
 
 def active_profile(store: dict) -> dict:
     return store["profiles"][store["active"]]
+
+
+def new_profile(name: str, robot_type: str = "agv") -> dict:
+    d = normalize(FORKLIFT_PRESET if robot_type == "forklift" else None)
+    d["name"] = name
+    return d
+
+
+def is_forklift(p: dict) -> bool:
+    return p.get("robot_type") == "forklift"
+
+
+def fork_bypass_rect(p: dict, carrying: bool = False):
+    """(x0, x1, y0, y1) of the area ahead of the fork tips that is bypassed during INSERT."""
+    front = p["center_x_m"] + p["length_m"] / 2
+    width = max(p["fork_width_m"], p["load_width_m"] if carrying else p["fork_width_m"])
+    half = width / 2 + p["fork"]["bypass_margin_m"]
+    return (front - p["fork_length_m"], front + p["fork"]["bypass_ahead_m"], -half, half)
+
+
+def signature(p: dict) -> str:
+    """Same hash as hiep_robot2 Profile.signature(): lets the HMI check what the safety node really runs."""
+    r = lambda v: round(float(v), 3)
+    data = [r(p["length_m"]), r(p["width_m"]), r(p["center_x_m"]), r(p["center_y_m"]),
+            [r(p["stop"][k]) for k in SIDES], [r(p["slow"][k]) for k in SIDES],
+            r(p["slow_linear_mps"]), r(p["slow_angular_rps"]), bool(p["safety_enabled"]),
+            bool(p["require_scan"]), int(p["min_points"]),
+            r(p["lidar_x_m"]), r(p["lidar_y_m"]), r(p["lidar_yaw_deg"])]
+    return hashlib.sha1(json.dumps(data).encode()).hexdigest()[:8]
+
+
+def fork_effective_config(p: dict) -> dict:
+    """What forklift_node should be running for this profile (same names as its ForkConfig)."""
+    d = {k: float(v) for k, v in p["fork"].items()}
+    d["fork_length_m"], d["fork_width_m"] = p["fork_length_m"], p["fork_width_m"]
+    d["load_width_m"], d["max_height_mm"] = p["load_width_m"], p["max_height_mm"]
+    d["front_x_m"] = p["center_x_m"] + p["length_m"] / 2
+    return d

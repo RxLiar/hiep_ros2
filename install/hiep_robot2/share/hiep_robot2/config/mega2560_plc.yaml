@@ -26,3 +26,6 @@ mega2560_plc_bridge:
     plc_status_topic: "/plc_status"
     plc_connection_topic: "/plc_connection_status"
     signal_light_states_topic: "/signal_light_states"
+    # Fork lift height sensor calibration (only used when the fork firmware is enabled)
+    fork_mm_per_count: 1.0
+    fork_height_offset_mm: 0.0

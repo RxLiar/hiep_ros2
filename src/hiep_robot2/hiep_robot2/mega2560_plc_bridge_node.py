@@ -20,6 +20,8 @@ from .plc_io_protocol import (
     encode_stop_all,
     parse_device_identity,
     parse_plc_status,
+    encode_fork_command,
+    parse_fork_status,
 )
 
 
@@ -64,6 +66,9 @@ class Mega2560PlcBridgeNode(Node):
         self.declare_parameter("plc_status_topic", "/plc_status")
         self.declare_parameter("plc_connection_topic", "/plc_connection_status")
         self.declare_parameter("signal_light_states_topic", "/signal_light_states")
+        # Fork height: counts from the Mega ADC -> mm. mm = counts * fork_mm_per_count + fork_height_offset_mm
+        self.declare_parameter("fork_mm_per_count", 1.0)
+        self.declare_parameter("fork_height_offset_mm", 0.0)
 
         self.serial_port = str(self.get_parameter("serial_port").value)
         self.baudrate = int(self.get_parameter("baudrate").value)
@@ -88,9 +93,15 @@ class Mega2560PlcBridgeNode(Node):
         self.plc_connection_topic = str(self.get_parameter("plc_connection_topic").value)
         self.signal_light_states_topic = str(self.get_parameter("signal_light_states_topic").value)
 
+        self.fork_mm_per_count = float(self.get_parameter("fork_mm_per_count").value)
+        self.fork_height_offset_mm = float(self.get_parameter("fork_height_offset_mm").value)
+
         # ROS input.
         self.create_subscription(String, self.conveyor_cmd_topic, self._conveyor_cmd_callback, 20)
         self.create_subscription(String, self.light_cmd_topic, self._light_cmd_callback, 10)
+        # Fork lift (optional): JSON {"dir": "U|D|S", "speed": 0..100} in, {"height_mm", "top", "bottom", "fault"} out
+        self.create_subscription(String, "/fork_hw_cmd", self._fork_cmd_callback, 10)
+        self.fork_state_pub = self.create_publisher(String, "/fork_hw_state", 10)
 
         # ROS output. Existing HMI already consumes conveyor_cargo,
         # sensor_states and bumper_states.
@@ -166,6 +177,20 @@ class Mega2560PlcBridgeNode(Node):
                 f"PLC conveyor {conveyor_id}: mode={mode}, speed={max(0, min(100, speed))}%, "
                 f"duration={max(0.0, duration):.1f}s"
             )
+
+    def _fork_cmd_callback(self, msg: String) -> None:
+        try:
+            payload = json.loads(msg.data)
+            self._write_serial(encode_fork_command(
+                self._next_sequence(), str(payload.get("dir", "S")), int(payload.get("speed", 0))))
+        except Exception as exc:
+            self.get_logger().warning(f"Invalid /fork_hw_cmd payload: {exc}")
+
+    def _handle_fork_status(self, st: dict) -> None:
+        mm = st["height_counts"] * self.fork_mm_per_count + self.fork_height_offset_mm
+        self._publish_json(self.fork_state_pub, {
+            "height_mm": round(mm, 1), "top": st["top"], "bottom": st["bottom"],
+            "moving": st["moving"], "fault": st["fault"]})
 
     def _light_cmd_callback(self, msg: String) -> None:
         try:
@@ -334,6 +359,10 @@ class Mega2560PlcBridgeNode(Node):
                 if status is not None:
                     self._last_status_monotonic = time.monotonic()
                     self._handle_status(status)
+                    continue
+                fork = parse_fork_status(line)
+                if fork is not None:
+                    self._handle_fork_status(fork)
             except (serial.SerialException, OSError) as exc:
                 self._disconnect(f"PLC serial read failed: {exc}")
             except Exception as exc:

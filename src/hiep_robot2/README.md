@@ -274,3 +274,49 @@ Nav2 / HMI joystick -> /cmd_vel -> [safety_monitor_node] -> /cmd_vel_safe -> KEY
   the dynamic parameter; if your Nav2 rejects it (check the node log), edit `footprint` in the Nav2 yaml
   (the HMI shows the string to paste). The Gazebo URDF is NOT changed.
 - Software layer only: it does not replace the hardware e-stop or a safety-rated lidar / PLC chain.
+
+## Fork lift (0.6.0)
+
+Nodes: `forklift_node` (new) = fork mechanism + pallet sequences, `safety_monitor_node` (bypass added),
+`mega2560_plc_bridge_node` (fork command / state), Mega firmware 0.5.0 (optional fork module).
+
+```
+HMI / test  --/forklift/command-->  forklift_node  --/fork_hw_cmd-->  PLC bridge --FORK,seq,U|D|S,pct--> Mega2560
+                                         |  \<--/fork_hw_state (height_mm, top, bottom, fault)-- FSTAT <--
+                                         |--/cmd_vel (insert / retract only)--> safety_monitor --> /cmd_vel_safe --> bridge
+                                         |--/safety_bypass (insert rectangle + own-load rectangle)--> safety_monitor
+                                         `--/forklift/status (JSON, 5 Hz)--> HMI
+```
+- Commands (JSON): `pick`, `drop`, `lift`/`lower`/`to_height` (`height_mm`), `insert` (`insert_depth_m`),
+  `retract` (`retract_m`), `stop`, `reset`, `set_carrying`. Each has an `id`; the status echoes it.
+  `ros2 topic pub --once /forklift/command std_msgs/msg/String "{data: '{\"id\":\"t1\",\"cmd\":\"pick\"}'}"`
+- PICK = lower to entry height -> insert (slow, odometry distance) -> lift -> back out.
+  DROP = raise to level -> insert -> lower to release -> back out -> lower to travel height.
+- Bypass: ONLY the insert step asks for it - a rectangle ahead of the fork tips (fork width + margin, `bypass_ahead_m`
+  long), speed capped to `insert_speed + 0.02` (max 0.30 m/s), time-to-live 0.6 s and refreshed at 5 Hz, so it expires
+  if the node dies. The REAR zone is never bypassed, nor is anything outside the rectangle (people at the sides).
+  While a load is carried an "own load" rectangle is published (no speed cap) so the pallet itself does not stop the
+  robot. A fork lift is therefore protected when it backs out with a load.
+- Fail safe: no `/fork_hw_state` for 1 s, a fork fault, stalled fork (no height change for 2.5 s), blocked robot
+  (no movement for 4 s while driving), step timeouts, emergency stop -> the task stops with an error. The firmware
+  stops the fork if no FORK command arrives for 0.4 s, on a limit switch, on the e-stop, and never energises UP and DOWN together.
+- Try it without hardware: `ros2 launch hiep_robot2 agv_hardware.launch.py profile:=model forklift:=true`
+  (`backend: sim` = virtual fork at 60 mm/s). Real fork: `forklift:=plc`, after setting `FORK_ENABLED = true` in
+  `firmware/mega2560_plc/mega2560_plc.ino`, **checking the pins (47, 48, 6, 49, 50, A8) against your wiring**, and
+  calibrating `fork_mm_per_count` / `fork_height_offset_mm` in `config/mega2560_plc.yaml`.
+- Pallet position: the sequences are open loop (odometry distance). The robot has to be placed in front of the pallet
+  within a few centimetres by Nav2; there is no pallet detection (camera / lidar) yet.
+
+
+## Troubleshooting: the safety zones have no effect (0.7.0)
+
+Run `ros2 run hiep_robot2 safety_check` (or open the "Robot & Safety" page: it shows the same list). It reports:
+- `safety_monitor` not running / not receiving `/scan`;
+- **nobody listens to `/cmd_vel_safe`** -> the gate is not in the command path (start the bridge through
+  `agv_hardware.launch.py safety:=true`, or remap the motor node to `/cmd_vel_safe`, including a Gazebo `ros_gz_bridge`);
+- **nodes that still listen to `/cmd_vel` directly** (they ignore the zones);
+- the node runs another configuration than the HMI profile (press Apply & save);
+- where the lidar is assumed to be. 0.7.0 asks TF (scan frame -> `base_frame`, default `base_footprint`) and only falls
+  back to the manual lidar numbers. A merged scan that is already in `base_link` used to be shifted by the typed lidar
+  offset, which moved people out of the zones.
+- Zones beside the body now count for both directions of travel (before, only the front half did).

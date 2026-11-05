@@ -93,8 +93,9 @@ class _RoleCard(QFrame):
     def _apply_style(self, sel: bool):
         color = self._accent if sel else "#30363D"
         bg    = f"{self._accent}15" if sel else "#161B22"
+        self.setObjectName("RoleCard")
         self.setStyleSheet(
-            f"QFrame{{background:{bg};"
+            f"#RoleCard{{background:{bg};"
             f"border:2px solid {color};"
             "border-radius:12px;}")
 
@@ -208,8 +209,9 @@ class LoginDialog(QDialog):
         outer.setContentsMargins(0, 0, 0, 0)
 
         card = QFrame()
+        card.setObjectName("LoginCard")
         card.setStyleSheet(
-            "QFrame{"
+            "#LoginCard{"
             "background:#0D1117;"
             "border:1px solid #30363D;"
             "border-radius:18px;"

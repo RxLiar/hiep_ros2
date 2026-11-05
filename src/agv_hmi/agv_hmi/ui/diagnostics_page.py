@@ -363,9 +363,14 @@ class DiagnosticsPage(QWidget):
         form = QFormLayout()
         self._hw_profile = QComboBox(); self._hw_profile.addItems(["model", "real"])
         self._hw_plc = QComboBox(); self._hw_plc.addItems(["auto", "true", "false"])
+        self._hw_safety = QComboBox(); self._hw_safety.addItems(["true", "auto", "false"])   # default on: the zones should act
+        self._hw_fork = QComboBox(); self._hw_fork.addItems(["false", "true", "plc"])
         self._hw_profile_lbl, self._hw_plc_lbl = QLabel(), QLabel()
+        self._hw_safety_lbl, self._hw_fork_lbl = QLabel(), QLabel()
         form.addRow(self._hw_profile_lbl, self._hw_profile)
         form.addRow(self._hw_plc_lbl, self._hw_plc)
+        form.addRow(self._hw_safety_lbl, self._hw_safety)
+        form.addRow(self._hw_fork_lbl, self._hw_fork)
         v.addLayout(form)
         self._hw_btn = QPushButton(); self._hw_btn.clicked.connect(self._toggle_hw)
         self._hw_status = QLabel(); self._hw_status.setWordWrap(True)
@@ -385,7 +390,9 @@ class DiagnosticsPage(QWidget):
         else:
             self._hw = ManagedLaunch("Hardware", ["ros2", "launch", "hiep_robot2", "agv_hardware.launch.py"])
             ok, msg = self._hw.start([f"profile:={self._hw_profile.currentText()}",
-                                      f"plc:={self._hw_plc.currentText()}"])
+                                      f"plc:={self._hw_plc.currentText()}",
+                                      f"safety:={self._hw_safety.currentText()}",
+                                      f"forklift:={self._hw_fork.currentText()}"])
             if not ok:
                 self._hw_status.setText("❌ " + msg)
                 self._hw = None
@@ -395,7 +402,8 @@ class DiagnosticsPage(QWidget):
     def _update_hw_ui(self):
         run = self.hw_running()
         self._hw_btn.setText(tr("hw_stop") if run else tr("hw_start"))
-        self._hw_profile.setEnabled(not run); self._hw_plc.setEnabled(not run)
+        for cb in (self._hw_profile, self._hw_plc, self._hw_safety, self._hw_fork):
+            cb.setEnabled(not run)
         self._hw_status.setText(
             ("🟢 " + tr("hw_running", f"{self._hw_profile.currentText()} / plc={self._hw_plc.currentText()}"))
             if run else "⬛ " + tr("hw_stopped"))
@@ -425,5 +433,6 @@ class DiagnosticsPage(QWidget):
         self._lexp.setText(tr("dg_export")); self._lclr.setText(tr("dg_clear"))
         self._bag_auto.setText(tr("bag_auto")); self._update_bag_ui()
         self._hw_profile_lbl.setText(tr("hw_profile")); self._hw_plc_lbl.setText(tr("hw_plc"))
+        self._hw_safety_lbl.setText(tr("hw_safety") + " (safety:=)"); self._hw_fork_lbl.setText(tr("hw_forklift") + " (forklift:=)")
         self._hw_hint.setText(tr("hw_hint")); self._update_hw_ui()
         self._refresh_topics()

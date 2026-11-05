@@ -18,7 +18,7 @@
   <xacro:include filename="$(find mec_mobile_description)/urdf/wheel.urdf.xacro"/>
   <xacro:include filename="$(find mec_mobile_description)/urdf/lidar.urdf.xacro"/>
   <xacro:include filename="$(find mec_mobile_description)/urdf/imu.urdf.xacro"/>
-
+  <xacro:include filename="$(find mec_mobile_description)/urdf/camera.urdf.xacro"/>
   <!-- GAZEBO CONTROL -->
   <xacro:include filename="$(find mec_mobile_description)/urdf/control/mec_mobile_v1.gazebo"/>
 
@@ -92,8 +92,19 @@
       y="0.0"
       z="0.35"/>
 
+
+  <!-- Camera -->
+  <!-- ========================= -->
+
+  <xacro:camera_link
+      x="0.83"
+      y="0.0"
+      z="0.2"/>    
+
   <!-- ========================= -->
   <!-- GAZEBO MATERIAL -->
   <!-- ========================= -->
+
+  
 
 </robot>

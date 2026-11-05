@@ -22,6 +22,12 @@ DEFAULTS = {
     "joy_max_ang": 0.6,
     "operator_kiosk": False,
     "schedule_enabled": False,      # allow routes to start by themselves from the schedule
+    # 4.7.0 UI
+    "ui_animations": True,          # animated page / panel transitions (turn off on slow HMI hardware)
+    "ui_sidebar_compact": False,    # main sidebar collapsed to an icon rail
+    "ui_panels": {},                # {panel key: collapsed?}
+    "ui_groups": {},                # {group key: collapsed?}
+    "ui_joystick_collapsed": False,
 }
 _cache: dict | None = None
 

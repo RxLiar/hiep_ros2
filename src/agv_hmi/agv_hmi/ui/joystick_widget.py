@@ -6,9 +6,17 @@ joystick_widget.py — Virtual joystick overlay
 - Không tự publish — emit signal để parent wiring
 """
 import math
-from PyQt6.QtWidgets import QWidget
-from PyQt6.QtGui import QPainter, QColor, QPen, QBrush, QRadialGradient
-from PyQt6.QtCore import Qt, QPointF, QTimer, pyqtSignal
+import weakref
+
+from PyQt6.QtWidgets import QWidget, QToolTip
+from PyQt6.QtGui import QPainter, QColor, QPen, QBrush, QRadialGradient, QRegion
+from PyQt6.QtCore import Qt, QPointF, QRect, QTimer, QVariantAnimation, QEvent, pyqtSignal
+
+from agv_hmi.core import prefs
+from agv_hmi.ui import anim
+from agv_hmi.ui.i18n import tr
+
+_INSTANCES: "weakref.WeakSet" = weakref.WeakSet()
 
 
 class JoystickWidget(QWidget):
@@ -44,6 +52,19 @@ class JoystickWidget(QWidget):
         self._max_linear  = 1.0
         self._max_angular = 1.5
 
+        # 4.7.0: the joystick can be folded into a small chip (bottom-left) to free the map
+        self._chip_c = QPointF(17, 133)
+        self._chip_r = 13.0
+        self._t = 1.0                     # 1 = joystick shown, 0 = folded into the chip
+        self._collapsed = False
+        self._t_anim = QVariantAnimation(self)
+        self._t_anim.setEasingCurve(anim.EASE_INOUT)
+        self._t_anim.valueChanged.connect(self._on_t)
+        self._t_anim.finished.connect(self._after_t)
+        _INSTANCES.add(self)
+        if prefs.get("ui_joystick_collapsed"):
+            self._apply_collapsed(True, animate=False)
+
     # ── Public ──────────────────────────────────────────────────────
 
     def set_max_velocity(self, linear: float, angular: float):
@@ -51,9 +72,74 @@ class JoystickWidget(QWidget):
         self._max_linear  = max(0.01, linear)
         self._max_angular = max(0.01, angular)
 
+    def is_collapsed(self) -> bool:
+        return self._collapsed
+
+    def toggle_collapsed(self):
+        """Fold / unfold every joystick (they share one preference)."""
+        target = not self._collapsed
+        prefs.set("ui_joystick_collapsed", target)
+        for j in list(_INSTANCES):
+            j._apply_collapsed(target, animate=True)
+
+    def _apply_collapsed(self, collapsed: bool, animate: bool = True):
+        if collapsed == self._collapsed and self._t_anim.state() == QVariantAnimation.State.Stopped:
+            return
+        self._collapsed = collapsed
+        if collapsed and self._pressed:
+            self._pressed = False
+            self._knob = QPointF(self._center)
+            self._timer.stop()
+            self.velocity_signal.emit(0.0, 0.0)
+        if not collapsed:
+            self.clearMask()
+        end = 0.0 if collapsed else 1.0
+        self._t_anim.stop()
+        d = anim.dur(anim.DUR_MED) if animate else 0
+        if d == 0:
+            self._t = end
+            self._after_t()
+            self.update()
+        else:
+            self._t_anim.setDuration(d)
+            self._t_anim.setStartValue(self._t)
+            self._t_anim.setEndValue(end)
+            self._t_anim.start()
+
+    def _on_t(self, v):
+        self._t = float(v)
+        self.update()
+
+    def _after_t(self):
+        if self._collapsed:   # only the chip may catch the mouse, the map below stays usable
+            r = int(self._chip_r) + 3
+            self.setMask(QRegion(QRect(int(self._chip_c.x()) - r, int(self._chip_c.y()) - r,
+                                       2 * r, 2 * r), QRegion.RegionType.Ellipse))
+        else:
+            self.clearMask()
+        self.update()
+
+    def _in_chip(self, pos) -> bool:
+        return math.hypot(pos.x() - self._chip_c.x(), pos.y() - self._chip_c.y()) <= self._chip_r + 3
+
+    def event(self, ev):
+        if ev.type() == QEvent.Type.ToolTip:
+            if self._in_chip(ev.pos()):
+                QToolTip.showText(ev.globalPos(),
+                                  tr("joy_show") if self._collapsed else tr("joy_hide"), self)
+            else:
+                QToolTip.hideText()
+            return True
+        return super().event(ev)
+
     # ── Mouse events ────────────────────────────────────────────────
 
     def mousePressEvent(self, ev):
+        if ev.button() == Qt.MouseButton.LeftButton and self._in_chip(ev.position()):
+            self.toggle_collapsed()
+            return
+        if self._collapsed or self._t < 0.99:
+            return
         if ev.button() == Qt.MouseButton.LeftButton:
             self._pressed = True
             self._update_knob(ev.position())
@@ -105,6 +191,35 @@ class JoystickWidget(QWidget):
 
         cx, cy = self._center.x(), self._center.y()
         R = self.RADIUS
+
+        if self._t > 0.01:
+            p.save()
+            p.setOpacity(self._t)
+            sc = 0.25 + 0.75 * self._t
+            p.translate(self._chip_c)
+            p.scale(sc, sc)
+            p.translate(-self._chip_c)
+            self._paint_stick(p, cx, cy, R)
+            p.restore()
+        self._paint_chip(p)
+
+    def _paint_chip(self, p):
+        c = self._chip_c
+        p.setBrush(QBrush(QColor(13, 17, 23, 215)))
+        p.setPen(QPen(QColor(88, 166, 255, 170), 1.4))
+        p.drawEllipse(c, self._chip_r, self._chip_r)
+        pen = QPen(QColor(150, 200, 255, 230), 1.6)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        p.setPen(pen)
+        if self._t > 0.5:                      # open: "minimise" dash
+            p.drawLine(QPointF(c.x() - 4.5, c.y()), QPointF(c.x() + 4.5, c.y()))
+        else:                                   # folded: mini joystick (ring + knob)
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.drawEllipse(c, 6.5, 6.5)
+            p.setBrush(QBrush(QColor(150, 200, 255, 230)))
+            p.drawEllipse(c, 2.2, 2.2)
+
+    def _paint_stick(self, p, cx, cy, R):
 
         # Background circle (semi-transparent)
         p.setBrush(QBrush(QColor(13, 17, 23, 180)))

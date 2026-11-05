@@ -301,3 +301,165 @@ _add("al_safety_stop", "Vật cản trong vùng STOP — robot dừng", "Obstacl
 _add("al_safety_noscan", "Safety monitor mất lidar — robot bị chặn", "Safety monitor lost the lidar — robot blocked", "라이다 손실", "LiDAR喪失", "雷达丢失")
 _add("pf_safety", "Safety monitor có lidar", "Safety monitor has lidar data", "안전 모니터 정상", "安全モニター正常", "安全监视正常")
 _add("dash_safety", "🛡 An toàn", "🛡 Safety", "🛡 안전", "🛡 安全", "🛡 安全")
+
+# ── Fork lift ──────────────────────────────────────────────────────────────
+_add("page_forklift", "Fork lift", "Fork lift", "지게차", "フォークリフト", "叉车")
+_add("rt_label", "Loại robot", "Robot type", "로봇 유형", "ロボット種別", "机器人类型")
+_add("rt_agv", "AGV chuyển hàng (băng tải)", "Cargo AGV (conveyor)", "화물 AGV (컨베이어)", "搬送AGV（コンベア）", "搬运 AGV（输送带）")
+_add("rt_forklift", "Fork lift (pallet)", "Fork lift (pallet)", "지게차 (팔레트)", "フォークリフト（パレット）", "叉车（托盘）")
+_add("rt_mismatch", "Route này dành cho {} nhưng hồ sơ robot đang chọn là {}. Đổi hồ sơ trong trang Robot & An toàn.",
+     "This route is for {} but the active robot profile is {}. Change the profile in Robot & Safety.",
+     "경로 유형 불일치", "ルート種別が一致しません", "路线类型与机器人配置不符")
+_add("task_fork_pick", "Nhận hàng (xúc pallet)", "Pick up pallet", "팔레트 집기", "パレットを取る", "取托盘")
+_add("task_fork_drop", "Thả hàng (đặt pallet)", "Drop pallet", "팔레트 내리기", "パレットを置く", "放托盘")
+_add("task_fork_lift", "Nâng càng", "Raise fork", "포크 올리기", "フォーク上昇", "升叉")
+_add("task_fork_lower", "Hạ càng", "Lower fork", "포크 내리기", "フォーク下降", "降叉")
+_add("task_fork_insert", "Đi vào pallet", "Drive into pallet", "팔레트 진입", "パレットに進入", "进入托盘")
+_add("task_fork_retract", "Lùi ra khỏi pallet", "Back out of pallet", "팔레트에서 후진", "パレットから後退", "退出托盘")
+_add("fk_height", "Chiều cao (mm)", "Height (mm)", "높이 (mm)", "高さ (mm)", "高度 (mm)")
+_add("fk_approach_h", "Chiều cao khi vào pallet (mm)", "Entry height (mm)", "진입 높이 (mm)", "進入高さ (mm)", "进入高度 (mm)")
+_add("fk_lift_h", "Chiều cao nâng hàng (mm)", "Lift height (mm)", "들어올림 높이 (mm)", "持上高さ (mm)", "起升高度 (mm)")
+_add("fk_drop_h", "Chiều cao đặt hàng (mm)", "Drop level (mm)", "내림 높이 (mm)", "置き高さ (mm)", "放置高度 (mm)")
+_add("fk_release", "Hạ thêm để nhả hàng (mm)", "Lower to release (mm)", "추가 하강 (mm)", "解放下降 (mm)", "释放下降 (mm)")
+_add("fk_travel_h", "Chiều cao khi chạy (mm)", "Travel height (mm)", "주행 높이 (mm)", "走行高さ (mm)", "行驶高度 (mm)")
+_add("fk_insert", "Độ sâu đi vào (m)", "Insert depth (m)", "진입 깊이 (m)", "進入深さ (m)", "进入深度 (m)")
+_add("fk_retract", "Quãng lùi ra (m)", "Back-out distance (m)", "후진 거리 (m)", "後退距離 (m)", "退出距离 (m)")
+_add("fk_waiting", "⏳ Fork lift: {}", "⏳ Fork lift: {}", "⏳ 지게차: {}", "⏳ フォーク: {}", "⏳ 叉车: {}")
+_add("fk_failed", "Fork lift lỗi: {}", "Fork lift failed: {}", "지게차 오류: {}", "フォークリフト異常: {}", "叉车故障: {}")
+_add("fk_no_node", "Không thấy forklift_node (chưa có /forklift/status)", "forklift_node not responding (no /forklift/status)",
+     "forklift_node 응답 없음", "forklift_node 応答なし", "forklift_node 无响应")
+_add("fk_state_idle", "Rảnh", "Idle", "대기", "待機", "空闲")
+_add("fk_state_running", "Đang chạy", "Running", "실행 중", "実行中", "运行中")
+_add("fk_state_done", "Xong", "Done", "완료", "完了", "完成")
+_add("fk_state_error", "Lỗi", "Error", "오류", "エラー", "错误")
+_add("fk_carry_yes", "Đang mang hàng", "Carrying a load", "화물 적재", "荷物あり", "载货")
+_add("fk_carry_no", "Không có hàng", "No load", "화물 없음", "荷物なし", "无货")
+_add("fk_set_carry", "Đặt: có hàng", "Set: has load", "적재로 설정", "荷物ありに設定", "设为载货")
+_add("fk_clear_carry", "Đặt: không hàng", "Set: no load", "적재 해제", "荷物なしに設定", "设为无货")
+_add("fk_goto_h", "Đi tới chiều cao", "Go to height", "높이로 이동", "高さへ移動", "升降到高度")
+_add("fk_lower_all", "Hạ hết", "Lower fully", "완전 하강", "最下まで", "降到底")
+_add("fk_pick", "📦 Nhận hàng", "📦 Pick up", "📦 집기", "📦 取る", "📦 取货")
+_add("fk_drop", "📤 Thả hàng", "📤 Drop", "📤 내리기", "📤 置く", "📤 放货")
+_add("fk_insert_btn", "➡ Vào pallet", "➡ Insert", "➡ 진입", "➡ 進入", "➡ 进入")
+_add("fk_retract_btn", "⬅ Lùi ra", "⬅ Back out", "⬅ 후진", "⬅ 後退", "⬅ 退出")
+_add("fk_stop", "⛔ Dừng fork lift", "⛔ Stop fork lift", "⛔ 지게차 정지", "⛔ フォーク停止", "⛔ 停止叉车")
+_add("fk_reset", "Xoá lỗi", "Clear error", "오류 해제", "エラー解除", "清除错误")
+_add("fk_manual_box", "Điều khiển tay", "Manual control", "수동 제어", "手動操作", "手动控制")
+_add("fk_seq_box", "Chuỗi tự động (thử trước khi đưa vào route)", "Sequences (test before using in a route)", "자동 시퀀스", "自動シーケンス", "自动序列")
+_add("fk_status_box", "Trạng thái", "Status", "상태", "状態", "状态")
+_add("fk_bypass_on", "Bypass đang bật: {}", "Bypass active: {}", "바이패스 작동: {}", "バイパス有効: {}", "旁路已启用: {}")
+_add("fk_warn", "Khi INSERT, vùng phía trước đầu càng được bypass (tốc độ ≤ 0.10 m/s). Vùng phía SAU và hai bên vẫn bảo vệ khi lùi ra. Pallet phải đã được đưa tới đúng vị trí trước càng.",
+     "During INSERT the area ahead of the fork tips is bypassed (speed ≤ 0.10 m/s). The REAR and side zones stay active while backing out. The pallet must already be in front of the forks.",
+     "", "", "")
+_add("fk_not_forklift", "Hồ sơ robot đang chọn không phải fork lift (trang Robot & An toàn).", "The active robot profile is not a fork lift (see Robot & Safety).", "", "", "")
+_add("sf_type", "Loại robot", "Robot type", "로봇 유형", "ロボット種別", "机器人类型")
+_add("sf_fork_box", "Fork lift: càng và pallet", "Fork lift: forks and pallet", "지게차: 포크/팔레트", "フォークリフト：フォーク/パレット", "叉车：货叉与托盘")
+_add("sf_fork_len", "Chiều dài càng (m)", "Fork length (m)", "포크 길이 (m)", "フォーク長 (m)", "货叉长度 (m)")
+_add("sf_fork_wid", "Bề rộng hai càng (m)", "Overall fork width (m)", "포크 폭 (m)", "フォーク幅 (m)", "货叉总宽 (m)")
+_add("sf_load_wid", "Bề rộng pallet lớn nhất (m)", "Widest pallet (m)", "최대 팔레트 폭 (m)", "最大パレット幅 (m)", "最大托盘宽 (m)")
+_add("sf_max_h", "Chiều cao nâng tối đa (mm)", "Max lift height (mm)", "최대 높이 (mm)", "最大高さ (mm)", "最大高度 (mm)")
+_add("sf_bypass_ahead", "Bypass phía trước đầu càng (m)", "Bypass ahead of the tips (m)", "바이패스 거리 (m)", "バイパス距離 (m)", "旁路前方距离 (m)")
+_add("sf_ins_speed", "Tốc độ vào pallet (m/s)", "Insert speed (m/s)", "진입 속도 (m/s)", "進入速度 (m/s)", "进入速度 (m/s)")
+_add("sf_new_forklift", "➕ Fork lift", "➕ Fork lift", "➕ 지게차", "➕ フォーク", "➕ 叉车")
+_add("al_forklift", "Fork lift: {}", "Fork lift: {}", "지게차: {}", "フォークリフト: {}", "叉车: {}")
+_add("al_forklift", "{}", "{}", "{}", "{}", "{}")
+
+# ── Safety chain diagnosis ────────────────────────────────────────────────
+_add("sd_title", "Kiểm tra chuỗi an toàn (vì sao vùng không có tác dụng?)", "Safety chain check (why do the zones have no effect?)")
+_add("sd_not_running", "safety_monitor KHÔNG chạy (không có /safety_state) — vùng safety/stop không tác dụng.", "safety_monitor is NOT running (no /safety_state) — the zones have no effect.")
+_add("sd_not_running_hint", "Chạy: ros2 launch hiep_robot2 agv_hardware.launch.py profile:=real (hoặc safety:=true), hoặc safety_monitor.launch.py", "Run: ros2 launch hiep_robot2 agv_hardware.launch.py profile:=real (or safety:=true), or safety_monitor.launch.py")
+_add("sd_running", "safety_monitor đang chạy: trạng thái {}, hồ sơ '{}'", "safety_monitor running: state {}, profile '{}'")
+_add("sd_disabled", "Lớp an toàn đang TẮT trong hồ sơ.", "The safety layer is DISABLED in the profile.")
+_add("sd_disabled_hint", "Bật 'Bật lớp an toàn' rồi Áp dụng & lưu.", "Tick 'Enable the safety layer' then Apply & save.")
+_add("sd_no_consumer", "KHÔNG node nào nghe {} — cổng an toàn không nằm trên đường lệnh, robot bỏ qua vùng.", "NOBODY listens to {} — the gate is not in the command path, the robot ignores the zones.")
+_add("sd_no_consumer_hint", "Bridge động cơ phải nhận lệnh từ /cmd_vel_safe: chạy agv_hardware.launch.py safety:=true, hoặc remap node điều khiển motor (kể cả bridge Gazebo) sang /cmd_vel_safe.", "The motor bridge must read /cmd_vel_safe: run agv_hardware.launch.py safety:=true, or remap your motor node (including the Gazebo bridge) to /cmd_vel_safe.")
+_add("sd_consumer_unknown", "Chưa biết ai nghe {}.", "Cannot tell who listens to {}.")
+_add("sd_consumer_ok", "{} có {} node đang nghe.", "{} has {} listener(s).")
+_add("sd_direct", "Các node sau vẫn nghe {} trực tiếp nên KHÔNG bị chặn: {}", "These nodes still listen to {} directly and are NOT gated: {}")
+_add("sd_direct_hint", "Đổi tham số cmd_vel_topic của chúng sang /cmd_vel_safe (hoặc remap trong launch).", "Point them to /cmd_vel_safe (cmd_vel_topic parameter or a remap in the launch file).")
+_add("sd_direct_ok", "Không node nào khác nghe {} trực tiếp.", "No other node listens to {} directly.")
+_add("sd_no_scan", "safety_monitor không nhận được /scan mới.", "safety_monitor receives no fresh /scan.")
+_add("sd_no_scan_hint", "Kiểm tra driver lidar / tên topic scan.", "Check the lidar driver / scan topic name.")
+_add("sd_scan_ok", "Nhận /scan (frame '{}').", "/scan is received (frame '{}').")
+_add("sd_pose_tf", "Vị trí lidar lấy từ TF: x={} y={} yaw={}° trong '{}'.", "Lidar pose from TF: x={} y={} yaw={}° in '{}'.")
+_add("sd_pose_profile", "Vị trí lidar lấy từ SỐ NHẬP TAY: x={} y={} yaw={}° (không có TF).", "Lidar pose comes from the MANUAL numbers: x={} y={} yaw={}° (no TF).")
+_add("sd_pose_profile_hint", "Nếu số này không đúng vị trí thật (ví dụ scan gộp đã ở base_link) thì mọi vùng bị lệch. Sửa TF hoặc số trong hồ sơ.", "If this is not the real lidar position (e.g. a merged scan already in base_link) every zone is shifted. Fix TF or the profile numbers.")
+_add("sd_sig_bad", "Node đang chạy cấu hình KHÁC với hồ sơ trong HMI.", "The node runs a DIFFERENT configuration than the HMI profile.")
+_add("sd_sig_bad_hint", "Bấm 'Áp dụng & lưu' (gửi /safety_config), rồi kiểm tra lại.", "Press 'Apply & save' (sends /safety_config), then check again.")
+_add("sd_sig_ok", "Node chạy đúng cấu hình của hồ sơ.", "The node runs the same configuration as the profile.")
+_add("sd_live", "Lệnh vào ({:.2f} m/s, {:.2f} rad/s) → ra ({:.2f} m/s, {:.2f} rad/s), trạng thái {}", "Command in ({:.2f} m/s, {:.2f} rad/s) → out ({:.2f} m/s, {:.2f} rad/s), state {}")
+_add("sf_active_in_ros", "Hồ sơ đang áp dụng cho robot: {} ({})", "Profile applied to the robot: {} ({})")
+_add("hw_safety", "Safety monitor", "Safety monitor")
+_add("hw_forklift", "Fork lift", "Fork lift")
+
+# ── Fork lift page: parameters + guide ───────────────────────────────────
+_add("fk_tab_control", "Điều khiển", "Control")
+_add("fk_tab_params", "Thông số", "Parameters")
+_add("fk_tab_guide", "Hướng dẫn", "Guide")
+_add("fk_grp_geom", "Hình học càng và pallet", "Forks and pallet")
+_add("fk_grp_heights", "Chiều cao", "Heights")
+_add("fk_grp_motion", "Chuyển động vào/ra pallet", "Driving into / out of the pallet")
+_add("fk_grp_bypass", "Vùng bypass khi vào pallet", "Bypass while inserting")
+_add("fk_grp_adv", "Nâng cao (điều khiển cơ cấu nâng)", "Advanced (fork control)")
+_add("fk_p_flen", "Chiều dài càng (m)", "Fork length (m)")
+_add("fk_p_fwid", "Bề rộng hai càng (m)", "Overall fork width (m)")
+_add("fk_p_lwid", "Bề rộng pallet lớn nhất (m)", "Widest pallet (m)")
+_add("fk_p_overhang", "Hàng nhô ra khỏi đầu càng (m)", "Load overhang beyond the tips (m)")
+_add("fk_p_maxh", "Chiều cao nâng tối đa (mm)", "Max lift height (mm)")
+_add("fk_p_insspeed", "Tốc độ vào pallet (m/s)", "Insert speed (m/s)")
+_add("fk_p_retspeed", "Tốc độ lùi ra (m/s)", "Back-out speed (m/s)")
+_add("fk_p_bahead", "Bypass phía trước đầu càng (m)", "Bypass ahead of the tips (m)")
+_add("fk_p_bmargin", "Lề bypass hai bên càng (m)", "Bypass side margin (m)")
+_add("fk_p_tol", "Sai số chiều cao cho phép (mm)", "Height tolerance (mm)")
+_add("fk_p_maxspd", "Tốc độ nâng/hạ tối đa (%)", "Max fork speed (%)")
+_add("fk_p_minspd", "Tốc độ nâng/hạ tối thiểu (%)", "Min fork speed (%)")
+_add("fk_p_slowzone", "Giảm tốc khi còn cách đích (mm)", "Slow down within (mm)")
+_add("fk_p_stall", "Phát hiện càng kẹt sau (giây)", "Stall detection after (s)")
+_add("fk_p_blocked", "Phát hiện xe bị chặn sau (giây)", "Blocked detection after (s)")
+_add("fk_p_hto", "Timeout bước nâng/hạ (giây)", "Fork step timeout (s)")
+_add("fk_p_dto", "Timeout bước vào/lùi (giây)", "Drive step timeout (s)")
+_add("fk_save", "💾 Lưu thông số fork lift", "💾 Save fork lift parameters")
+_add("fk_defaults", "↺ Khôi phục mặc định", "↺ Restore defaults")
+_add("fk_saved", "Đã lưu và gửi cho forklift_node.", "Saved and sent to forklift_node.")
+_add("fk_unsaved", "Chưa lưu (đang chỉnh).", "Not saved yet (editing).")
+_add("fk_profile_is", "Đang chỉnh hồ sơ: {} ({})", "Editing profile: {} ({})")
+_add("fk_where", "Lưu tại: {}\nTham số riêng của từng waypoint nằm trong lộ trình: {}", "Stored in: {}\nPer-waypoint task values are inside the route file: {}")
+_add("fk_sync_ok", "✅ forklift_node đang dùng đúng các thông số đã lưu.", "✅ forklift_node runs the saved parameters.")
+_add("fk_sync_bad", "⚠ forklift_node đang dùng giá trị khác: {} — bấm 'Lưu thông số' để gửi lại.", "⚠ forklift_node uses different values: {} — press 'Save' to send them again.")
+_add("fk_sync_none", "forklift_node chưa báo thông số (chưa chạy?).", "forklift_node has not reported its parameters (not running?).")
+_add("fk_test_hint", "Giá trị dùng khi thử bằng nút bên dưới (lấy từ tab Thông số, không tự lưu).", "Values used by the test buttons below (taken from the Parameters tab; not saved).")
+_add("fk_guide",
+ "<h3>Cách cài đặt và dùng fork lift</h3><ol>"
+ "<li><b>Tạo hồ sơ fork lift</b> — trang <i>Robot &amp; An toàn</i> → nút <i>➕ Fork lift</i> → đặt tên. Nhập kích thước thân xe (<i>Dài</i> tính cả càng), bề rộng, vùng SAFETY/STOP → <i>Áp dụng &amp; lưu</i>.</li>"
+ "<li><b>Thông số fork lift</b> — tab <i>Thông số</i> (ngay trong trang này): kích thước càng và pallet, chiều cao vào pallet / nâng / chạy, độ sâu vào, quãng lùi, tốc độ, vùng bypass → <i>Lưu thông số fork lift</i>.</li>"
+ "<li><b>Chạy phần cứng</b> — trang <i>Chẩn đoán → Phần cứng</i>: profile <b>real</b>, safety <b>true</b>, forklift <b>true</b> (càng ảo để thử) hoặc <b>plc</b> (càng thật qua Mega2560) → Khởi động.</li>"
+ "<li><b>Thử từng bước</b> — tab <i>Điều khiển</i>: <i>Đi tới chiều cao</i> → <i>Vào pallet</i> → <i>Nhận hàng</i> / <i>Thả hàng</i>. Nút chuyển động phải giữ 0.8 giây. Thử ở chỗ trống, có người đứng cạnh nút E-stop.</li>"
+ "<li><b>Lập chương trình</b> — trang <i>Điều hướng</i> → <i>Loại robot: Fork lift</i>. Đặt waypoint ở điểm đứng <b>trước pallet, thẳng hàng với pallet</b> → thêm task <i>Nhận hàng</i>; waypoint tiếp theo ở trước kệ → task <i>Thả hàng</i> → Lưu lộ trình rồi chạy ở trang <i>Lộ trình</i>.</li></ol>"
+ "<p><b>Lưu ý:</b> khi vào pallet robot đi thẳng theo quãng đường đo bằng odometry (chưa có camera nhận pallet), nên Nav2 phải đưa robot tới trước pallet với sai số vài cm. Vùng phía sau và hai bên vẫn được bảo vệ khi lùi ra.</p>",
+ "<h3>How to set up and use the fork lift</h3><ol>"
+ "<li><b>Create a fork-lift profile</b> — page <i>Robot &amp; Safety</i> → <i>➕ Fork lift</i> → name it. Enter the truck size (<i>Length</i> includes the forks), width, SAFETY/STOP zones → <i>Apply &amp; save</i>.</li>"
+ "<li><b>Fork-lift parameters</b> — the <i>Parameters</i> tab of this page: fork and pallet size, entry / lift / travel heights, insert depth, back-out distance, speeds, bypass → <i>Save fork lift parameters</i>.</li>"
+ "<li><b>Start the hardware</b> — <i>Diagnostics → Hardware</i>: profile <b>real</b>, safety <b>true</b>, forklift <b>true</b> (virtual fork for tests) or <b>plc</b> (real fork on the Mega2560) → Start.</li>"
+ "<li><b>Try each step</b> — <i>Control</i> tab: <i>Go to height</i> → <i>Insert</i> → <i>Pick up</i> / <i>Drop</i>. Motion buttons need a 0.8 s hold. Test in free space with someone at the e-stop.</li>"
+ "<li><b>Program a route</b> — <i>Navigation</i> page → <i>Robot type: Fork lift</i>. Put the waypoint <b>in front of the pallet, aligned with it</b> → add the <i>Pick up</i> task; next waypoint in front of the rack → <i>Drop</i> task → save the route and run it from the <i>Routes</i> page.</li></ol>"
+ "<p><b>Note:</b> the insert drives straight for a distance measured by odometry (no pallet camera yet), so Nav2 must bring the truck in front of the pallet within a few centimetres. The rear and side zones stay active when backing out.</p>")
+
+
+# ── 4.7.0: collapsible bars / animation ─────────────────────────────────
+_add("panel_hide", "Ẩn thanh này", "Hide this panel", "패널 숨기기", "パネルを隠す", "隐藏此面板")
+_add("panel_show", "Hiện thanh này", "Show this panel", "패널 표시", "パネルを表示", "显示此面板")
+_add("sb_collapse", "Thu gọn", "Collapse", "접기", "折りたたむ", "收起")
+_add("sb_expand", "Mở rộng", "Expand", "펼치기", "展開", "展开")
+_add("tb_menu_tip", "Thu gọn / mở rộng menu (Ctrl+B)", "Collapse / expand menu (Ctrl+B)",
+     "메뉴 접기/펼치기 (Ctrl+B)", "メニューの折りたたみ/展開 (Ctrl+B)", "收起/展开菜单 (Ctrl+B)")
+_add("tb_focus_tip", "Chế độ tập trung: ẩn menu và các thanh bên (F11)",
+     "Focus mode: hide menu and side panels (F11)",
+     "집중 모드: 메뉴와 사이드 패널 숨기기 (F11)", "集中モード: メニューとサイドパネルを隠す (F11)",
+     "专注模式：隐藏菜单和侧栏 (F11)")
+_add("tb_focus_off_tip", "Thoát chế độ tập trung (F11 / Esc)", "Leave focus mode (F11 / Esc)",
+     "집중 모드 종료 (F11 / Esc)", "集中モードを終了 (F11 / Esc)", "退出专注模式 (F11 / Esc)")
+_add("joy_hide", "Thu gọn joystick", "Fold joystick", "조이스틱 접기", "ジョイスティックを畳む", "收起摇杆")
+_add("joy_show", "Hiện joystick", "Show joystick", "조이스틱 표시", "ジョイスティックを表示", "显示摇杆")
+_add("set_animations", "Hiệu ứng chuyển động (tắt nếu máy HMI chậm)",
+     "Animations (turn off on a slow HMI PC)",
+     "애니메이션 (느린 HMI PC에서는 끄기)", "アニメーション (低速なHMI PCではオフ)", "动画效果（HMI 电脑较慢时请关闭）")

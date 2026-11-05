@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    Combined AGV RGB-D camera model for ROS 2 Jazzy + Gazebo Harmonic.
+
+    Main macro:
+      <xacro:rgbd_camera ... />
+
+    Compatibility macro for the first camera.xacro interface:
+      <xacro:camera_link x="..." y="..." z="..." />
+
+    Notes:
+      - The Gazebo sensor is a simulated, co-located RGB-D camera.
+      - D435-style visual mesh and TF frames are retained.
+      - Infrared frame links are TF references only; this sensor does NOT
+        publish separate IR1 / IR2 images or emulate D435 stereo hardware.
+  -->
+
+  <xacro:macro name="rgbd_camera" params="
+    prefix:=''
+    camera_name:='camera'
+    parent:='base_link'
+    camera_topic:='camera'
+
+    mesh_file:='file://$(find mec_mobile_description)/meshes/intel_realsense/visual/d435.stl'
+    mesh_scale:='1 1 1'
+    mesh_xyz_offset:='0 0 0'
+    mesh_rpy_offset:='1.57079632679 0 1.57079632679'
+
+    xyz_offset:='0.105 0 0.05'
+    rpy_offset:='0 0.0 0'
+
+    collision_xyz_offset:='0 0 0'
+    collision_rpy_offset:='0 0 0'
+    inertial_xyz_offset:='0 0 0'
+    inertial_rpy_offset:='0 0 0'
+
+    depth_frame_xyz_offset:='0 0 0'
+    depth_frame_rpy_offset:='0 0 0'
+    optical_xyz_offset:='0 0 0'
+    optical_rpy_offset:='-1.57079632679 0 -1.57079632679'
+
+    infra1_xyz_offset:='0 0 0'
+    infra1_rpy_offset:='0 0 0'
+    infra2_xyz_offset:='0 -0.05 0'
+    infra2_rpy_offset:='0 0 0'
+    color_xyz_offset:='0 0.015 0'
+    color_rpy_offset:='0 0 0'
+
+    cam_width:=0.090
+    cam_height:=0.025
+    cam_depth:=0.02505
+    mass:=0.072
+
+    material_name:='aluminum'
+    material_color:='0.8 0.8 0.8 1.0'
+
+    horizontal_fov:=1.5184
+    image_width:=1920
+    image_height:=1080
+    image_format:='R8G8B8'
+    clip_near:=0.10
+    clip_far:=10.0
+    update_rate:=60
+    always_on:=true
+    visualize:=true
+    enable_collision:=false">
+
+    <!-- ================= CAMERA BODY ================= -->
+    <link name="${prefix}${camera_name}_link">
+      <visual>
+        <origin xyz="${mesh_xyz_offset}" rpy="${mesh_rpy_offset}"/>
+        <geometry>
+          <mesh filename="${mesh_file}" scale="${mesh_scale}"/>
+        </geometry>
+        <material name="${material_name}">
+          <color rgba="${material_color}"/>
+        </material>
+      </visual>
+
+      <xacro:if value="${enable_collision}">
+        <collision>
+          <origin xyz="${collision_xyz_offset}" rpy="${collision_rpy_offset}"/>
+          <geometry>
+            <box size="${cam_depth} ${cam_width} ${cam_height}"/>
+          </geometry>
+        </collision>
+      </xacro:if>
+
+      <inertial>
+        <origin xyz="${inertial_xyz_offset}" rpy="${inertial_rpy_offset}"/>
+        <mass value="${mass}"/>
+        <!-- Approximate box inertia from cam_depth x cam_width x cam_height. -->
+        <inertia
+          ixx="${float(mass) * (float(cam_width)**2 + float(cam_height)**2) / 12.0}"
+          ixy="0" ixz="0"
+          iyy="${float(mass) * (float(cam_depth)**2 + float(cam_height)**2) / 12.0}"
+          iyz="0"
+          izz="${float(mass) * (float(cam_depth)**2 + float(cam_width)**2) / 12.0}"/>
+      </inertial>
+    </link>
+
+    <!-- Camera mounting: x forward, y left, z up in the robot base frame. -->
+    <joint name="${prefix}${camera_name}_joint" type="fixed">
+      <parent link="${prefix}${parent}"/>
+      <child link="${prefix}${camera_name}_link"/>
+      <origin xyz="${xyz_offset}" rpy="${rpy_offset}"/>
+    </joint>
+
+    <!-- ================= REALSENSE-STYLE TF FRAMES ================= -->
+    <link name="${prefix}${camera_name}_depth_frame"/>
+    <joint name="${prefix}${camera_name}_depth_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_link"/>
+      <child link="${prefix}${camera_name}_depth_frame"/>
+      <origin xyz="${depth_frame_xyz_offset}" rpy="${depth_frame_rpy_offset}"/>
+    </joint>
+
+    <link name="${prefix}${camera_name}_depth_optical_frame"/>
+    <joint name="${prefix}${camera_name}_depth_optical_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_depth_frame"/>
+      <child link="${prefix}${camera_name}_depth_optical_frame"/>
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}"/>
+    </joint>
+
+    <link name="${prefix}${camera_name}_infra1_frame"/>
+    <joint name="${prefix}${camera_name}_infra1_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_link"/>
+      <child link="${prefix}${camera_name}_infra1_frame"/>
+      <origin xyz="${infra1_xyz_offset}" rpy="${infra1_rpy_offset}"/>
+    </joint>
+
+    <link name="${prefix}${camera_name}_infra1_optical_frame"/>
+    <joint name="${prefix}${camera_name}_infra1_optical_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_infra1_frame"/>
+      <child link="${prefix}${camera_name}_infra1_optical_frame"/>
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}"/>
+    </joint>
+
+    <link name="${prefix}${camera_name}_infra2_frame"/>
+    <joint name="${prefix}${camera_name}_infra2_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_link"/>
+      <child link="${prefix}${camera_name}_infra2_frame"/>
+      <origin xyz="${infra2_xyz_offset}" rpy="${infra2_rpy_offset}"/>
+    </joint>
+
+    <link name="${prefix}${camera_name}_infra2_optical_frame"/>
+    <joint name="${prefix}${camera_name}_infra2_optical_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_infra2_frame"/>
+      <child link="${prefix}${camera_name}_infra2_optical_frame"/>
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}"/>
+    </joint>
+
+    <link name="${prefix}${camera_name}_color_frame"/>
+    <joint name="${prefix}${camera_name}_color_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_link"/>
+      <child link="${prefix}${camera_name}_color_frame"/>
+      <origin xyz="${color_xyz_offset}" rpy="${color_rpy_offset}"/>
+    </joint>
+
+    <link name="${prefix}${camera_name}_color_optical_frame"/>
+    <joint name="${prefix}${camera_name}_color_optical_joint" type="fixed">
+      <parent link="${prefix}${camera_name}_color_frame"/>
+      <child link="${prefix}${camera_name}_color_optical_frame"/>
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}"/>
+    </joint>
+
+    <!-- ================= GAZEBO HARMONIC RGB-D SENSOR ================= -->
+    <gazebo reference="${prefix}${camera_name}_link">
+      <sensor name="${prefix}${camera_name}_sensor" type="rgbd_camera">
+        <always_on>${always_on}</always_on>
+        <update_rate>${update_rate}</update_rate>
+        <visualize>${visualize}</visualize>
+
+        <!-- RGB-D topic base. Gazebo generates image, depth_image, points
+             and camera_info topics from this base topic. -->
+        <topic>${camera_topic}</topic>
+        <gz_frame_id>${prefix}${camera_name}_depth_optical_frame</gz_frame_id>
+
+        <camera>
+          <horizontal_fov>${horizontal_fov}</horizontal_fov>
+          <image>
+            <width>${image_width}</width>
+            <height>${image_height}</height>
+            <format>${image_format}</format>
+          </image>
+          <clip>
+            <near>${clip_near}</near>
+            <far>${clip_far}</far>
+          </clip>
+          <camera_info_topic>${camera_topic}/camera_info</camera_info_topic>
+          <!-- Harmonic uses this frame id for the RGB-D camera messages. -->
+          <optical_frame_id>${prefix}${camera_name}_depth_optical_frame</optical_frame_id>
+        </camera>
+      </sensor>
+    </gazebo>
+
+  </xacro:macro>
+
+  <!--
+    Backward-compatible interface with the original simple camera.xacro.
+    Existing call remains valid:
+      <xacro:camera_link x="0.3" y="0" z="0.5"/>
+  -->
+  <xacro:macro name="camera_link" params="x y z">
+    <xacro:rgbd_camera
+      camera_name="camera"
+      parent="base_link"
+      camera_topic="camera"
+      xyz_offset="${x} ${y} ${z}"/>
+  </xacro:macro>
+
+</robot>

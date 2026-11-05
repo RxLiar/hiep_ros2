@@ -44,6 +44,7 @@ class _StatusCard(QFrame):
         super().__init__()
         self._accent = accent
         self._clickable = clickable
+        self.setObjectName("StatusCard")     # selector below must not hit the child QLabels
         self.setMinimumSize(160, 130)
 
         if clickable:
@@ -87,12 +88,12 @@ class _StatusCard(QFrame):
 
     def _set_style(self, accent: str, bg: str):
         self.setStyleSheet(
-            f"QFrame{{"
+            f"#StatusCard{{"
             f"background:{bg};"
             f"border:1px solid {accent};"
             "border-radius:12px;"
             "}"
-            f"QFrame:hover{{border-color:{accent};}}"
+            f"#StatusCard:hover{{border-color:{accent};}}"
         )
 
     def set_value(
@@ -171,8 +172,9 @@ class HomePage(QWidget):
         root.setSpacing(22)
 
         hero = QFrame()
+        hero.setObjectName("HomeHero")
         hero.setStyleSheet(
-            "QFrame{"
+            "#HomeHero{"
             "background:#010409;"
             "border:1px solid #21262D;"
             "border-radius:16px;"

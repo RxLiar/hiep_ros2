@@ -26,7 +26,8 @@ class SystemSettingsBox(QGroupBox):
         self._c_touch = chk("operator_kiosk")
         self._c_touch.toggled.connect(self.touch_mode_changed)
         self._c_joy = chk("joy_enabled")
-        for c in (self._c_pre, self._c_snd, self._c_touch):
+        self._c_anim = chk("ui_animations")      # 4.7.0
+        for c in (self._c_pre, self._c_snd, self._c_touch, self._c_anim):
             v.addWidget(c)
 
         # tower light masks (engineer only: they depend on the PLC wiring)
@@ -36,7 +37,7 @@ class SystemSettingsBox(QGroupBox):
         tv.addWidget(self._tower_lbl)
         row = QHBoxLayout()
         for st in ("idle", "running", "paused", "error"):
-            sp = QSpinBox(); sp.setRange(0, 15); sp.setValue(int(prefs.get(f"tower_mask_{st}")))
+            sp = QSpinBox(); sp.setRange(0, 15); sp.setKeyboardTracking(False); sp.setValue(int(prefs.get(f"tower_mask_{st}")))
             sp.valueChanged.connect(lambda val, s=st: prefs.set(f"tower_mask_{s}", int(val)))
             row.addWidget(sp)
         tv.addLayout(row)
@@ -50,7 +51,7 @@ class SystemSettingsBox(QGroupBox):
         for key, rng, step, dec in (("joy_deadman_button", (0, 20), 1, 0), ("joy_lin_axis", (0, 10), 1, 0),
                                     ("joy_ang_axis", (0, 10), 1, 0), ("joy_max_lin", (0.05, 1.5), 0.05, 2),
                                     ("joy_max_ang", (0.1, 2.0), 0.1, 2)):
-            sp = QDoubleSpinBox(); sp.setRange(*rng); sp.setSingleStep(step); sp.setDecimals(dec)
+            sp = QDoubleSpinBox(); sp.setRange(*rng); sp.setSingleStep(step); sp.setDecimals(dec); sp.setKeyboardTracking(False)
             sp.setValue(float(prefs.get(key)))
             sp.valueChanged.connect(lambda val, k=key, d=dec: prefs.set(k, int(val) if d == 0 else float(val)))
             lbl = QLabel(); self._f[key] = lbl; form.addRow(lbl, sp)
@@ -87,6 +88,7 @@ class SystemSettingsBox(QGroupBox):
         self.setTitle(tr("ss_title"))
         self._c_pre.setText(tr("ss_preflight")); self._c_snd.setText(tr("ss_sound"))
         self._c_tower.setText(tr("ss_tower")); self._tower_lbl.setText(tr("ss_tower_masks"))
+        self._c_anim.setText(tr("set_animations"))
         self._c_touch.setText(tr("ss_touch")); self._c_joy.setText(tr("ss_joy")); self._joy_lbl.setText("")
         for key, tk in (("joy_deadman_button", "ss_joy_btn"), ("joy_lin_axis", "ss_joy_lin"),
                         ("joy_ang_axis", "ss_joy_ang"), ("joy_max_lin", "ss_joy_vmax"), ("joy_max_ang", "ss_joy_wmax")):

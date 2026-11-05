@@ -39,6 +39,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QPixmap, QColor
 
+from agv_hmi.ui.collapsible import CollapsiblePanel, make_groups_collapsible
 from agv_hmi.ui.map_widget import MapWidget, MODE_GOAL, MODE_POSE
 from agv_hmi.ui.error_header import ErrorHeader
 from agv_hmi.ui.joystick_widget import JoystickWidget
@@ -204,8 +205,9 @@ class _HistoryTab(QWidget):
         lay.addLayout(hdr)
 
         sf = QFrame()
+        sf.setObjectName("StatBar")
         sf.setStyleSheet(
-            "QFrame{background:#161B22;border:1px solid #21262D;"
+            "#StatBar{background:#161B22;border:1px solid #21262D;"
             "border-radius:8px;}")
         sfl = QHBoxLayout(sf)
         sfl.setContentsMargins(12, 8, 12, 8); sfl.setSpacing(20)
@@ -402,7 +404,8 @@ class RoutesPage(QWidget):
     def _build(self):
         root = QHBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0); root.setSpacing(0)
-        root.addWidget(self._build_list_panel())
+        self._list_panel = CollapsiblePanel(self._build_list_panel(), 300, "left", "routes.list")
+        root.addWidget(self._list_panel)
 
         right = QWidget()
         right_lay = QVBoxLayout(right)
@@ -425,13 +428,11 @@ class RoutesPage(QWidget):
         map_tab = QWidget()
         map_lay = QHBoxLayout(map_tab)
         map_lay.setContentsMargins(0, 0, 0, 0); map_lay.setSpacing(0)
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        splitter.addWidget(self._build_map_area())   # [1][2] map + joystick + pose
-        splitter.addWidget(self._build_status_panel())
-        splitter.setStretchFactor(0, 1)
-        splitter.setStretchFactor(1, 0)
-        splitter.setSizes([850, 270])
-        map_lay.addWidget(splitter)
+        map_lay.addWidget(self._build_map_area(), 1)   # [1][2] map + joystick + pose
+        status = self._build_status_panel()
+        make_groups_collapsible(status, "routes")
+        self._status_panel = CollapsiblePanel(status, 270, "right", "routes.status")
+        map_lay.addWidget(self._status_panel)
         self._tabs.addTab(map_tab, "🗺  Bản đồ")
 
         self._history_tab = _HistoryTab()
@@ -443,9 +444,9 @@ class RoutesPage(QWidget):
 
     def _build_list_panel(self):
         panel = QWidget()
+        panel.setObjectName("RoutesListPanel")     # styled in the .qss (a bare stylesheet leaked to every child)
+        panel.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         panel.setFixedWidth(300)
-        panel.setStyleSheet(
-            "background:#010409;border-right:1px solid #21262D;")
         lay = QVBoxLayout(panel)
         lay.setContentsMargins(10, 14, 10, 14); lay.setSpacing(8)
 
@@ -649,8 +650,9 @@ class RoutesPage(QWidget):
 
         # [D] Stuck banner — ẩn mặc định, chỉ hiện khi mission gặp sự cố
         self._stuck_frame = QFrame()
+        self._stuck_frame.setObjectName("StuckBanner")
         self._stuck_frame.setStyleSheet(
-            "QFrame{background:#2E2000;border:1px solid #9E6A03;"
+            "#StuckBanner{background:#2E2000;border:1px solid #9E6A03;"
             "border-radius:8px;}")
         sfl = QVBoxLayout(self._stuck_frame)
         sfl.setContentsMargins(10, 8, 10, 8); sfl.setSpacing(6)

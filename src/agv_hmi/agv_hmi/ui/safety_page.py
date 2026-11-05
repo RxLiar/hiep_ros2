@@ -13,6 +13,8 @@ from PyQt6.QtWidgets import (
     QCheckBox, QPushButton, QComboBox, QLineEdit, QScrollArea, QInputDialog, QMessageBox, QSplitter, QGridLayout)
 
 from agv_hmi.core import robot_profile as RP
+from agv_hmi.core import safety_diag as SD
+import time as _time
 from agv_hmi.ui.i18n import tr
 
 _STATE_COLOR = {"ok": "#3FB950", "slow": "#E3B341", "stop": "#F85149", "no_scan": "#F85149",
@@ -56,6 +58,11 @@ class SafetyEditor(QWidget):
         p = self.p
         mx = max(max(p["slow"]["front"], p["slow"]["rear"]), 0.8)
         my = max(max(p["slow"]["left"], p["slow"]["right"]), 0.8)
+        if RP.is_forklift(p):                       # keep the whole bypass region in view
+            bx0, bx1, by0, by1 = RP.fork_bypass_rect(p, True)
+            front = p["center_x_m"] + p["length_m"] / 2
+            mx = max(mx, bx1 - front)
+            my = max(my, max(abs(by0), abs(by1)) - p["width_m"] / 2)
         self._fit = (p["length_m"] / 2 + mx + 0.6, p["width_m"] / 2 + my + 0.6)
 
     def _scale(self) -> float:
@@ -148,6 +155,15 @@ class SafetyEditor(QWidget):
         pa.drawRect(slow)
         pa.setPen(QPen(QColor(248, 81, 73), 2)); pa.setBrush(QBrush(QColor(248, 81, 73, 60)))
         pa.drawRect(stop)
+        # fork lift: the area ahead of the tips that is bypassed while inserting into a pallet
+        if RP.is_forklift(p):
+            bx = self._rect_px(RP.fork_bypass_rect(p, False))
+            active = "fork_insert" in (self.state.get("bypass") or [])
+            pa.setPen(QPen(QColor(63, 185, 80), 2 if active else 1, Qt.PenStyle.DotLine))
+            pa.setBrush(QBrush(QColor(63, 185, 80, 55 if active else 22)))
+            pa.drawRect(bx)
+            f0 = QFont(); f0.setPixelSize(11); pa.setFont(f0); pa.setPen(QColor(63, 185, 80))
+            pa.drawText(QPointF(bx.left() + 6, bx.top() + 14), "BYPASS (insert)")
         # lidar points coloured by zone
         if len(self.pts):
             cls = RP.classify_points(self.pts, p)
@@ -208,6 +224,8 @@ class SafetyPage(QWidget):
     def __init__(self):
         super().__init__()
         self._store = RP.load_store()
+        self._node_state: dict | None = None
+        self._node_state_t = 0.0
         self._loading = False
         self._dirty = False
         self._build()
@@ -216,6 +234,9 @@ class SafetyPage(QWidget):
     # -- UI --------------------------------------------------------------------
     def _spin(self, lo, hi, step, dec=2):
         sp = QDoubleSpinBox(); sp.setRange(lo, hi); sp.setSingleStep(step); sp.setDecimals(dec)
+        # Commit on Enter / Tab / focus-out only. With keyboard tracking every keystroke ("0", "0.", "0.5")
+        # was applied and normalised (slow >= stop) while the user was still typing, which rewrote the box.
+        sp.setKeyboardTracking(False)
         sp.valueChanged.connect(self._on_form_changed); return sp
 
     def _build(self):
@@ -226,17 +247,27 @@ class SafetyPage(QWidget):
         self._legend = QLabel(); self._hint = QLabel()
         left.addWidget(self._legend); left.addWidget(self._hint)
 
-        scroll = QScrollArea(); scroll.setWidgetResizable(True); scroll.setMinimumWidth(360); scroll.setMaximumWidth(460)
+        scroll = QScrollArea(); scroll.setWidgetResizable(True); scroll.setMinimumWidth(420); scroll.setMaximumWidth(540)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         panel = QWidget(); v = QVBoxLayout(panel); scroll.setWidget(panel); root.addWidget(scroll, 2)
+
+        self._active_lbl = QLabel(); self._active_lbl.setStyleSheet("font-weight:700;")
+        v.addWidget(self._active_lbl)
+        self._chain_box = QGroupBox(); cv = QVBoxLayout(self._chain_box)
+        self._chain_lbl = QLabel(); self._chain_lbl.setWordWrap(True); self._chain_lbl.setTextFormat(Qt.TextFormat.RichText)
+        cv.addWidget(self._chain_lbl)
+        v.addWidget(self._chain_box)
 
         # profile row
         self._prof_box = QGroupBox(); pr = QHBoxLayout(self._prof_box)
         self._combo = QComboBox(); self._combo.currentTextChanged.connect(self._on_profile_switch)
         self._b_new, self._b_dup, self._b_del = QPushButton(), QPushButton(), QPushButton()
+        self._b_fl = QPushButton()
         self._b_new.clicked.connect(lambda: self._new_profile(False)); self._b_dup.clicked.connect(lambda: self._new_profile(True))
+        self._b_fl.clicked.connect(lambda: self._new_profile(False, "forklift"))
         self._b_del.clicked.connect(self._delete_profile)
         pr.addWidget(self._combo, 1)
-        for b in (self._b_new, self._b_dup, self._b_del):
+        for b in (self._b_new, self._b_fl, self._b_dup, self._b_del):
             pr.addWidget(b)
         v.addWidget(self._prof_box)
 
@@ -245,10 +276,25 @@ class SafetyPage(QWidget):
         self._name = QLineEdit(); self._name.textChanged.connect(self._on_form_changed)
         self._len, self._wid = self._spin(0.1, 10, 0.05), self._spin(0.1, 5, 0.05)
         self._cx, self._cy = self._spin(-5, 5, 0.05), self._spin(-2, 2, 0.05)
+        self._type = QComboBox()
+        self._type.addItem("", "agv"); self._type.addItem("", "forklift")
+        self._type.currentIndexChanged.connect(self._on_form_changed)
+        self._type_lbl = QLabel(); f.addRow(self._type_lbl, self._type)
         self._lbl = {k: QLabel() for k in ("name", "len", "wid", "cx", "cy")}
         for k, w in (("name", self._name), ("len", self._len), ("wid", self._wid), ("cx", self._cx), ("cy", self._cy)):
             f.addRow(self._lbl[k], w)
         v.addWidget(self._robot_box)
+
+        # fork lift specifics
+        self._fork_box = QGroupBox(); ffl = QFormLayout(self._fork_box)
+        self._flen, self._fwid, self._lwid = self._spin(0.1, 5, 0.05), self._spin(0.1, 3, 0.05), self._spin(0.1, 3, 0.05)
+        self._fmax = self._spin(100, 8000, 50, 0)
+        self._fahead, self._fspeed = self._spin(0.2, 4, 0.1), self._spin(0.02, 0.3, 0.01)
+        self._flbl = {k: QLabel() for k in ("flen", "fwid", "lwid", "fmax", "fahead", "fspeed")}
+        for k, w in (("flen", self._flen), ("fwid", self._fwid), ("lwid", self._lwid), ("fmax", self._fmax),
+                     ("fahead", self._fahead), ("fspeed", self._fspeed)):
+            ffl.addRow(self._flbl[k], w)
+        v.addWidget(self._fork_box)
 
         # lidar
         self._lidar_box = QGroupBox(); f = QFormLayout(self._lidar_box)
@@ -273,7 +319,8 @@ class SafetyPage(QWidget):
         # behaviour
         self._beh_box = QGroupBox(); f = QFormLayout(self._beh_box)
         self._slin, self._sang = self._spin(0.02, 2.0, 0.05), self._spin(0.05, 3.0, 0.05)
-        self._minpts = QSpinBox(); self._minpts.setRange(1, 50); self._minpts.valueChanged.connect(self._on_form_changed)
+        self._minpts = QSpinBox(); self._minpts.setRange(1, 50); self._minpts.setKeyboardTracking(False)
+        self._minpts.valueChanged.connect(self._on_form_changed)
         self._enabled, self._require = QCheckBox(), QCheckBox()
         for c in (self._enabled, self._require):
             c.toggled.connect(self._on_form_changed)
@@ -305,7 +352,11 @@ class SafetyPage(QWidget):
             "slow": {s: self._zs[("slow", s)].value() for s in RP.SIDES},
             "slow_linear_mps": self._slin.value(), "slow_angular_rps": self._sang.value(),
             "safety_enabled": self._enabled.isChecked(), "require_scan": self._require.isChecked(),
-            "min_points": self._minpts.value()})
+            "min_points": self._minpts.value(),
+            "robot_type": self._type.currentData(),
+            "fork_length_m": self._flen.value(), "fork_width_m": self._fwid.value(),
+            "load_width_m": self._lwid.value(), "max_height_mm": self._fmax.value(),
+            "fork": dict(self.editor.p["fork"], bypass_ahead_m=self._fahead.value(), insert_speed_mps=self._fspeed.value())})
 
     def _fill_form(self, p: dict):
         self._loading = True
@@ -317,6 +368,10 @@ class SafetyPage(QWidget):
                 self._zs[(kind, s)].setValue(p[kind][s])
         self._slin.setValue(p["slow_linear_mps"]); self._sang.setValue(p["slow_angular_rps"])
         self._minpts.setValue(p["min_points"]); self._enabled.setChecked(p["safety_enabled"]); self._require.setChecked(p["require_scan"])
+        self._type.setCurrentIndex(max(0, self._type.findData(p["robot_type"])))
+        self._flen.setValue(p["fork_length_m"]); self._fwid.setValue(p["fork_width_m"]); self._lwid.setValue(p["load_width_m"])
+        self._fmax.setValue(p["max_height_mm"]); self._fahead.setValue(p["fork"]["bypass_ahead_m"]); self._fspeed.setValue(p["fork"]["insert_speed_mps"])
+        self._fork_box.setVisible(p["robot_type"] == "forklift")
         self._loading = False
         self.editor.set_profile(p); self._update_fp()
 
@@ -332,6 +387,7 @@ class SafetyPage(QWidget):
         if self._loading:
             return
         self.editor.set_profile(self._current())
+        self._fork_box.setVisible(self._type.currentData() == "forklift")
         self._fill_zone_spins_from_editor()
         self._update_fp(); self._set_dirty(True)
 
@@ -339,7 +395,10 @@ class SafetyPage(QWidget):
         self._loading = True
         for kind in ("stop", "slow"):
             for s in RP.SIDES:
-                self._zs[(kind, s)].setValue(self.editor.p[kind][s])
+                sp = self._zs[(kind, s)]
+                if sp.hasFocus() or sp.lineEdit().hasFocus():
+                    continue                      # do not rewrite the box being edited
+                sp.setValue(self.editor.p[kind][s])
         self._loading = False
 
     def _on_editor_changed(self):
@@ -359,12 +418,12 @@ class SafetyPage(QWidget):
             return
         self._fill_form(self._store["profiles"][name]); self._set_dirty(True)
 
-    def _new_profile(self, duplicate: bool):
+    def _new_profile(self, duplicate: bool, robot_type: str = "agv"):
         name, ok = QInputDialog.getText(self, tr("page_safety"), tr("sf_prompt_name"))
         name = name.strip()
         if not ok or not name:
             return
-        base = self._current() if duplicate else RP.normalize(None)
+        base = self._current() if duplicate else RP.new_profile(name, robot_type)
         base["name"] = name
         self._store["profiles"][name] = RP.normalize(base); self._store["active"] = name
         self._loading = True; self._combo.clear(); self._combo.addItems(list(self._store["profiles"]))
@@ -391,30 +450,78 @@ class SafetyPage(QWidget):
         self.editor.set_profile(p)
         self._dirty = False
         self._status.setStyleSheet("color:#3FB950;"); self._status.setText("✅ " + tr("sf_applied"))
+        self._update_active_label()
         self.profile_applied.emit(p)
 
     def active_profile(self) -> dict:
         return RP.active_profile(self._store)
 
+    def apply_external(self, patch: dict):
+        """Merge values edited elsewhere (the Fork lift page) into the profile shown here, then apply & save.
+        Unsaved edits of this page are applied too, so there is only one copy of the profile."""
+        base = self._current()
+        for k, v in patch.items():
+            if k == "fork":
+                base["fork"] = dict(base["fork"], **v)
+            else:
+                base[k] = v
+        self._fill_form(RP.normalize(base))
+        self.apply()
+
     # -- live data ---------------------------------------------------------------------
     def feed_scan(self, angle_min, angle_inc, range_min, range_max, ranges):
-        self.editor.set_scan_points(RP.scan_to_base(ranges, angle_min, angle_inc, range_min, range_max, self.editor.p))
+        st = self.editor.state or {}
+        pose = None
+        if st.get("pose_source") in ("tf", "same_frame") and st.get("lidar_pose"):
+            lx, ly, yaw_deg = st["lidar_pose"]
+            pose = (float(lx), float(ly), math.radians(float(yaw_deg)))     # same pose the node uses
+        self.editor.set_scan_points(RP.scan_to_base(ranges, angle_min, angle_inc, range_min, range_max, self.editor.p, pose))
 
     def feed_state(self, payload: str):
         try:
             d = json.loads(payload)
             if isinstance(d, dict):
                 self.editor.set_state(d)
+                self._node_state, self._node_state_t = d, _time.monotonic()
+                self._refresh_chain()
         except ValueError:
             pass
 
     def mark_state_stale(self):
         self.editor.set_state({"state": "unknown"})
+        self._node_state = None
+        self._refresh_chain()
+
+    def _refresh_chain(self):
+        fresh = self._node_state is not None and _time.monotonic() - self._node_state_t < 3.0
+        items = SD.diagnose(self._node_state, RP.signature(RP.active_profile(self._store)), fresh)
+        colors = {SD.OK: ("✅", "#3FB950"), SD.WARN: ("⚠️", "#E3B341"), SD.FAIL: ("❌", "#F85149")}
+        rows = []
+        for level, key, args in items:
+            icon, col = colors[level]
+            try:
+                text = tr(key, *args)
+            except Exception:
+                text = tr(key)
+            rows.append(f"<span style='color:{col}'>{icon} {text}</span>")
+            if level != SD.OK and tr(key + "_hint") != key + "_hint":
+                rows.append(f"<span style='color:#8B949E'>&nbsp;&nbsp;&nbsp;&nbsp;→ {tr(key + '_hint')}</span>")
+        self._chain_lbl.setText("<br>".join(rows))
+        self._update_active_label()
+
+    def _update_active_label(self):
+        p = RP.active_profile(self._store)
+        self._active_lbl.setText("🛡 " + tr("sf_active_in_ros", p["name"], tr("rt_" + p["robot_type"])))
 
     # -- i18n -------------------------------------------------------------------------
     def retranslate(self):
+        self._chain_box.setTitle(tr("sd_title")); self._update_active_label(); self._refresh_chain()
         self._prof_box.setTitle(tr("sf_profile")); self._robot_box.setTitle(tr("sf_robot_box"))
         self._lidar_box.setTitle(tr("sf_lidar_box")); self._zone_box.setTitle(tr("sf_zone_box")); self._beh_box.setTitle(tr("sf_beh_box"))
+        self._b_fl.setText(tr("sf_new_forklift")); self._type_lbl.setText(tr("sf_type"))
+        self._type.setItemText(0, tr("rt_agv")); self._type.setItemText(1, tr("rt_forklift")); self._fork_box.setTitle(tr("sf_fork_box"))
+        for k, key in (("flen", "sf_fork_len"), ("fwid", "sf_fork_wid"), ("lwid", "sf_load_wid"), ("fmax", "sf_max_h"), ("fahead", "sf_bypass_ahead"), ("fspeed", "sf_ins_speed")):
+            self._flbl[k].setText(tr(key))
         for b, k in ((self._b_new, "sf_new"), (self._b_dup, "sf_dup"), (self._b_del, "sf_del"),
                      (self._b_apply, "sf_apply"), (self._b_revert, "sf_revert")):
             b.setText(tr(k))

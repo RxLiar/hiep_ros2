@@ -22,6 +22,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from agv_hmi.ui.collapsible import CollapsiblePanel, make_groups_collapsible
 from agv_hmi.ui.fleet_map_widget import FleetMapWidget
 from agv_hmi.ui.i18n import tr
 
@@ -145,18 +146,15 @@ class FleetPage(QWidget):
 
         root.addLayout(metrics)
 
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-
-        splitter.addWidget(self._build_table_panel())
-        splitter.addWidget(self._build_map_panel())
-        splitter.addWidget(self._build_detail_panel())
-
-        splitter.setStretchFactor(0, 2)
-        splitter.setStretchFactor(1, 4)
-        splitter.setStretchFactor(2, 2)
-        splitter.setSizes([360, 660, 300])
-
-        root.addWidget(splitter)
+        body = QHBoxLayout()
+        body.setContentsMargins(0, 0, 0, 0)
+        body.setSpacing(0)
+        self._table_panel = CollapsiblePanel(self._build_table_panel(), 360, "left", "fleet.table")
+        body.addWidget(self._table_panel)
+        body.addWidget(self._build_map_panel(), 1)
+        self._detail_panel = CollapsiblePanel(self._build_detail_panel(), 300, "right", "fleet.detail")
+        body.addWidget(self._detail_panel)
+        root.addLayout(body, 1)
 
     def _build_table_panel(self) -> QWidget:
         box = QGroupBox(tr("fleet_robot_list"))

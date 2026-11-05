@@ -9,7 +9,7 @@ qss_files = glob.glob('agv_hmi/ui/*.qss')
 
 setup(
     name=package_name,
-    version='4.2.0',
+    version='4.7.0',
     # find_packages tự động tìm agv_hmi, agv_hmi.ui, agv_hmi.ros
     packages=find_packages(exclude=['test']),
     package_data={
@@ -24,7 +24,7 @@ setup(
     zip_safe=True,
     maintainer='hiep0247',
     maintainer_email='gaphan247@gmail.com',
-    description='AGV Busan Autonomous Robot HMI v4.2.0',
+    description='AGV Busan Autonomous Robot HMI v4.7.0',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={

@@ -27,10 +27,11 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
     QGroupBox, QLabel, QPushButton, QScrollArea,
     QListWidget, QListWidgetItem, QLineEdit,
-    QFileDialog, QMessageBox, QFrame
+    QFileDialog, QMessageBox, QFrame, QComboBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 
+from agv_hmi.ui.collapsible import CollapsiblePanel, make_groups_collapsible
 from agv_hmi.ui.map_widget import MapWidget, MODE_GOAL, MODE_POSE
 from agv_hmi.ui.error_header import ErrorHeader
 from agv_hmi.ui.joystick_widget import JoystickWidget
@@ -63,6 +64,7 @@ class NavigationPage(QWidget):
     resume_signal        = pyqtSignal()   # FIX: thêm signal resume
     save_route_signal    = pyqtSignal(str, str, list, str)   # name, map_path, wps, route_id
     nav_launch_toggle_signal = pyqtSignal(bool)               # True=start, False=stop
+    robot_type_changed   = pyqtSignal(str)                    # "agv" | "forklift"
 
     def __init__(self, role: str = "operator"):
         super().__init__()
@@ -86,12 +88,15 @@ class NavigationPage(QWidget):
         root.addWidget(self.error_header)
 
         # Body
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        splitter.addWidget(self._build_map_area())
-        splitter.addWidget(self._build_panel())
-        splitter.setStretchFactor(0, 1)
-        splitter.setSizes([980, 320])
-        root.addWidget(splitter)
+        body = QHBoxLayout()
+        body.setContentsMargins(0, 0, 0, 0)
+        body.setSpacing(0)
+        body.addWidget(self._build_map_area(), 1)
+        panel = self._build_panel()
+        make_groups_collapsible(panel, "nav")
+        self._panel = CollapsiblePanel(panel, 392, "right", "nav.panel")
+        body.addWidget(self._panel)
+        root.addLayout(body, 1)
 
     def _build_map_area(self):
         container = QWidget()
@@ -118,13 +123,23 @@ class NavigationPage(QWidget):
     def _build_panel(self):
         sa = QScrollArea()
         sa.setWidgetResizable(True)
-        sa.setFixedWidth(330)
+        sa.setFixedWidth(392)
         sa.setObjectName("Panel")
 
         inner = QWidget()
         lay = QVBoxLayout(inner)
         lay.setContentsMargins(12, 14, 12, 14)
         lay.setSpacing(10)
+
+        # ── Robot type: decides which task types the waypoints offer ──
+        self._rt_box = QGroupBox(tr("rt_label"))
+        rt_lay = QVBoxLayout(self._rt_box)
+        self._rt_combo = QComboBox()
+        self._rt_combo.addItem(tr("rt_agv"), "agv")
+        self._rt_combo.addItem(tr("rt_forklift"), "forklift")
+        self._rt_combo.currentIndexChanged.connect(self._on_robot_type_changed)
+        rt_lay.addWidget(self._rt_combo)
+        lay.addWidget(self._rt_box)
 
         # ── NAV launch control ───────────────────────────────────
         nav_box = QGroupBox("NAV2")
@@ -352,8 +367,29 @@ class NavigationPage(QWidget):
         self._map_lbl.setText(os.path.basename(mp))
         return True
 
+    # ── Robot type (AGV / fork lift) ─────────────────────────────────
+
+    def robot_type(self) -> str:
+        return str(self._rt_combo.currentData() or "agv")
+
+    def set_robot_type(self, robot_type: str):
+        i = self._rt_combo.findData(robot_type if robot_type in ("agv", "forklift") else "agv")
+        self._rt_combo.setCurrentIndex(max(0, i))
+
+    def _on_robot_type_changed(self, _idx: int):
+        rt = self.robot_type()
+        if hasattr(self, "_task_editor"):
+            self._task_editor.set_robot_type(rt)
+        self.robot_type_changed.emit(rt)
+
+    def retranslate_robot_type(self):
+        self._rt_box.setTitle(tr("rt_label"))
+        self._rt_combo.setItemText(0, tr("rt_agv"))
+        self._rt_combo.setItemText(1, tr("rt_forklift"))
+
     def load_route_readonly(self, route: dict):
         """Operator: load lộ trình để xem + chạy."""
+        self.set_robot_type(str(route.get("robot_type", "agv")))
         self._editing_route_id = ""
         self._waypoints = copy.deepcopy(route.get("waypoints", []))
         map_ok = self.load_map_path(route.get("map_path", ""))
@@ -362,6 +398,7 @@ class NavigationPage(QWidget):
 
     def load_route_for_edit(self, route: dict):
         """Engineer: load route vào Navigation để chỉnh sửa và lưu đè."""
+        self.set_robot_type(str(route.get("robot_type", "agv")))
         self._editing_route_id = str(route.get("id", ""))
         self._waypoints = copy.deepcopy(route.get("waypoints", []))
         map_ok = self.load_map_path(route.get("map_path", ""))
@@ -513,6 +550,7 @@ class NavigationPage(QWidget):
         self.resume_signal.emit()
 
     def retranslate(self):
+        self.retranslate_robot_type()
         self.error_header.retranslate()
         self._vel_panel.retranslate()
         self._pose_btn.setText(tr("nav_pose_enable"))

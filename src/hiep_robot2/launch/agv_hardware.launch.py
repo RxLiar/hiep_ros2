@@ -7,6 +7,7 @@
       Real AGV: KEYA traction + Mega2560 PLC (conveyors / bumpers / EMG / lights)
 
   plc:=auto|true|false      (default auto: off for model, on for real)
+  forklift:=false|true|plc  start the fork-lift node (true = built-in simulator, plc = real fork via the Mega2560)
   safety:=auto|true|false   lidar slow/stop gate (default auto: off for model, on for real).
                             When on, Nav2/HMI commands go /cmd_vel -> safety_monitor -> /cmd_vel_safe -> bridge.
 """
@@ -39,6 +40,7 @@ def _setup(context, *args, **kwargs):
     if safety == "auto":
         safety = "true" if profile == "real" else "false"
     use_safety = safety in _TRUE
+    forklift = LaunchConfiguration("forklift").perform(context).strip().lower()
 
     def include(name, **launch_arguments):
         return IncludeLaunchDescription(
@@ -52,6 +54,8 @@ def _setup(context, *args, **kwargs):
     ]
     if use_safety:
         actions.append(include("safety_monitor.launch.py"))
+    if forklift in _TRUE or forklift == "plc":
+        actions.append(include("forklift.launch.py", backend="plc" if forklift == "plc" else "sim"))
     if use_plc:
         actions.append(include("mega2560_plc.launch.py"))
     return actions
@@ -61,6 +65,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument("profile", default_value="model",
                               description="model = ESP32 test model, real = KEYA + Mega2560 PLC"),
+        DeclareLaunchArgument("forklift", default_value="false",
+                              description="false | true (simulated fork) | plc (real fork on the Mega2560)"),
         DeclareLaunchArgument("safety", default_value="auto",
                               description="auto | true | false: lidar slow/stop gate (safety_monitor)"),
         DeclareLaunchArgument("plc", default_value="auto",

@@ -770,3 +770,34 @@ QPushButton#ThemeOptBtn:checked {
     border-color: #0969DA;
     color: #0969DA;
 }
+
+
+/* ================================================================
+   4.7.0 POLISH  (appended: overrides the rules above)
+   ================================================================ */
+
+#AppTitle    { font-size: 12px; font-weight: 700; }
+#AppVersion  { font-size: 10px; }
+
+/* the collapse handle draws the divider itself */
+#Panel       { border-left: none; }
+#RoutesListPanel { background-color: #F6F8FA; }
+
+QGroupBox {
+    border-color: #D8DEE4;
+    border-radius: 10px;
+}
+QGroupBox::title { padding: 0 8px; }
+
+QPushButton { border-radius: 8px; }
+QPushButton#BtnPrimary,
+QPushButton#BtnSuccess,
+QPushButton#BtnDanger { border-radius: 8px; font-weight: 600; }
+
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QTimeEdit { border-radius: 8px; }
+
+QToolTip {
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+QScrollArea { border: none; }

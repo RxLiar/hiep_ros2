@@ -6,6 +6,7 @@ from PyQt6.QtGui import QMouseEvent, QPixmap
 
 from agv_hmi.ui.i18n import tr
 from agv_hmi.ui.language_selector import LanguageSelector
+from agv_hmi.ui.nav_button import IconButton
 
 LOGO_PATH = "/home/hiep0247/Downloads/TBD_logo.png"
 
@@ -23,6 +24,8 @@ class TitleBar(QWidget):
     language_changed = pyqtSignal(str)
     estop_clicked = pyqtSignal()
     alarms_clicked = pyqtSignal()
+    menu_clicked = pyqtSignal()       # 4.7.0: collapse / expand the sidebar
+    focus_clicked = pyqtSignal()      # 4.7.0: focus mode (hide sidebar + side panels)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -37,6 +40,11 @@ class TitleBar(QWidget):
         lay = QHBoxLayout(self)
         lay.setContentsMargins(14, 0, 10, 0)
         lay.setSpacing(8)
+
+        self._menu_btn = IconButton("menu", 32)
+        self._menu_btn.setToolTip(tr("tb_menu_tip"))
+        self._menu_btn.clicked.connect(self.menu_clicked)
+        lay.addWidget(self._menu_btn)
 
         self._logo = QLabel()
         self._logo.setFixedSize(34, 34)
@@ -94,6 +102,11 @@ class TitleBar(QWidget):
         sep2.setStyleSheet("color:#30363D;background:transparent;")
         lay.addWidget(sep2)
 
+        self._focus_btn = IconButton("focus", 30)
+        self._focus_btn.setToolTip(tr("tb_focus_tip"))
+        self._focus_btn.clicked.connect(self.focus_clicked)
+        lay.addWidget(self._focus_btn)
+
         self._alarm_btn = QPushButton("🔔")
         self._alarm_btn.setFixedHeight(30)
         self._alarm_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -119,28 +132,13 @@ class TitleBar(QWidget):
 
         lay.addSpacing(8)
 
-        for sym, slot in [
-            ("⎯", self.minimize_clicked),
-            ("□", self.maximize_clicked),
-            ("✕", self.close_clicked),
-        ]:
-            b = QPushButton(sym)
-            b.setFixedSize(32, 32)
-            is_close = sym == "✕"
-            b.setStyleSheet(
-                f"QPushButton{{"
-                f"background:{'#8B0000' if is_close else '#21262D'};"
-                "border:none;"
-                "border-radius:6px;"
-                "color:#8B949E;"
-                "font-size:13px;"
-                "}"
-                f"QPushButton:hover{{"
-                f"background:{'#B22222' if is_close else '#30363D'};"
-                "color:#E6EDF3;"
-                "}"
-            )
+        self._win_btns = {}
+        for kind, slot in (("min", self.minimize_clicked),
+                           ("max", self.maximize_clicked),
+                           ("close", self.close_clicked)):
+            b = IconButton(kind, 32)
             b.clicked.connect(slot)
+            self._win_btns[kind] = b
             lay.addWidget(b)
 
     def _set_logo(self):
@@ -166,6 +164,13 @@ class TitleBar(QWidget):
             "font-weight:800;"
             "qproperty-alignment:AlignCenter;"
         )
+
+    def set_maximized(self, on: bool):
+        self._win_btns["max"].set_kind("restore" if on else "max")
+
+    def set_focus_mode(self, on: bool):
+        self._focus_btn.set_kind("focus_off" if on else "focus")
+        self._focus_btn.setToolTip(tr("tb_focus_off_tip") if on else tr("tb_focus_tip"))
 
     def set_page_title(self, title: str):
         self._page_lbl.setText(f"  /  {title}" if title else "")
@@ -217,6 +222,8 @@ class TitleBar(QWidget):
             "QPushButton:hover{background:#30363D;}")
 
     def retranslate(self):
+        self._menu_btn.setToolTip(tr("tb_menu_tip"))
+        self._focus_btn.setToolTip(tr("tb_focus_tip"))
         self._estop_btn.setText(tr("estop_btn"))
         self._estop_btn.setToolTip(tr("estop_tip"))
         self._name_lbl.setText(tr("app_name"))

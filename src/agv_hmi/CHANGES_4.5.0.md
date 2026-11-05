@@ -51,3 +51,34 @@
 - The configured size is used to draw the robot on every map, and the zones are drawn around it.
 - Alarms: obstacle in the STOP zone, safety monitor lost the lidar. Pre-flight check includes the safety monitor
   (only once it has been seen). Dashboard card shows the safety state.
+
+# 4.6.0 - Fork lift
+- Robot type (AGV conveyor / Fork lift) is chosen in the Navigation page when programming; the choice is saved with the
+  route (`robot_type`). The waypoint task list changes with the type.
+- New waypoint tasks (fork lift): Pick up pallet, Drop pallet, Raise fork, Lower fork, Drive into pallet, Back out.
+  Each runs closed-loop: the HMI sends the command to `forklift_node`, waits for `done`/`error`, and stops the mission
+  on error (alarm + toast). Fork tasks are always sequential. Routes with fork tasks refuse to start unless the active
+  robot profile is a fork lift.
+- Robot profile: `robot_type`, `fork_length_m`, `fork_width_m`, `load_width_m`, `max_height_mm`, `fork{}` (heights,
+  insert depth, speeds, bypass distance). "Robot & Safety" page: "+ Fork lift" profile, fork fields, the BYPASS region
+  is drawn in green.
+- "Fork lift" page (Engineer): height gauge, state/progress/bypass indicator, manual height / insert / back-out,
+  Pick and Drop test sequences (hold 0.8 s to run), Stop, set "carrying" flag.
+- Physical or soft e-stop also stops the fork lift task.
+
+# 4.6.1 - fixes (safety page)
+- FIXED: typing a number into a zone margin box (STOP / SAFETY) rewrote the box on every keystroke, e.g. typing 0.55 for
+  "SAFETY left" gave 0.10 and 0.30 for "STOP front" gave 0.00. Values are now committed on Enter / Tab / focus-out and the
+  box being edited is never rewritten.
+- "Safety chain check" panel on the Robot & Safety page (is the monitor running, does a bridge listen to /cmd_vel_safe,
+  who still listens to /cmd_vel directly, is the node on the same configuration, lidar pose from TF or manual numbers).
+- The lidar points are drawn with the pose the node actually uses (TF).
+- "Applied to the robot" label with the active profile; Hardware tab: safety:= / forklift:= options.
+
+# 4.6.2 - Fork lift parameters
+- The Fork lift page has a **Parameters** tab: every fork-lift value (fork / pallet size, entry / lift / travel heights,
+  release clearance, insert depth, back-out distance, speeds, bypass distance and the advanced control values) can be
+  edited and saved. They live in the robot profile: `~/.agv_hmi/robot_profile.json` (see FORKLIFT_GUIDE_vi.md).
+- The page tells whether `forklift_node` runs the saved values (the node now reports its effective configuration in
+  `/forklift/status` -> `cfg`).
+- "Guide" tab with the set-up steps; the test fields of the Control tab start from the saved values.

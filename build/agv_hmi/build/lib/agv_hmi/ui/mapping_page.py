@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 
+from agv_hmi.ui.collapsible import CollapsiblePanel, make_groups_collapsible
 from agv_hmi.ui.map_widget import MapWidget
 from agv_hmi.ui.error_header import ErrorHeader
 from agv_hmi.ui.joystick_widget import JoystickWidget
@@ -73,12 +74,15 @@ class MappingPage(QWidget):
         self.error_header = ErrorHeader()
         root.addWidget(self.error_header)
 
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        splitter.addWidget(self._build_map_area())
-        splitter.addWidget(self._build_panel())
-        splitter.setStretchFactor(0, 1)
-        splitter.setSizes([1000, 260])
-        root.addWidget(splitter)
+        body = QHBoxLayout()
+        body.setContentsMargins(0, 0, 0, 0)
+        body.setSpacing(0)
+        body.addWidget(self._build_map_area(), 1)
+        panel = self._build_panel()
+        make_groups_collapsible(panel, "mapping")
+        self._panel = CollapsiblePanel(panel, 288, "right", "mapping.panel")
+        body.addWidget(self._panel)
+        root.addLayout(body, 1)
 
     def _build_map_area(self):
         container = QWidget()
@@ -100,7 +104,7 @@ class MappingPage(QWidget):
     def _build_panel(self):
         sa = QScrollArea()
         sa.setWidgetResizable(True)
-        sa.setFixedWidth(270)
+        sa.setFixedWidth(288)
         sa.setObjectName("Panel")
 
         inner = QWidget()

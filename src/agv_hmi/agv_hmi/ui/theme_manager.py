@@ -135,6 +135,8 @@ class ThemeManager(QObject):
             self.theme_changed.emit(self._effective)
 
     def _apply_qss(self, effective: str):
+        # custom-painted widgets (nav buttons, panel handles ...) read the theme from here
+        self._app.setProperty("hmi_theme", effective)
         path = QSS_DARK_PATH if effective == THEME_DARK else QSS_LIGHT_PATH
         if not os.path.exists(path):
             return

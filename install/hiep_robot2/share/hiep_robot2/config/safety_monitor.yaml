@@ -13,3 +13,5 @@ safety_monitor:
     hold_s: 0.3                    # keep a zone "occupied" this long after the last hit
     block_rotation_in_stop: true
     apply_nav2_footprint: true     # push footprint to /local_costmap and /global_costmap
+    use_tf: true                   # lidar position from TF (scan frame -> base_frame); profile lidar pose = fallback
+    base_frame: base_footprint     # the frame the footprint is expressed in (Nav2 robot_base_frame)

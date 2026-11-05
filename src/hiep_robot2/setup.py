@@ -6,7 +6,7 @@ package_name = 'hiep_robot2'
 
 setup(
     name=package_name,
-    version='0.5.0',
+    version='0.7.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
@@ -28,6 +28,8 @@ setup(
             'keya_driver_bridge_node = hiep_robot2.keya_driver_bridge_node:main',
             'mega2560_plc_bridge_node = hiep_robot2.mega2560_plc_bridge_node:main',
             'safety_monitor_node = hiep_robot2.safety_monitor_node:main',
+            'forklift_node = hiep_robot2.forklift_node:main',
+            'safety_check = hiep_robot2.safety_check:main',
         ],
     },
 )

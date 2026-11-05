@@ -27,6 +27,24 @@ const uint8_t CONV_REV[CONVEYOR_COUNT] = {23, 25, 27, 29};
 const uint8_t SENSOR_A[CONVEYOR_COUNT] = {30, 32, 34, 36};
 const uint8_t SENSOR_B[CONVEYOR_COUNT] = {31, 33, 35, 37};
 
+// ---------------------------------------------------------------------------
+// Fork lift (OPTIONAL). Disabled by default so existing wiring is not touched.
+// Set FORK_ENABLED = true and CHECK THE PINS against your wiring first.
+// Safety: the fork only moves while commands keep arriving (FORK_CMD_TIMEOUT_MS),
+// stops on the limit switches and on the emergency stop, and never drives UP and
+// DOWN at the same time.
+// ---------------------------------------------------------------------------
+constexpr bool FORK_ENABLED = false;
+constexpr uint8_t PIN_FORK_UP = 47;           // contactor / valve: lift UP
+constexpr uint8_t PIN_FORK_DOWN = 48;         // contactor / valve: lift DOWN
+constexpr uint8_t PIN_FORK_PWM = 6;           // speed (PWM) or enable; any free PWM pin
+constexpr uint8_t PIN_FORK_TOP = 49;          // top limit switch
+constexpr uint8_t PIN_FORK_BOTTOM = 50;       // bottom limit switch
+constexpr uint8_t PIN_FORK_HEIGHT_ADC = A8;   // height sensor (potentiometer / linear sensor)
+constexpr bool FORK_LIMIT_ACTIVE_HIGH = true;
+constexpr uint32_t FORK_CMD_TIMEOUT_MS = 400;
+constexpr uint32_t FORK_DEADTIME_MS = 150;    // pause when reversing direction
+
 // Robot I/O.
 constexpr uint8_t PIN_BUMPER_LEFT = 38;
 constexpr uint8_t PIN_BUMPER_RIGHT = 39;
@@ -315,8 +333,89 @@ void updateConveyors() {
 //   STOPALL,<seq>
 // ============================================================================
 
+// ---- fork lift state ----
+char forkDir = 'S';
+uint8_t forkSpeed = 0;
+uint32_t forkLastCmdMs = 0;
+uint32_t forkDeadUntilMs = 0;
+uint8_t forkApplied = 0;       // 0 stop, 1 up, 2 down
+uint8_t forkFault = 0;         // 1 = both limit switches active (wiring), 2 = emergency stop active while commanded
+
+bool forkTop() { return readActive(PIN_FORK_TOP, FORK_LIMIT_ACTIVE_HIGH); }
+bool forkBottom() { return readActive(PIN_FORK_BOTTOM, FORK_LIMIT_ACTIVE_HIGH); }
+
+void forkOutputs(uint8_t dir, uint8_t speed) {
+  digitalWrite(PIN_FORK_UP, LOW);
+  digitalWrite(PIN_FORK_DOWN, LOW);
+  analogWrite(PIN_FORK_PWM, 0);
+  if (dir == 1) { digitalWrite(PIN_FORK_UP, HIGH); }
+  if (dir == 2) { digitalWrite(PIN_FORK_DOWN, HIGH); }
+  if (dir != 0) { analogWrite(PIN_FORK_PWM, speedPercentToPwm(speed)); }
+  forkApplied = dir;
+}
+
+void updateFork() {
+  if (!FORK_ENABLED) return;
+  const uint32_t now = millis();
+  uint8_t want = 0;
+  if (forkDir == 'U') want = 1;
+  else if (forkDir == 'D') want = 2;
+  const bool top = forkTop(), bottom = forkBottom();
+  forkFault = (top && bottom) ? 1 : 0;                                      // both limits at once = wiring fault
+  if (now - forkLastCmdMs > FORK_CMD_TIMEOUT_MS) want = 0;                  // nobody is commanding: stop
+  if (emergencyActive()) { if (want != 0) forkFault = 2; want = 0; }
+  if (forkFault == 1) want = 0;
+  if (want == 1 && top) want = 0;
+  if (want == 2 && bottom) want = 0;
+
+  if (want == 0) {
+    if (forkApplied != 0) { forkOutputs(0, 0); forkDeadUntilMs = now + FORK_DEADTIME_MS; }
+    return;
+  }
+  if (want != forkApplied) {
+    if (forkApplied != 0) {                                                 // reversing: release first
+      forkOutputs(0, 0);
+      forkDeadUntilMs = now + FORK_DEADTIME_MS;
+      return;
+    }
+    if (now < forkDeadUntilMs) return;                                      // wait out the dead time
+    forkOutputs(want, forkSpeed);
+    return;
+  }
+  analogWrite(PIN_FORK_PWM, speedPercentToPwm(forkSpeed));                  // same direction: follow speed changes
+}
+
+void publishForkStatus() {
+  if (!FORK_ENABLED) return;
+  static uint32_t forkSeq = 0;
+  ++forkSeq;
+  Serial.print("FSTAT,");
+  Serial.print(forkSeq);
+  Serial.print(",");
+  Serial.print(analogRead(PIN_FORK_HEIGHT_ADC));
+  Serial.print(",");
+  Serial.print(forkTop() ? 1 : 0);
+  Serial.print(",");
+  Serial.print(forkBottom() ? 1 : 0);
+  Serial.print(",");
+  Serial.print(forkApplied != 0 ? 1 : 0);
+  Serial.print(",");
+  Serial.println(forkFault);
+}
+
 void handleLine(char *line) {
   long seq = 0;
+  char forkCmd = 0;
+  int forkPct = 0;
+  if (sscanf(line, "FORK,%ld,%c,%d", &seq, &forkCmd, &forkPct) == 3) {
+    (void)seq;
+    if (forkCmd == 'U' || forkCmd == 'D' || forkCmd == 'S') {
+      forkDir = forkCmd;
+      forkSpeed = static_cast<uint8_t>(constrain(forkPct, 0, 100));
+      forkLastCmdMs = millis();
+    }
+    return;
+  }
   int conveyorId = 0;
   char mode = 0;
   int speed = 0;
@@ -488,8 +587,17 @@ void setup() {
   }
   applyLightMask(0);
 
+  if (FORK_ENABLED) {
+    pinMode(PIN_FORK_UP, OUTPUT);
+    pinMode(PIN_FORK_DOWN, OUTPUT);
+    pinMode(PIN_FORK_PWM, OUTPUT);
+    pinMode(PIN_FORK_TOP, SAFETY_PIN_MODE);
+    pinMode(PIN_FORK_BOTTOM, SAFETY_PIN_MODE);
+    forkOutputs(0, 0);
+  }
+
   delay(50);
-  Serial.println("ID,AGV_PLC_MEGA2560,0.4.0");
+  Serial.println("ID,AGV_PLC_MEGA2560,0.5.0");
 }
 
 void loop() {
@@ -498,17 +606,19 @@ void loop() {
 
   parseSerialInput();
   updateConveyors();
+  updateFork();
 
   const uint32_t now = millis();
   if (now - lastStatusMs >= STATUS_PERIOD_MS) {
     lastStatusMs = now;
     publishStatus();
+    publishForkStatus();
   }
 
   // Periodic identity makes passive auto-detection reliable even when the ROS
   // bridge starts long after the PLC firmware has already booted.
   if (now - lastIdMs >= ID_PERIOD_MS) {
     lastIdMs = now;
-    Serial.println("ID,AGV_PLC_MEGA2560,0.4.0");
+    Serial.println("ID,AGV_PLC_MEGA2560,0.5.0");
   }
 }
