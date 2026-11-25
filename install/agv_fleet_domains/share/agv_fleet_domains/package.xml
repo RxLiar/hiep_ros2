@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>agv_fleet_domains</name>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <description>
     Domain isolation and selective domain bridges for the AGV fleet.
   </description>

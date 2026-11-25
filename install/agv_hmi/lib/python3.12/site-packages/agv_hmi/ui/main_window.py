@@ -68,6 +68,10 @@ from agv_hmi.ui.stations_page import StationsPage
 from agv_hmi.ui.schedule_page import SchedulePage
 from agv_hmi.ui.dashboard import DashboardWidget
 from agv_hmi.ui.safety_page import SafetyPage
+from agv_hmi.ui.safety_override import OVERRIDE
+from agv_hmi.ui.subtabs import SubTabBar
+from agv_hmi.core import nav_groups as NG
+from agv_hmi.ui.joystick_widget import JoystickWidget
 from agv_hmi.ui.forklift_page import ForkliftPage
 from agv_hmi.core import robot_profile as RP
 import time as _time
@@ -125,6 +129,7 @@ class Sidebar(QWidget):
     page_changed          = pyqtSignal(int)
     retranslate_requested = pyqtSignal()
     toggle_requested      = pyqtSignal()      # user clicked the collapse button
+    main_clicked          = pyqtSignal(int)   # 4.10.0: a MAIN tab button was pressed (MainWindow picks the sub-page)
 
     IDX_HOME     = 0
     IDX_MAPPING  = 1
@@ -224,31 +229,13 @@ class Sidebar(QWidget):
             if item.widget(): item.widget().deleteLater()
         self._btns.clear()
 
-        engineer_only = {self.IDX_MAPPING, self.IDX_MAPLIB, self.IDX_DIAG, self.IDX_SCHEDULE, self.IDX_SAFETY, self.IDX_FORKLIFT}
-        pages = [
-            ("⌂",  "page_home",       self.IDX_HOME),
-            ("◉",  "page_fleet",      self.IDX_FLEET),
-            ("◎",  "page_mapping",    self.IDX_MAPPING),
-            ("⊳",  "page_navigation", self.IDX_NAV),
-            ("≡",  "page_routes",     self.IDX_ROUTES),
-            ("⟳",  "page_conveyors",  self.IDX_CONVEYOR),
-            ("🗺", "page_maplib",     self.IDX_MAPLIB),
-            ("🔔", "page_alarms",     self.IDX_ALARMS),
-            ("📍", "page_stations",   self.IDX_STATIONS),
-            ("🗓", "page_schedule",   self.IDX_SCHEDULE),
-            ("🛡", "page_safety",     self.IDX_SAFETY),
-            ("🏗", "page_forklift",   self.IDX_FORKLIFT),
-            ("📊", "page_reports",    self.IDX_REPORTS),
-            ("🩺", "page_diag",       self.IDX_DIAG),
-            ("⚙",  "page_settings",   self.IDX_SETTINGS),
-        ]
-        for icon, key, idx in pages:
-            if idx in engineer_only and self._role != "engineer":
-                continue
+        # 4.10.0: only the MAIN tabs; every other page is a sub-tab (see core/nav_groups.py)
+        for idx in NG.main_pages(self._role):
+            icon, key = NG.MAIN_ICON[idx], NG.MAIN_KEY[idx]
             b = NavButton(icon, tr(key))
             b.setFixedHeight(54 if self._touch else 38)
             b.set_compact(self._compact)
-            b.clicked.connect(lambda _, i=idx: self.switch(i))
+            b.clicked.connect(lambda _, i=idx: self.main_clicked.emit(i))
             self._nav_lay.addWidget(b)
             self._btns.append((b, idx, key))
         self._nav_lay.addStretch()
@@ -328,8 +315,9 @@ class Sidebar(QWidget):
         self._stxt.setVisible(vis)
 
     def switch(self, idx: int):
+        main = NG.group_main(idx)               # a sub-page highlights the main tab it belongs to
         for b, bidx, _ in self._btns:
-            b.set_active(bidx == idx)
+            b.set_active(bidx == main)
         self.page_changed.emit(idx)
 
     def set_ros_status(self, txt: str, ok: bool = True):
@@ -367,6 +355,8 @@ class MainWindow(QMainWindow):
     soft_estop_signal    = pyqtSignal()       # -> RosInterface.soft_estop
     light_mask_signal    = pyqtSignal(int)    # -> RosInterface.publish_light_mask
     safety_config_signal = pyqtSignal(str)    # -> RosInterface.publish_safety_config
+    safety_override_signal = pyqtSignal(bool)  # -> RosInterface.publish_safety_override (Engineer teleop, 5 Hz)
+    fleet_robot_id_signal = pyqtSignal(str)    # -> RosInterface.set_fleet_robot_id (Fleet control panel)
     forklift_cmd_signal  = pyqtSignal(str)    # -> RosInterface.publish_forklift_command
 
     # [NEW] Đổi người vận hành: quay về màn hình Login, ROS node vẫn sống.
@@ -519,6 +509,28 @@ class MainWindow(QMainWindow):
         self._estop_banner.setVisible(False)
         root.addWidget(self._estop_banner)
 
+        # 4.9.0: progress of a running mission while another page is open
+        self._mission_bar = QWidget()
+        self._mission_bar.setObjectName("MissionBar")
+        self._mission_bar.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        mb = QHBoxLayout(self._mission_bar)
+        mb.setContentsMargins(14, 6, 14, 6); mb.setSpacing(8)
+        self._mission_bar_lbl = QLabel()
+        self._mission_bar_lbl.setStyleSheet("font-weight:700;")
+        self._mission_bar_ok = QPushButton(); self._mission_bar_view = QPushButton(); self._mission_bar_stop = QPushButton()
+        self._mission_bar_stop.setObjectName("BtnDanger")
+        for b in (self._mission_bar_ok, self._mission_bar_view, self._mission_bar_stop):
+            b.setFixedHeight(28)
+        self._mission_bar_ok.clicked.connect(self._confirm_task_continue)
+        self._mission_bar_view.clicked.connect(self._mission_bar_goto)
+        self._mission_bar_stop.clicked.connect(self._mission_bar_stop_clicked)
+        mb.addWidget(self._mission_bar_lbl, 1)
+        for b in (self._mission_bar_ok, self._mission_bar_view, self._mission_bar_stop):
+            mb.addWidget(b)
+        self._mission_bar.setVisible(False)
+        root.addWidget(self._mission_bar)
+        self._mission_bar_state = ""
+
         body = QWidget()
         body_lay = QHBoxLayout(body)
         body_lay.setContentsMargins(0, 0, 0, 0); body_lay.setSpacing(0)
@@ -549,8 +561,15 @@ class MainWindow(QMainWindow):
                   self._stations, self._schedule, self._safety, self._forklift):
             self._pages.addWidget(p)
 
-        body_lay.addWidget(self._pages)
+        content = QWidget()
+        content_lay = QVBoxLayout(content)
+        content_lay.setContentsMargins(0, 0, 0, 0); content_lay.setSpacing(0)
+        self._subtabs = SubTabBar()
+        content_lay.addWidget(self._subtabs)
+        content_lay.addWidget(self._pages, 1)
+        body_lay.addWidget(content, 1)
         root.addWidget(body)
+        self._last_sub: dict[int, int] = {}        # main tab -> sub-page used last
 
         self._toasts = ToastManager(central)
 
@@ -570,9 +589,32 @@ class MainWindow(QMainWindow):
                 lambda _: self._retranslate_all())
 
         self._titlebar.estop_clicked.connect(self._on_soft_estop)
+        self._titlebar.safety_chip_clicked.connect(
+            lambda: self._sidebar.switch(Sidebar.IDX_SAFETY if self._role == "engineer" else Sidebar.IDX_HOME))
+        self._titlebar.nav_chip_clicked.connect(lambda: self._sidebar.switch(Sidebar.IDX_NAV))
+        self._titlebar.fleet_chip_clicked.connect(lambda: self._sidebar.switch(Sidebar.IDX_FLEET))
+        self._titlebar.mission_chip_clicked.connect(
+            lambda: self._mission_bar_goto() if self._mission_running else self._sidebar.switch(Sidebar.IDX_ROUTES))
         self._titlebar.alarms_clicked.connect(
             lambda: self._sidebar.switch(Sidebar.IDX_ALARMS))
         self._safety.profile_applied.connect(self._on_profile_applied)
+
+        # 4.8.0: Engineer can switch the safety zones off while teleoperating (joystick / gamepad).
+        # The switch is only a request that is re-sent every 200 ms; the ROS node drops it after <= 2 s.
+        OVERRIDE.set(False)
+        for pg in (self._mapping, self._nav, self._routes):
+            js = getattr(pg, "_joystick", None)
+            if js is not None:
+                js.set_engineer(self._role == "engineer")
+        # 4.11.0: Fleet control (start fleet / connect this robot from the HMI)
+        self._fleet.control.set_engineer(self._role == "engineer")
+        self._fleet.control.robot_id_changed.connect(self.fleet_robot_id_signal.emit)
+        self._fleet.control.status_changed.connect(self._titlebar.set_fleet_chip)
+        QTimer.singleShot(3000, self._fleet.control.auto_start)
+        self._override_timer = QTimer(self)
+        self._override_timer.setInterval(200)
+        self._override_timer.timeout.connect(self._refresh_override)
+        OVERRIDE.changed.connect(self._on_override_changed)
         self._forklift.command_requested.connect(self.forklift_cmd_signal)
         self._forklift.params_save_requested.connect(self._safety.apply_external)
         self._stations.set_pose_requested.connect(self.pose_estimate_signal)
@@ -584,6 +626,8 @@ class MainWindow(QMainWindow):
         self.alarms.raised.connect(self._diag.on_alarm)
 
         self._sidebar.page_changed.connect(self._switch_page)
+        self._sidebar.main_clicked.connect(self._on_main_clicked)
+        self._subtabs.page_requested.connect(self._sidebar.switch)
         self._sidebar.retranslate_requested.connect(self._retranslate_all)
         self._sidebar.toggle_requested.connect(self.toggle_sidebar)
         self._titlebar.menu_clicked.connect(self.toggle_sidebar)
@@ -642,13 +686,31 @@ class MainWindow(QMainWindow):
 
     # ── Page switch ───────────────────────────────────────────────────
 
+    def _on_main_clicked(self, main_idx: int):
+        """A main tab was pressed: another group -> its last sub-page; the same group -> its overview page."""
+        self._sidebar.switch(NG.target_for_main_click(
+            main_idx, self._current_page_idx, self._last_sub, self._role))
+
     def _switch_page(self, idx: int):
         old_idx = self._current_page_idx
+        if (idx == Sidebar.IDX_MAPPING and old_idx is not None and old_idx != idx
+                and self._mission_running):
+            ans = QMessageBox.question(
+                self, tr("mb_mapping_title"), tr("mb_mapping_warn"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No)
+            if ans != QMessageBox.StandardButton.Yes:
+                self._sidebar.switch(old_idx)          # stay where we were (the mission keeps running)
+                return
+            self._stop_mission()
         if old_idx is not None and old_idx != idx:
             self._cleanup_leaving_page(old_idx, idx)
 
         self._current_page_idx = idx
         self._pages.setCurrentIndex(idx)
+        main = NG.group_main(idx)
+        self._last_sub[main] = idx
+        self._subtabs.set_group(NG.subpages(main, self._role), idx)
         titles = {
             Sidebar.IDX_HOME:     tr("page_home"),
             Sidebar.IDX_MAPPING:  tr("page_mapping"),
@@ -670,6 +732,7 @@ class MainWindow(QMainWindow):
         if self._focus_mode:
             self._focus_collapsed += collapse_panels(
                 self._pages.currentWidget(), True, animate=False)
+        self._update_mission_bar()
         if idx == Sidebar.IDX_ROUTES: self._routes.refresh()
         if idx == Sidebar.IDX_MAPLIB: self._maplib.refresh()
         if idx == Sidebar.IDX_FLEET:
@@ -681,36 +744,17 @@ class MainWindow(QMainWindow):
     def _cleanup_leaving_page(self, old_idx: int, new_idx: int):
         """Cleanup resources when changing pages.
 
-        Fleet Monitor is an observation screen. Navigation/Routes -> Fleet and
-        Fleet -> Navigation/Routes must preserve the active Nav2 goal and mission
-        state. Moving from the observation screen to an unrelated page still
-        stops an active mission, preserving the previous safety policy.
+        4.9.0: a running mission is a BACKGROUND task. Leaving Navigation / Routes / Fleet for any other
+        page no longer stops it (the state machine lives in MainWindow, not in the page). A banner under
+        the title bar shows its progress on the other pages. The only page that would break a mission is
+        Mapping (SLAM and Nav2 fight over /map and the map->odom transform): _switch_page asks first.
         """
-        if old_idx == Sidebar.IDX_MAPPING:
+        if old_idx == Sidebar.IDX_MAPPING and NG.group_main(new_idx) != Sidebar.IDX_MAPPING:
+            # leaving the Mapping tab stops SLAM; the Map library sub-tab belongs to it and keeps it running
             try:
                 self._mapping.cleanup()
             except Exception:
                 pass
-            return
-
-        control_pages = {
-            Sidebar.IDX_NAV,
-            Sidebar.IDX_ROUTES,
-            Sidebar.IDX_FLEET,
-        }
-
-        if old_idx in (Sidebar.IDX_NAV, Sidebar.IDX_ROUTES):
-            if new_idx == Sidebar.IDX_FLEET:
-                # Observation only: mission continues in the background.
-                return
-            self._stop_mission()
-            return
-
-        if old_idx == Sidebar.IDX_FLEET and self._mission_running:
-            if new_idx in control_pages:
-                # Return to a mission/control screen without cancelling.
-                return
-            self._stop_mission()
 
     # ── Nav2 launch control ────────────────────────────────────────────
 
@@ -1073,6 +1117,7 @@ class MainWindow(QMainWindow):
     def _on_alarms_changed(self):
         self._titlebar.set_alarm_badge(self.alarms.unacked_count(), self.alarms.worst_active_level())
         self._dashboard.set_alarm_count(len(self.alarms.active()))
+        self._subtabs.set_badge(Sidebar.IDX_ALARMS, len(self.alarms.active()))
         self._update_tower()
 
     def _on_alarm_raised(self, alarm: dict):
@@ -1117,6 +1162,35 @@ class MainWindow(QMainWindow):
         """Send the saved profile to ROS (the topic is latched, so a late node still gets it)."""
         self.safety_config_signal.emit(_json.dumps(self._safety.active_profile()))
 
+    def _on_override_changed(self, on: bool):
+        if on and self._role != "engineer":          # defensive: only Engineer may do this
+            OVERRIDE.set(False)
+            return
+        audit_log.audit("safety_override", "ON (teleop, zones off)" if on else "OFF")
+        if on:
+            self._override_timer.start()
+            self.safety_override_signal.emit(True)
+            self._toasts.show_toast(tr("joy_safety_toast_on"), "warn", 4000)
+        else:
+            self._override_timer.stop()
+            self.safety_override_signal.emit(False)
+            self._toasts.show_toast(tr("joy_safety_toast_off"), "ok", 2500)
+
+    def _refresh_override(self):
+        """Keep the override alive while it is on. A running mission always puts the zones back."""
+        if not OVERRIDE.is_on():
+            self._override_timer.stop()
+            return
+        if self._mission_running:
+            OVERRIDE.set(False)
+            return
+        self.safety_override_signal.emit(True)
+
+    def on_safety_points(self, payload: str):
+        """Points as the safety_monitor sees them (base frame): the Safety page draws exactly these."""
+        if self._pages.currentIndex() == Sidebar.IDX_SAFETY:
+            self._safety.feed_points(payload)
+
     def on_safety_state(self, payload: str):
         try:
             d = _json.loads(payload)
@@ -1126,15 +1200,101 @@ class MainWindow(QMainWindow):
         self.health.set_safety(state)
         self._safety.feed_state(payload)
         self._dashboard.set_safety(state)
+        self._titlebar.set_safety_chip(state)
         self._forklift.feed_bypass(d.get("bypass", []))
         self.alarms.set_condition("safety.stop", state == "stop", "warn", tr("al_safety_stop"), "Safety")
         self.alarms.set_condition("safety.noscan", state == "no_scan", "error", tr("al_safety_noscan"), "Safety")
+        self.alarms.set_condition("safety.override", state == "override", "warn", tr("al_safety_override"), "Safety")
 
     def on_scan_raw(self, angle_min: float, inc: float, rmin: float, rmax: float, ranges: list):
         if self._pages.currentIndex() == Sidebar.IDX_SAFETY:        # only while the page is open
             self._safety.feed_scan(angle_min, inc, rmin, rmax, ranges)
 
+    def _mission_summary(self):
+        """(kind, text) of the mission for the title-bar chip: idle / run / wait / pause / stuck."""
+        if not self._mission_running:
+            return "idle", ""
+        total = len(self._mission_wps)
+        pos = self._mission_idx
+        n = f"{min(pos + 1, total)}/{total}" if total else ""
+        if self._mission_stuck:
+            return "stuck", tr("chip_mission_stuck", n)
+        if self._confirm_continue is not None:
+            return "wait", tr("chip_mission_wait", n)
+        if self._mission_paused:
+            return "pause", tr("chip_mission_pause", n)
+        return "run", tr("chip_mission_run", n)
+
+    def _update_status_chips(self):
+        self._titlebar.set_mission_chip(*self._mission_summary())
+        ready = None
+        if self.nav_client is not None:
+            try:
+                ready = bool(self.nav_client.is_ready(0.0))
+            except Exception:
+                ready = None
+        self._titlebar.set_nav_chip(ready)
+        if self.health_safety_stale():
+            self._titlebar.set_safety_chip(None)
+
+    def health_safety_stale(self) -> bool:
+        """True when /safety_state has not been received for a while (the chip must not keep showing 'ok')."""
+        try:
+            return not self.health.safety_fresh()
+        except Exception:
+            return False
+
+    def _update_mission_bar(self):
+        """Show the progress of a running mission when Navigation / Routes is not the open page."""
+        self._update_status_chips()
+        idx = self._current_page_idx
+        away = bool(self._mission_running) and idx not in (Sidebar.IDX_NAV, Sidebar.IDX_ROUTES)
+        if not away:
+            if self._mission_bar.isVisible():
+                self._mission_bar.setVisible(False)
+            self._mission_bar_state = ""
+            return
+        total = len(self._mission_wps)
+        pos = self._mission_idx
+        label = self._mission_wps[pos].get("label", "?") if 0 <= pos < total else "?"
+        waiting = self._confirm_continue is not None
+        if self._mission_stuck:
+            key, color = "mb_stuck", "#F85149"
+        elif waiting:
+            key, color = "mb_confirm", "#E3B341"
+        elif self._mission_paused:
+            key, color = "mb_paused", "#E3B341"
+        else:
+            key, color = "mb_running", "#3FB950"
+        self._mission_bar_lbl.setText(tr(key, min(pos + 1, total) if total else 0, total, label))
+        self._mission_bar_ok.setText(tr("mb_ok")); self._mission_bar_ok.setVisible(waiting and not self._mission_stuck)
+        self._mission_bar_view.setText(tr("mb_view")); self._mission_bar_stop.setText(tr("mb_stop"))
+        sig = f"{key}|{color}"
+        if sig != self._mission_bar_state:
+            self._mission_bar_state = sig
+            self._mission_bar.setStyleSheet(
+                f"QWidget#MissionBar{{background:{color}26;border-bottom:2px solid {color};}}"
+                f"QLabel{{color:{color};}}")
+        self._mission_bar.setVisible(True)
+
+    def _mission_bar_goto(self):
+        self._sidebar.switch(Sidebar.IDX_ROUTES if self._mission_source == "routes" else Sidebar.IDX_NAV)
+
+    def _mission_bar_stop_clicked(self):
+        ans = QMessageBox.question(self, tr("mb_stop"), tr("mb_stop_confirm"),
+                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                   QMessageBox.StandardButton.No)
+        if ans == QMessageBox.StandardButton.Yes:
+            self._stop_mission()
+            self._update_mission_bar()
+
+    def _notify_away(self, text: str, kind: str = "warn", ms: int = 8000):
+        """Toast for a mission event the operator cannot see because another page is open."""
+        if self._current_page_idx not in (Sidebar.IDX_NAV, Sidebar.IDX_ROUTES):
+            self._toasts.show_toast(text, kind, ms)
+
     def _housekeeping(self):
+        self._update_mission_bar()
         self._update_tower()
         if self.health.safety_ever and not self.health.safety_fresh():
             self._safety.mark_state_stale()
@@ -1533,6 +1693,9 @@ class MainWindow(QMainWindow):
 
     def _run_route_from_list(self, route: dict):
         """Run a saved route and automatically activate its Fleet map."""
+        if self._mission_running:                  # a mission already runs (maybe in the background)
+            self._toasts.show_toast(tr("st_busy"), "warn")
+            return
         self._mission_source = "routes"
         if not self._preflight():
             try:
@@ -1731,6 +1894,7 @@ class MainWindow(QMainWindow):
                        token: int | None = None):
         if not waypoints or not self.nav_client:
             return
+        OVERRIDE.set(False)          # an autonomous mission never runs with the safety zones off
         if token is None:
             token = self._new_mission_token()
         else:
@@ -1851,6 +2015,7 @@ class MainWindow(QMainWindow):
             msg = f"⚠ Gặp sự cố tại WP {label} — xem lựa chọn bên dưới"
             self._nav.set_status(msg)
             self._routes.on_mission_stuck(label)
+            self._notify_away(tr("mb_stuck_toast", label), "error", 10000)
             return
 
         idx = self._mission_idx
@@ -1921,6 +2086,7 @@ class MainWindow(QMainWindow):
             self._nav.set_status(tr("nav_confirm"))
             self._routes.set_status(
                 "⏸ Chờ người vận hành xác nhận để tiếp tục.")
+            self._notify_away(tr("mb_confirm_toast"), "warn", 10000)
             self._request_route_confirm(); return
         if str(task.get("type", "")).startswith("fork_"):
             self._start_fork_task(task, tasks, idx + 1, on_done, token)
@@ -2115,6 +2281,8 @@ class MainWindow(QMainWindow):
         self._nav.set_status(tr("nav_done"))
         self._nav.set_mission_running(False)
         self._nav.map_widget.clear_nav_path()
+        self._notify_away(tr("mb_done_toast"), "ok", 6000)
+        self._update_mission_bar()
 
         if source == "routes" and self._schedule.queue:
             QTimer.singleShot(2500, self._try_run_queue)
@@ -2225,6 +2393,10 @@ class MainWindow(QMainWindow):
     def closeEvent(self, ev):
         """Dọn process và thoát Qt, trừ trường hợp đổi người vận hành."""
         try:
+            OVERRIDE.set(False)
+        except Exception:
+            pass
+        try:
             self.shutdown_processes()
         except Exception as e:
             print(f"[MainWindow] Shutdown failed: {e}")
@@ -2312,6 +2484,9 @@ class MainWindow(QMainWindow):
         self._reports.retranslate(); self._stations.retranslate(); self._schedule.retranslate()
         self._safety.retranslate(); self._forklift.retranslate()
         self._dashboard.retranslate()
+        self._subtabs.retranslate()
+        for js in self.findChildren(JoystickWidget):
+            js.retranslate()
         for panel in self.findChildren(CollapsiblePanel):
             panel.retranslate()
         self._estop_banner.setText(tr("estop_banner"))

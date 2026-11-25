@@ -10,6 +10,11 @@ from agv_hmi.ui.nav_button import IconButton
 
 LOGO_PATH = "/home/hiep0247/Downloads/TBD_logo.png"
 
+# state -> colour of a status chip
+CHIP_COLORS = {"ok": "#3FB950", "warn": "#E3B341", "bad": "#F85149", "off": "#8B949E", "info": "#58A6FF",
+               "override": "#F0883E"}
+SAFETY_CHIP = {"ok": "ok", "slow": "warn", "stop": "bad", "no_scan": "bad", "override": "override"}
+
 CONN_COLORS = {
     "offline": "#F85149",
     "idle": "#E3B341",
@@ -26,6 +31,10 @@ class TitleBar(QWidget):
     alarms_clicked = pyqtSignal()
     menu_clicked = pyqtSignal()       # 4.7.0: collapse / expand the sidebar
     focus_clicked = pyqtSignal()      # 4.7.0: focus mode (hide sidebar + side panels)
+    safety_chip_clicked = pyqtSignal()    # 4.10.0: status chips (click = open the related page)
+    nav_chip_clicked = pyqtSignal()
+    mission_chip_clicked = pyqtSignal()
+    fleet_chip_clicked = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -75,6 +84,25 @@ class TitleBar(QWidget):
         lay.addWidget(self._page_lbl)
 
         lay.addStretch()
+
+        # 4.10.0: status chips - Safety / Nav2 / Mission. Click one to open the related page.
+        self._safety_chip = self._make_chip(self.safety_chip_clicked)
+        self._nav_chip = self._make_chip(self.nav_chip_clicked)
+        self._mission_chip = self._make_chip(self.mission_chip_clicked)
+        self._fleet_chip = self._make_chip(self.fleet_chip_clicked)
+        self._fleet_state = ("info", "")
+        for c in (self._safety_chip, self._nav_chip, self._mission_chip, self._fleet_chip):
+            lay.addWidget(c)
+        self._safety_state = None
+        self._nav_state = None
+        self._mission_state = ("idle", "")
+        self.set_safety_chip(None)
+        self.set_nav_chip(None)
+        self.set_mission_chip("idle", "")
+        self.set_fleet_chip("info", tr("chip_fleet_off"))
+        sep0 = QLabel("|")
+        sep0.setStyleSheet("color:#30363D;background:transparent;")
+        lay.addWidget(sep0)
 
         self._conn_dot = QLabel("●")
         self._conn_dot.setStyleSheet("color:#F85149;font-size:10px;background:transparent;")
@@ -140,6 +168,55 @@ class TitleBar(QWidget):
             b.clicked.connect(slot)
             self._win_btns[kind] = b
             lay.addWidget(b)
+
+    def _make_chip(self, signal) -> QPushButton:
+        b = QPushButton()
+        b.setFixedHeight(26)
+        b.setCursor(Qt.CursorShape.PointingHandCursor)
+        b.clicked.connect(signal)
+        return b
+
+    @staticmethod
+    def _chip_style(color: str) -> str:
+        return (f"QPushButton{{background:{color}22;color:{color};border:1px solid {color}66;"
+                f"border-radius:13px;padding:0 10px;font-size:11px;font-weight:700;}}"
+                f"QPushButton:hover{{background:{color}44;}}")
+
+    def set_safety_chip(self, state):
+        """state: ok / slow / stop / no_scan / override, or None when the safety node is silent."""
+        self._safety_state = state
+        kind = SAFETY_CHIP.get(state, "off")
+        text = tr(f"sf_state_{state}") if state in SAFETY_CHIP else "—"
+        self._safety_chip.setText(f"🛡 {text}")
+        self._safety_chip.setToolTip(tr("chip_safety_tip"))
+        self._safety_chip.setStyleSheet(self._chip_style(CHIP_COLORS[kind]))
+
+    def set_nav_chip(self, ready):
+        """ready: True (Nav2 action server up), False (down) or None (unknown yet)."""
+        self._nav_state = ready
+        kind, text = ("ok", tr("chip_nav_on")) if ready else (("off", tr("chip_nav_off")) if ready is False else ("off", "—"))
+        self._nav_chip.setText(f"🧭 {text}")
+        self._nav_chip.setToolTip(tr("chip_nav_tip"))
+        self._nav_chip.setStyleSheet(self._chip_style(CHIP_COLORS[kind]))
+
+    def set_mission_chip(self, kind: str, text: str):
+        """kind: idle / run / wait / pause / stuck."""
+        self._mission_state = (kind, text)
+        color = {"idle": "off", "run": "ok", "wait": "warn", "pause": "warn", "stuck": "bad"}.get(kind, "off")
+        icon = {"idle": "⏹", "run": "▶", "wait": "⏳", "pause": "⏸", "stuck": "⚠"}.get(kind, "⏹")
+        self._mission_chip.setText(f"{icon} {text or tr('chip_mission_idle')}")
+        self._mission_chip.setToolTip(tr("chip_mission_tip"))
+        self._mission_chip.setStyleSheet(self._chip_style(CHIP_COLORS[color]))
+
+    def set_fleet_chip(self, level: str, text: str):
+        """level: ok / warn / bad / info (the Fleet control panel's state)."""
+        if (level, text) == self._fleet_state and self._fleet_chip.text():
+            return                                    # called every second: only restyle on a real change
+        self._fleet_state = (level, text)
+        color = {"ok": "ok", "warn": "warn", "bad": "bad"}.get(level, "off")
+        self._fleet_chip.setText(f"🛰 {text}")
+        self._fleet_chip.setToolTip(tr("chip_fleet_tip"))
+        self._fleet_chip.setStyleSheet(self._chip_style(CHIP_COLORS[color]))
 
     def _set_logo(self):
         if os.path.exists(LOGO_PATH):
@@ -227,6 +304,10 @@ class TitleBar(QWidget):
         self._estop_btn.setText(tr("estop_btn"))
         self._estop_btn.setToolTip(tr("estop_tip"))
         self._name_lbl.setText(tr("app_name"))
+        self.set_safety_chip(self._safety_state)
+        self.set_nav_chip(self._nav_state)
+        self.set_mission_chip(*self._mission_state)
+        self._fleet_chip.setToolTip(tr("chip_fleet_tip"))     # its text is re-sent by the Fleet panel every second
         self.set_connection(self._connection_state)
         self._lang_selector.retranslate()
 

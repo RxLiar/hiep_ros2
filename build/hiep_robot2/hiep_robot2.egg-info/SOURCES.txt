@@ -40,5 +40,6 @@ launch/safety_monitor.launch.py
 resource/hiep_robot2
 test/test_forklift_logic.py
 test/test_safety_check.py
+test/test_safety_dual_override.py
 test/test_safety_logic.py
 test/test_safety_node.py

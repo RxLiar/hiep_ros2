@@ -6,7 +6,7 @@ import threading
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QGroupBox, QLabel,
     QPushButton, QScrollArea, QFileDialog, QDoubleSpinBox, QCheckBox,
-    QFormLayout, QMessageBox
+    QFormLayout, QMessageBox, QGridLayout, QButtonGroup, QSpinBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 
@@ -19,7 +19,7 @@ from agv_hmi.ui.i18n import tr
 from agv_hmi.ui.process_manager import ManagedLaunch
 from agv_hmi.core.map_cleaner import clean_map, CleanParams
 from agv_hmi.core import map_io
-from agv_hmi.ui.map_widget import MODE_GOAL, MODE_MEASURE
+from agv_hmi.ui.map_widget import MODE_GOAL, MODE_MEASURE, MODE_EDIT, EDIT_TOOLS
 from agv_hmi.core import zones as zones_io
 
 
@@ -61,6 +61,7 @@ class MappingPage(QWidget):
         self._raw_view = None          # (grid, res, ox, oy) of the live map while a clean map is shown
         self._clean_result = None      # (CleanResult, params, res, ox, oy)
         self._cleaned_view = False
+        self._opened_path = ""         # saved map opened for editing (empty = the live / cleaned map)
         self._clean_finished.connect(self._on_clean_finished)
         self._launcher = ManagedLaunch("Mapping", MAPPING_CMD, kill_patterns=MAPPING_KILL_PATTERNS)
         self._is_mapping = False
@@ -158,6 +159,7 @@ class MappingPage(QWidget):
         lay.addWidget(act_box)
 
         lay.addWidget(self._build_clean_box())
+        lay.addWidget(self._build_edit_box())
         lay.addWidget(self._build_zone_box())
         lay.addWidget(self._build_view_box())
 
@@ -236,11 +238,210 @@ class MappingPage(QWidget):
         self._mv_mini.toggled.connect(self.map_widget.set_show_minimap)
         self._mv_measure = QPushButton(tr("mv_measure"))
         self._mv_measure.setCheckable(True)
-        self._mv_measure.toggled.connect(
-            lambda on: self.map_widget.set_mode(MODE_MEASURE if on else MODE_GOAL))
-        for w in (self._mv_follow, self._mv_grid, self._mv_mini, self._mv_measure):
+        self._mv_measure.toggled.connect(self._on_measure_toggled)
+        self.map_widget.set_measure_multi(True)            # several clicks = polyline with a running total
+        self._mv_mclear = QPushButton(tr("mv_measure_clear"))
+        self._mv_mclear.clicked.connect(self.map_widget.clear_measure)
+        self._mv_mhint = QLabel(tr("mv_measure_hint")); self._mv_mhint.setWordWrap(True)
+        self._mv_mhint.setStyleSheet("color:#8B949E;font-size:11px;")
+        for w in (self._mv_follow, self._mv_grid, self._mv_mini, self._mv_measure, self._mv_mclear, self._mv_mhint):
             v.addWidget(w)
         return self._mv_box
+
+    def _on_measure_toggled(self, on: bool):
+        if on:
+            self.map_widget.set_mode(MODE_MEASURE)
+        else:                                  # back to what we were doing before measuring
+            self.map_widget.set_mode(MODE_EDIT if self.map_widget.is_editing() else MODE_GOAL)
+
+    # ── Manual map editing (4.9.0) ───────────────────────────────────
+
+    def _build_edit_box(self):
+        self._ed_box = QGroupBox(tr("ed_title"))
+        v = QVBoxLayout(self._ed_box)
+        self._ed_open = QPushButton(tr("ed_open"))
+        self._ed_open.setFixedHeight(32)
+        self._ed_open.clicked.connect(self.open_saved_map)
+        v.addWidget(self._ed_open)
+        self._ed_toggle = QPushButton(tr("ed_start"))
+        self._ed_toggle.setCheckable(True)
+        self._ed_toggle.setFixedHeight(34)
+        self._ed_toggle.toggled.connect(self._on_edit_toggled)
+        v.addWidget(self._ed_toggle)
+
+        grid = QGridLayout()
+        self._ed_group = QButtonGroup(self)
+        self._ed_group.setExclusive(True)
+        self._ed_tool_btns = {}
+        for i, tool in enumerate(EDIT_TOOLS):
+            b = QPushButton(tr(f"ed_t_{tool}"))
+            b.setCheckable(True)
+            b.setMinimumHeight(30)
+            b.setChecked(tool == "wall")
+            b.clicked.connect(lambda _c, t=tool: self.map_widget.set_edit_tool(t))
+            self._ed_group.addButton(b)
+            self._ed_tool_btns[tool] = b
+            grid.addWidget(b, i // 2, i % 2)
+        v.addLayout(grid)
+
+        form = QFormLayout()
+        self._ed_brush = QSpinBox()
+        self._ed_brush.setRange(2, 100); self._ed_brush.setSingleStep(1); self._ed_brush.setValue(10)
+        self._ed_brush.setSuffix(" cm"); self._ed_brush.setKeyboardTracking(False)
+        self._ed_brush.valueChanged.connect(lambda cm: self.map_widget.set_edit_brush_m(cm / 100.0))
+        self._ed_brush_lbl = QLabel(tr("ed_brush")); form.addRow(self._ed_brush_lbl, self._ed_brush)
+        self._ed_cells = QSpinBox(); self._ed_cells.setRange(1, 6); self._ed_cells.setValue(1)
+        self._ed_cells_lbl = QLabel(tr("ed_cells")); form.addRow(self._ed_cells_lbl, self._ed_cells)
+        v.addLayout(form)
+
+        self._ed_snap = QCheckBox(tr("ed_snap"))
+        self._ed_snap.toggled.connect(self.map_widget.set_edit_snap)
+        v.addWidget(self._ed_snap)
+
+        row = QHBoxLayout()
+        self._ed_undo, self._ed_redo = QPushButton(tr("ed_undo")), QPushButton(tr("ed_redo"))
+        self._ed_undo.clicked.connect(self.map_widget.edit_undo); self._ed_redo.clicked.connect(self.map_widget.edit_redo)
+        row.addWidget(self._ed_undo); row.addWidget(self._ed_redo)
+        v.addLayout(row)
+
+        row2 = QHBoxLayout()
+        self._ed_thicken, self._ed_thin = QPushButton(tr("ed_thicken")), QPushButton(tr("ed_thin"))
+        self._ed_thicken.clicked.connect(lambda: self._edit_batch(self.map_widget.edit_thicken, self._ed_cells.value()))
+        self._ed_thin.clicked.connect(lambda: self._edit_batch(self.map_widget.edit_thin, self._ed_cells.value()))
+        row2.addWidget(self._ed_thicken); row2.addWidget(self._ed_thin)
+        v.addLayout(row2)
+        self._ed_specks = QPushButton(tr("ed_specks"))
+        self._ed_specks.clicked.connect(lambda: self._edit_batch(self.map_widget.edit_clear_specks, 4, "ed_specks_done"))
+        v.addWidget(self._ed_specks)
+
+        self._ed_save = QPushButton(tr("ed_save")); self._ed_save.setObjectName("BtnSuccess"); self._ed_save.setFixedHeight(34)
+        self._ed_save.clicked.connect(self.save_edited_map)
+        v.addWidget(self._ed_save)
+        self._ed_status = QLabel(""); self._ed_status.setWordWrap(True); self._ed_status.setObjectName("StatusLabel")
+        self._ed_hint = QLabel(tr("ed_hint")); self._ed_hint.setWordWrap(True)
+        self._ed_hint.setStyleSheet("color:#8B949E;font-size:11px;")
+        v.addWidget(self._ed_status); v.addWidget(self._ed_hint)
+
+        self._ed_controls = (list(self._ed_tool_btns.values()) + [self._ed_brush, self._ed_cells, self._ed_snap,
+                             self._ed_undo, self._ed_redo, self._ed_thicken, self._ed_thin, self._ed_specks])
+        self._edited_once = False
+        self._set_edit_enabled(False)
+        self.map_widget.edit_state_changed.connect(self._on_edit_state)
+        self.map_widget.edit_ended.connect(self._on_edit_ended)
+        return self._ed_box
+
+    def _set_edit_enabled(self, on: bool):
+        for w in self._ed_controls:
+            w.setEnabled(on)
+        if not on:
+            self._ed_undo.setEnabled(False); self._ed_redo.setEnabled(False)
+        self._ed_save.setEnabled(on and self._edited_once)
+
+    def _on_edit_toggled(self, on: bool):
+        if on:
+            if self.map_widget.get_grid() is None:
+                self._ed_status.setText(tr("ed_no_map"))
+                self._ed_toggle.blockSignals(True); self._ed_toggle.setChecked(False); self._ed_toggle.blockSignals(False)
+                return
+            # freeze the live SLAM map (otherwise the next /map message would overwrite the edits) and
+            # remember it so "show raw map" can bring it back
+            if not self._cleaned_view:
+                self._raw_view = self.map_widget.get_grid()
+                self._cleaned_view = True
+                self._mc_raw.setEnabled(True)
+            self._mv_measure.blockSignals(True); self._mv_measure.setChecked(False); self._mv_measure.blockSignals(False)
+            if self.map_widget.begin_edit():
+                self._edited_once = False
+                self._set_edit_enabled(True)
+                self.map_widget.set_edit_brush_m(self._ed_brush.value() / 100.0)
+                self.map_widget.set_edit_snap(self._ed_snap.isChecked())
+                for t, b in self._ed_tool_btns.items():
+                    if b.isChecked():
+                        self.map_widget.set_edit_tool(t)
+                self._ed_toggle.setText(tr("ed_stop"))
+                self._ed_status.setText(tr("ed_on"))
+        else:
+            self.map_widget.end_edit()
+            self._ed_toggle.setText(tr("ed_start"))
+            self._set_edit_enabled(False)
+            self._ed_save.setEnabled(self._edited_once)       # the edited map can still be saved
+            self._ed_status.setText(tr("ed_off") if self._edited_once else "")
+
+    def _on_edit_state(self, can_undo: bool, can_redo: bool):
+        self._ed_undo.setEnabled(can_undo); self._ed_redo.setEnabled(can_redo)
+        if can_undo:
+            self._edited_once = True
+        self._ed_save.setEnabled(self._edited_once)
+
+    def _on_edit_ended(self):
+        """The grid was replaced from outside (raw map restored, map cleaned, map cleared): edits are gone."""
+        self._ed_toggle.blockSignals(True); self._ed_toggle.setChecked(False); self._ed_toggle.blockSignals(False)
+        self._ed_toggle.setText(tr("ed_start"))
+        self._edited_once = False
+        self._set_edit_enabled(False)
+        self._ed_status.setText("")
+
+    def _edit_batch(self, fn, arg, done_key: str = "ed_thick_done"):
+        n = fn(arg)
+        self._ed_status.setText(tr(done_key, n))
+
+    def _export_zones(self, path_no_ext: str, shape, res, ox, oy) -> str:
+        zones = self.map_widget.get_zones()
+        zones_io.save_zones(path_no_ext, zones)
+        if zones:
+            mask = zones_io.export_keepout_mask(path_no_ext, zones, shape, res, ox, oy)
+            if mask:
+                return "\n" + tr("zn_exported", mask)
+        return ""
+
+    def open_saved_map(self):
+        """Load a map saved earlier (.yaml + .pgm) and start editing it."""
+        if not self._confirm_discard_edits():
+            return
+        path, _ = QFileDialog.getOpenFileName(
+            self, tr("ed_open"), os.path.expanduser("~/maps"), "Map (*.yaml)")
+        if not path:
+            return
+        if self._launcher.is_running():
+            ans = QMessageBox.question(self, tr("ed_open"), tr("ed_open_mapping"),
+                                       QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                       QMessageBox.StandardButton.No)
+            if ans != QMessageBox.StandardButton.Yes:
+                return
+            self.stop_mapping()
+        self.map_widget.load_map_file(path)          # grid + saved vector walls + zones
+        if self.map_widget.get_grid() is None:
+            self._ed_status.setText(tr("ed_open_fail", path))
+            return
+        self._opened_path = path
+        self._raw_view = None                        # nothing to go "back" to except the live map
+        self._clean_result = None
+        self._cleaned_view = True                    # freeze: live SLAM must not replace the opened map
+        self._mc_raw.setEnabled(False); self._mc_save.setEnabled(False)
+        self._ed_toggle.setChecked(False)
+        self._ed_toggle.setChecked(True)             # -> _on_edit_toggled(True): starts editing this map
+        self._ed_status.setText(tr("ed_opened", os.path.basename(path)))
+
+    def save_edited_map(self):
+        """Save the grid exactly as shown (what the user drew), as a normal Nav2 map (.pgm + .yaml)."""
+        src = self.map_widget.get_grid()
+        if src is None:
+            return
+        grid, res, ox, oy = src
+        path, _ = QFileDialog.getSaveFileName(
+            self, tr("ed_save"),
+            (os.path.splitext(self._opened_path)[0] + "_edit") if self._opened_path
+            else os.path.expanduser("~/maps/map_edit"), "Map (*.yaml)")
+        if not path:
+            return
+        if path.endswith(".yaml"):
+            path = path[:-5]
+        try:
+            yaml_path = map_io.save_map(path, grid, res, ox, oy)       # no vector walls: the grid is the truth
+        except Exception as exc:
+            QMessageBox.warning(self, tr("ed_save"), str(exc))
+            return
+        self._ed_status.setText("✅ " + tr("ed_saved", yaml_path) + self._export_zones(path, grid.shape, res, ox, oy))
 
     def _current_params(self) -> CleanParams:
         return CleanParams(
@@ -251,7 +452,18 @@ class MappingPage(QWidget):
             wall_thickness_m=self._mc_thick.value() / 100.0,
         )
 
+    def _confirm_discard_edits(self) -> bool:
+        """Hand edits live only in the picture: replacing the grid would lose them."""
+        if not getattr(self, "_edited_once", False):
+            return True
+        ans = QMessageBox.question(self, tr("ed_title"), tr("ed_discard"),
+                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                   QMessageBox.StandardButton.No)
+        return ans == QMessageBox.StandardButton.Yes
+
     def run_clean(self):
+        if not self._confirm_discard_edits():
+            return
         src = self._raw_view if self._cleaned_view else self.map_widget.get_grid()
         if src is None:
             self._mc_status.setText(tr("mc_empty"))
@@ -288,7 +500,7 @@ class MappingPage(QWidget):
             + "\n" + tr("mc_hint_frozen"))
 
     def show_raw_map(self):
-        if self._raw_view is None:
+        if self._raw_view is None or not self._confirm_discard_edits():
             return
         grid, res, ox, oy = self._raw_view
         self.map_widget.set_grid(grid, res, ox, oy)
@@ -360,6 +572,13 @@ class MappingPage(QWidget):
             self.start_mapping()
 
     def start_mapping(self):
+        if self._opened_path:                        # an opened old map is frozen on screen: leaving it = new map
+            if not self._confirm_discard_edits():
+                return
+            self._opened_path = ""
+            self._cleaned_view = False
+            self.map_widget.end_edit()
+            self._on_edit_ended()
         ok, msg = self._launcher.start()
         self._status_lbl.setText(("🟢 " if ok else "❌ ") + msg)
         self._is_mapping = ok
@@ -388,7 +607,10 @@ class MappingPage(QWidget):
         self.stop_mapping()
 
     def clear_current_map(self):
+        if not self._confirm_discard_edits():
+            return
         self._cleaned_view = False
+        self._opened_path = ""
         self._raw_view = None
         self._clean_result = None
         self._mc_raw.setEnabled(False)
@@ -427,6 +649,15 @@ class MappingPage(QWidget):
         self._mv_grid.setText(tr("mv_grid"))
         self._mv_mini.setText(tr("mv_minimap"))
         self._mv_measure.setText(tr("mv_measure"))
+        self._mv_mclear.setText(tr("mv_measure_clear")); self._mv_mhint.setText(tr("mv_measure_hint"))
+        self._ed_box.setTitle(tr("ed_title")); self._ed_open.setText(tr("ed_open"))
+        self._ed_toggle.setText(tr("ed_stop") if self.map_widget.is_editing() else tr("ed_start"))
+        for t, b in self._ed_tool_btns.items():
+            b.setText(tr(f"ed_t_{t}"))
+        self._ed_brush_lbl.setText(tr("ed_brush")); self._ed_cells_lbl.setText(tr("ed_cells"))
+        self._ed_snap.setText(tr("ed_snap")); self._ed_undo.setText(tr("ed_undo")); self._ed_redo.setText(tr("ed_redo"))
+        self._ed_thicken.setText(tr("ed_thicken")); self._ed_thin.setText(tr("ed_thin"))
+        self._ed_specks.setText(tr("ed_specks")); self._ed_save.setText(tr("ed_save")); self._ed_hint.setText(tr("ed_hint"))
         self.error_header.retranslate()
         self._vel_panel.retranslate()
         self._start_stop_btn.setText(tr("mapping_stop") if self._launcher.is_running() else tr("mapping_start"))

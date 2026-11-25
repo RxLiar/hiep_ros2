@@ -49,19 +49,80 @@ class ManagedLaunch:
     """
 
     def __init__(self, name: str, cmd: list[str],
-                 kill_patterns: list[str] | None = None):
+                 kill_patterns: list[str] | None = None,
+                 log_path: str | None = None,
+                 signature: str | None = None):
+        """log_path : (4.11.0) write the process output there (truncated at every start) so the HMI can show it.
+        signature: command-line text that identifies THIS launch among other processes; default = the whole cmd.
+        """
         self.name = name
         self.cmd = list(cmd)
+        self.log_path = log_path
+        self._log_fh = None
         self.kill_patterns = list(kill_patterns or [])
         self.proc: Optional[subprocess.Popen] = None
         self.current_extra_args: list[str] = []
         # [NEW v4.2.7] Cụm command line đầy đủ (không gồm extra_args vì
         # extra_args thay đổi theo map) để match chính xác tiến trình
         # "ros2 launch <package> <file>" cũ còn sót lại.
-        self._launch_signature = " ".join(self.cmd)
+        self._launch_signature = signature if signature else " ".join(self.cmd)
 
     def is_running(self) -> bool:
         return self.proc is not None and self.proc.poll() is None
+
+    def external_pids(self) -> list[int]:
+        """PIDs of a launch with the same signature that THIS object did not start (left over from an earlier HMI
+        session or started in a terminal). Lets the HMI show the real state and stop it."""
+        try:
+            out = subprocess.run(["pgrep", "-af", self._launch_signature],
+                                 capture_output=True, text=True, timeout=2)
+        except Exception:
+            return []
+        mine = self.proc.pid if self.proc is not None else None
+        pids = []
+        for line in out.stdout.splitlines():
+            head = line.strip().split(" ", 1)[0]
+            if head.isdigit() and int(head) != mine and int(head) != os.getpid():
+                pids.append(int(head))
+        return pids
+
+    def is_active(self) -> bool:
+        """Started by this HMI, or already running outside it."""
+        return self.is_running() or bool(self.external_pids())
+
+    def tail(self, lines: int = 60) -> str:
+        """Last lines of the log file ('' when there is none)."""
+        if not self.log_path:
+            return ""
+        try:
+            with open(self.log_path, "rb") as fh:
+                fh.seek(0, os.SEEK_END)
+                size = fh.tell()
+                fh.seek(max(0, size - 24000))
+                data = fh.read().decode("utf-8", errors="replace")
+        except OSError:
+            return ""
+        return "\n".join(data.splitlines()[-lines:])
+
+    def _open_log(self):
+        self._close_log()
+        if not self.log_path:
+            return subprocess.DEVNULL
+        try:
+            os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
+            self._log_fh = open(self.log_path, "wb")
+            return self._log_fh
+        except OSError:
+            self._log_fh = None
+            return subprocess.DEVNULL
+
+    def _close_log(self):
+        if self._log_fh is not None:
+            try:
+                self._log_fh.close()
+            except Exception:
+                pass
+            self._log_fh = None
 
     def start(self, extra_args: list[str] | None = None) -> tuple[bool, str]:
         """
@@ -84,10 +145,11 @@ class ManagedLaunch:
         full_cmd = list(self.cmd) + list(extra_args)
 
         try:
+            sink = self._open_log()
             self.proc = subprocess.Popen(
                 full_cmd,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                stdout=sink,
+                stderr=subprocess.STDOUT if sink is not subprocess.DEVNULL else subprocess.DEVNULL,
                 preexec_fn=os.setsid,
             )
             self.current_extra_args = list(extra_args)
@@ -114,6 +176,7 @@ class ManagedLaunch:
 
         self.current_extra_args = []
         self.force_cleanup()
+        self._close_log()
         return True, f"{self.name} đã dừng"
 
     def force_cleanup(self):

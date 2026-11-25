@@ -30,6 +30,12 @@ def generate_launch_description():
 
     rviz_arg  = DeclareLaunchArgument('rviz',  default_value='true')
     world_arg = DeclareLaunchArgument('world', default_value='world.sdf')
+    safety_arg = DeclareLaunchArgument(
+        'safety', default_value='true',
+        description='Chay safety_monitor: /cmd_vel -> /cmd_vel_safe -> Gazebo')
+    merger_arg = DeclareLaunchArgument(
+        'merger', default_value='false',
+        description='Chay laser_merger tai day (de false neu navigation/mapping launch da chay no)')
 
     urdf_file = os.path.join(
         pkg_description, 'urdf', 'robots', 'robot_3d_agv.urdf.xacro'
@@ -122,6 +128,33 @@ def generate_launch_description():
 
 
     # ==================================================
+    # SAFETY MONITOR  (/cmd_vel -> /cmd_vel_safe)
+    # Gazebo chi nghe /cmd_vel_safe (xem gz_bridge.yaml), nen node nay
+    # PHAI chay thi robot moi di chuyen.
+    # ==================================================
+    pkg_hiep = get_package_share_directory('hiep_robot2')
+    safety_monitor = Node(
+        package='hiep_robot2',
+        executable='safety_monitor_node',
+        name='safety_monitor',
+        output='screen',
+        parameters=[
+            os.path.join(pkg_hiep, 'config', 'safety_monitor.yaml'),
+            {'use_sim_time': True},
+        ],
+        condition=IfCondition(LaunchConfiguration('safety'))
+    )
+
+    laser_merger_opt = Node(
+        package='mec_mobile_navigation',
+        executable='laser_merger_node.py',
+        name='laser_merger',
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        condition=IfCondition(LaunchConfiguration('merger'))
+    )
+
+    # ==================================================
     # RVIZ
     # ==================================================
     rviz_node = Node(
@@ -135,6 +168,8 @@ def generate_launch_description():
     return LaunchDescription([
         rviz_arg,
         world_arg,
+        safety_arg,
+        merger_arg,
 
         world_launch,               
 
@@ -144,7 +179,9 @@ def generate_launch_description():
 
         spawn_robot,            
 
-        # laser_merger,          
+        laser_merger_opt,
+
+        safety_monitor,
 
         #rviz_node,                 
     ])

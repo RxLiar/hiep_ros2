@@ -15,9 +15,12 @@ agv_hmi/core/__init__.py
 agv_hmi/core/alarm_manager.py
 agv_hmi/core/audit_log.py
 agv_hmi/core/backup.py
+agv_hmi/core/fleet_config.py
 agv_hmi/core/health_model.py
 agv_hmi/core/map_cleaner.py
+agv_hmi/core/map_editor.py
 agv_hmi/core/map_io.py
+agv_hmi/core/nav_groups.py
 agv_hmi/core/prefs.py
 agv_hmi/core/robot_profile.py
 agv_hmi/core/safety_diag.py
@@ -39,6 +42,7 @@ agv_hmi/ui/conveyor_panel.py
 agv_hmi/ui/dashboard.py
 agv_hmi/ui/diagnostics_page.py
 agv_hmi/ui/error_header.py
+agv_hmi/ui/fleet_control.py
 agv_hmi/ui/fleet_map_widget.py
 agv_hmi/ui/fleet_page.py
 agv_hmi/ui/forklift_page.py
@@ -50,6 +54,7 @@ agv_hmi/ui/joystick_widget.py
 agv_hmi/ui/language_selector.py
 agv_hmi/ui/login_dialog.py
 agv_hmi/ui/main_window.py
+agv_hmi/ui/map_editor.py
 agv_hmi/ui/map_library_page.py
 agv_hmi/ui/map_widget.py
 agv_hmi/ui/mapping_page.py
@@ -61,14 +66,17 @@ agv_hmi/ui/process_manager.py
 agv_hmi/ui/reports_page.py
 agv_hmi/ui/route_manager.py
 agv_hmi/ui/routes_page.py
+agv_hmi/ui/safety_override.py
 agv_hmi/ui/safety_page.py
 agv_hmi/ui/schedule_page.py
 agv_hmi/ui/settings_page.py
 agv_hmi/ui/stations_page.py
 agv_hmi/ui/style_dark.qss
 agv_hmi/ui/style_light.qss
+agv_hmi/ui/subtabs.py
 agv_hmi/ui/system_settings.py
 agv_hmi/ui/task_editor.py
+agv_hmi/ui/test_map_editor.py
 agv_hmi/ui/theme_manager.py
 agv_hmi/ui/title_bar.py
 agv_hmi/ui/toast.py
@@ -79,7 +87,10 @@ test/test_copyright.py
 test/test_flake8.py
 test/test_forklift_params.py
 test/test_forklift_setup_flow.py
+test/test_lidar_override_profile.py
 test/test_map_cleaner.py
+test/test_map_editor.py
+test/test_nav_groups.py
 test/test_pep257.py
 test/test_safety_typing.py
 test/test_smoke.py

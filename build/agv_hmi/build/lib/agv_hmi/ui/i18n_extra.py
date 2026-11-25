@@ -262,7 +262,7 @@ _add("sf_length", "Dài (m)", "Length (m)", "길이 (m)", "長さ (m)", "长 (m)
 _add("sf_width", "Rộng (m)", "Width (m)", "폭 (m)", "幅 (m)", "宽 (m)")
 _add("sf_cx", "Tâm thân so với base_link: x (m)", "Body centre vs base_link: x (m)", "차체 중심 x (m)", "車体中心 x (m)", "车体中心 x (m)")
 _add("sf_cy", "Tâm thân so với base_link: y (m)", "Body centre vs base_link: y (m)", "차체 중심 y (m)", "車体中心 y (m)", "车体中心 y (m)")
-_add("sf_lidar_box", "Vị trí lidar (so với base_link)", "Lidar pose (in base_link)", "라이다 위치", "LiDAR位置", "雷达位置")
+_add("sf_lidar_box", "Lidar (vị trí so với base_link)", "Lidar (pose in base_link)", "라이다 (base_link 기준)", "LiDAR（base_link基準）", "雷达（相对 base_link）")
 _add("sf_lx", "x (m, + phía trước)", "x (m, + forward)", "x (m)", "x (m)", "x (m)")
 _add("sf_ly", "y (m, + bên trái)", "y (m, + left)", "y (m)", "y (m)", "y (m)")
 _add("sf_lyaw", "Góc xoay (°)", "Yaw (°)", "회전 (°)", "回転 (°)", "偏航 (°)")
@@ -463,3 +463,175 @@ _add("joy_show", "Hiện joystick", "Show joystick", "조이스틱 표시", "ジ
 _add("set_animations", "Hiệu ứng chuyển động (tắt nếu máy HMI chậm)",
      "Animations (turn off on a slow HMI PC)",
      "애니메이션 (느린 HMI PC에서는 끄기)", "アニメーション (低速なHMI PCではオフ)", "动画效果（HMI 电脑较慢时请关闭）")
+
+
+# ── 4.8.0: two lidars + Engineer teleop override ────────────────────────
+_add("sf_lidar_mode", "Kiểu lidar", "Lidar set-up", "라이다 구성", "LiDAR構成", "雷达配置")
+_add("sf_lmode_merged", "1 scan gộp (/scan, đã ở khung base)", "1 merged scan (/scan, already in the base frame)",
+     "병합 스캔 1개 (/scan)", "結合スキャン1つ (/scan)", "1 路合并扫描 (/scan)")
+_add("sf_lmode_dual", "2 lidar (trước + sau), mỗi cái 1 topic", "2 lidars (front + rear), one topic each",
+     "라이다 2개 (전/후), 토픽 각각", "LiDAR2台（前/後）、トピック別", "2 个雷达（前+后），各自话题")
+_add("sf_l1_single", "Vị trí lidar (dự phòng khi thiếu TF)", "Lidar pose (fallback when TF is missing)",
+     "라이다 위치 (TF 없을 때)", "LiDAR位置（TFなし時）", "雷达位置（缺少 TF 时）")
+_add("sf_l1_box", "Lidar 1 (trước)", "Lidar 1 (front)", "라이다 1 (전방)", "LiDAR 1（前）", "雷达 1（前）")
+_add("sf_l2_box", "Lidar 2 (sau)", "Lidar 2 (rear)", "라이다 2 (후방)", "LiDAR 2（後）", "雷达 2（后）")
+_add("sf_ltopic", "Topic scan", "Scan topic", "스캔 토픽", "スキャントピック", "扫描话题")
+_add("sf_lidar_hint",
+     "Vị trí lấy từ TF nếu có; số nhập ở đây chỉ là dự phòng khi thiếu TF. Mũi tên trên hình là hướng 0° của scan (lidar sau thường yaw 180°). Nhấn Enter sau khi sửa topic.",
+     "The pose comes from TF when available; the numbers here are only a fallback. The arrow in the drawing is the 0° direction of the scan (a rear lidar is usually yaw 180°). Press Enter after editing a topic.")
+_add("sd_lidar_ok", "Lidar {} ({}): có scan, vị trí lấy từ TF x={} y={} yaw={}°.",
+     "Lidar {} ({}): scan OK, pose from TF x={} y={} yaw={}°.")
+_add("sd_lidar_profile", "Lidar {} ({}): có scan nhưng vị trí là SỐ NHẬP TAY x={} y={} yaw={}° (không có TF).",
+     "Lidar {} ({}): scan OK but the pose is the MANUAL numbers x={} y={} yaw={}° (no TF).")
+_add("sd_lidar_profile_hint", "Nếu số không đúng vị trí thật thì vùng bị lệch. Kiểm tra TF từ khung lidar tới base.",
+     "If the numbers are not the real position the zones are shifted. Check the TF from the lidar frame to the base.")
+_add("sd_lidar_lost", "Lidar {} ({}) KHÔNG có scan — robot bị chặn (an toàn).",
+     "Lidar {} ({}) has NO scan — the robot is blocked (fail safe).")
+_add("sd_lidar_lost_hint", "Kiểm tra topic ở trên, cáp/nguồn lidar, và gz bridge nếu đang mô phỏng.",
+     "Check the topic above, the lidar cable/power, and the gz bridge in simulation.")
+_add("sd_override", "Vùng safety đang bị TẮT bởi Engineer (teleop: {}).", "Safety zones are switched OFF by the Engineer (teleop: {}).")
+_add("sd_override_hint", "Tắt công tắc trên joystick, hoặc chạy mission để bật lại. Tự bật lại sau ≤ 2 s nếu HMI mất kết nối.",
+     "Switch it off on the joystick, or start a mission. It re-enables itself within 2 s if the HMI link is lost.")
+_add("sf_state_override", "TẮT SAFETY (teleop)", "SAFETY OFF (teleop)", "안전 해제 (원격)", "安全解除（遠隔）", "安全已关闭（遥控）")
+_add("al_safety_override", "Engineer đang tắt vùng safety (teleop)", "The Engineer switched the safety zones off (teleop)",
+     "엔지니어가 안전 구역을 껐습니다", "エンジニアが安全ゾーンをオフにしました", "工程师已关闭安全区")
+_add("joy_safety_on", "🛡 Safety: BẬT", "🛡 Safety: ON", "🛡 안전: 켜짐", "🛡 安全: ON", "🛡 安全：开")
+_add("joy_safety_off", "⚠ SAFETY TẮT", "⚠ SAFETY OFF", "⚠ 안전 해제", "⚠ 安全OFF", "⚠ 安全已关")
+_add("joy_safety_tip", "Chỉ Engineer: tắt vùng slow/stop khi teleop. Tự bật lại khi chạy mission hoặc mất kết nối HMI.",
+     "Engineer only: switch the slow/stop zones off while teleoperating. Re-enabled automatically when a mission starts or the HMI link is lost.")
+_add("joy_safety_title", "Tắt vùng safety?", "Switch the safety zones off?", "안전 구역을 끄시겠습니까?", "安全ゾーンをオフにしますか？", "关闭安全区？")
+_add("joy_safety_confirm",
+     "Robot sẽ KHÔNG chậm hoặc dừng khi có người/vật cản trong vùng safety. Chỉ dùng khi teleop để thoát chỗ kẹt và phải có người quan sát robot.\n\nTiếp tục?",
+     "The robot will NOT slow down or stop for people/obstacles in the safety zones. Use it only to teleoperate out of a tight spot, with someone watching the robot.\n\nContinue?")
+_add("joy_safety_toast_on", "⚠ Vùng safety đã TẮT (teleop)", "⚠ Safety zones are OFF (teleop)")
+_add("joy_safety_toast_off", "🛡 Vùng safety đã bật lại", "🛡 Safety zones are back ON")
+
+
+# ── 4.9.0: manual map editing + missions keep running on other pages ────
+_add("ed_title", "✏️ Sửa map bằng tay", "✏️ Edit map by hand", "✏️ 맵 수동 편집", "✏️ マップ手動編集", "✏️ 手动编辑地图")
+_add("ed_start", "✏️ Bật chế độ sửa", "✏️ Start editing", "✏️ 편집 시작", "✏️ 編集開始", "✏️ 开始编辑")
+_add("ed_stop", "✔ Xong sửa", "✔ Finish editing", "✔ 편집 종료", "✔ 編集終了", "✔ 完成编辑")
+_add("ed_t_wall", "🖊 Vẽ tường", "🖊 Draw wall", "🖊 벽 그리기", "🖊 壁を描く", "🖊 画墙")
+_add("ed_t_erase", "🧽 Tẩy (về trống)", "🧽 Erase (free)", "🧽 지우개 (빈 공간)", "🧽 消しゴム（空き）", "🧽 擦除（空闲）")
+_add("ed_t_unknown", "◼ Xoá sạch (chưa biết)", "◼ Clear (unknown)", "◼ 지우기 (미확인)", "◼ クリア（未知）", "◼ 清除（未知）")
+_add("ed_t_line", "📏 Đường thẳng", "📏 Straight wall", "📏 직선 벽", "📏 直線の壁", "📏 直墙")
+_add("ed_t_rect_clear", "⬚ Xoá vùng chữ nhật", "⬚ Clear rectangle", "⬚ 사각형 지우기", "⬚ 矩形を消去", "⬚ 清除矩形")
+_add("ed_t_rect_wall", "▮ Tường chữ nhật", "▮ Solid rectangle", "▮ 사각형 벽", "▮ 矩形の壁", "▮ 实心矩形")
+_add("ed_brush", "Cỡ bút / độ dày tường", "Brush / wall thickness", "브러시 / 벽 두께", "ブラシ／壁の太さ", "笔刷 / 墙厚")
+_add("ed_cells", "Số ô (làm dày/mỏng)", "Cells (thicken/thin)", "셀 수 (두껍게/얇게)", "セル数（太く/細く）", "格数（加厚/变薄）")
+_add("ed_snap", "Bám góc 0/45/90° (đường thẳng)", "Snap to 0/45/90° (straight wall)", "각도 맞춤 (직선)", "角度スナップ（直線）", "角度吸附（直线）")
+_add("ed_undo", "↶ Hoàn tác", "↶ Undo", "↶ 실행 취소", "↶ 元に戻す", "↶ 撤销")
+_add("ed_redo", "↷ Làm lại", "↷ Redo", "↷ 다시 실행", "↷ やり直し", "↷ 重做")
+_add("ed_thicken", "➕ Làm dày tường", "➕ Thicken walls", "➕ 벽 두껍게", "➕ 壁を太く", "➕ 加厚墙")
+_add("ed_thin", "➖ Làm mỏng tường", "➖ Thin walls", "➖ 벽 얇게", "➖ 壁を細く", "➖ 变薄墙")
+_add("ed_specks", "🧹 Xoá điểm nhiễu nhỏ", "🧹 Remove small specks", "🧹 작은 점 제거", "🧹 小さなノイズ除去", "🧹 清除小噪点")
+_add("ed_save", "💾 Lưu map đã sửa", "💾 Save edited map", "💾 편집한 맵 저장", "💾 編集マップを保存", "💾 保存已编辑地图")
+_add("ed_hint",
+     "Chuột trái: vẽ / kéo. Chuột phải: kéo map. Lăn chuột: zoom. Ctrl+Z / Ctrl+Y: hoàn tác / làm lại. Esc: huỷ nét đang kéo. Mỗi nét vẽ là 1 bước hoàn tác.",
+     "Left mouse: draw / drag. Right mouse: pan. Wheel: zoom. Ctrl+Z / Ctrl+Y: undo / redo. Esc: cancel the current drag. Each stroke is one undo step.")
+_add("ed_on", "Đang sửa map (cập nhật SLAM tạm dừng). Tường vector (nếu có) được chuyển thành ô để sửa.",
+     "Editing the map (live SLAM updates paused). Vector walls, if any, were turned into cells so they can be edited.")
+_add("ed_off", "Đã thoát chế độ sửa. Bấm 'Lưu map đã sửa' để ghi ra file.", "Editing finished. Press 'Save edited map' to write it to a file.")
+_add("ed_no_map", "Chưa có map để sửa.", "No map to edit yet.")
+_add("ed_thick_done", "Đã đổi {} ô.", "{} cells changed.")
+_add("ed_specks_done", "Đã xoá {} ô nhiễu.", "{} noise cells removed.")
+_add("ed_saved", "Đã lưu map đã sửa:\n{}", "Edited map saved:\n{}")
+_add("ed_discard", "Thao tác này sẽ thay map đang hiển thị và MẤT các chỉnh sửa tay chưa lưu. Tiếp tục?",
+     "This replaces the map on screen and LOSES the hand edits you have not saved. Continue?")
+_add("mv_measure_clear", "🗑 Xoá phép đo", "🗑 Clear measurement", "🗑 측정 지우기", "🗑 計測を消去", "🗑 清除测量")
+_add("mv_measure_hint", "Bấm nhiều điểm để đo đường gấp khúc (Σ = tổng). Với 1 đoạn hiện thêm Δx, Δy và góc. Esc: xoá.",
+     "Click several points to measure a polyline (Σ = total). One segment also shows Δx, Δy and the angle. Esc: clear.")
+
+_add("mb_running", "▶ Đang chạy lộ trình · điểm {}/{} · {}", "▶ Mission running · waypoint {}/{} · {}")
+_add("mb_paused", "⏸ Lộ trình tạm dừng · điểm {}/{} · {}", "⏸ Mission paused · waypoint {}/{} · {}")
+_add("mb_confirm", "⏳ Chờ bạn xác nhận · điểm {}/{} · {}", "⏳ Waiting for your confirmation · waypoint {}/{} · {}")
+_add("mb_stuck", "⚠ KẸT · điểm {}/{} · {} — bấm 'Xem' để chọn Thử lại / Bỏ qua / Huỷ",
+     "⚠ STUCK · waypoint {}/{} · {} — press 'View' to Retry / Skip / Cancel")
+_add("mb_view", "Xem", "View"); _add("mb_stop", "■ Dừng", "■ Stop"); _add("mb_ok", "✔ Xác nhận", "✔ Confirm")
+_add("mb_stop_confirm", "Dừng lộ trình đang chạy?", "Stop the running mission?")
+_add("mb_stuck_toast", "⚠ AGV kẹt tại điểm {} — mở thẻ Routes để xử lý", "⚠ AGV is stuck at waypoint {} — open Routes to handle it")
+_add("mb_confirm_toast", "⏳ AGV đang chờ xác nhận để tiếp tục", "⏳ The AGV is waiting for confirmation to continue")
+_add("mb_done_toast", "✅ Lộ trình đã hoàn thành", "✅ Mission completed")
+_add("mb_mapping_title", "Đang chạy lộ trình", "A mission is running")
+_add("mb_mapping_warn",
+     "Mapping (SLAM) xung đột với Nav2 (cùng /map và TF map→odom). Vào thẻ Mapping sẽ DỪNG lộ trình đang chạy. Tiếp tục?",
+     "Mapping (SLAM) conflicts with Nav2 (same /map and map→odom TF). Opening Mapping will STOP the running mission. Continue?")
+
+# ── 4.9.1: open an old saved map for editing ────────────────────────────
+_add("ed_open", "📂 Mở map đã lưu để sửa", "📂 Open a saved map to edit", "📂 저장된 맵 열기", "📂 保存済みマップを開く", "📂 打开已保存地图编辑")
+_add("ed_opened", "Đã mở '{}' để sửa. Cập nhật SLAM tạm dừng. Lưu ra tên mới để giữ bản gốc.",
+     "Opened '{}' for editing. Live SLAM updates are paused. Save under a new name to keep the original.")
+_add("ed_open_fail", "Không đọc được map: {}", "Could not read the map: {}")
+_add("ed_open_mapping", "Đang chạy Mapping. Dừng Mapping để mở map cũ?", "Mapping is running. Stop it to open the old map?")
+
+# ── 4.10.0: 6 main tabs + sub-tabs, status chips on the title bar ───────
+_add("sub_overview", "Tổng quan", "Overview", "개요", "概要", "概览")
+_add("sub_navigation", "Điều hướng", "Navigation", "내비게이션", "ナビゲーション", "导航")
+_add("sub_mapping", "Vẽ map", "Mapping", "매핑", "マッピング", "建图")
+_add("sub_routes", "Lộ trình", "Routes", "경로", "ルート", "路线")
+_add("sub_general", "Chung", "General", "일반", "一般", "常规")
+_add("chip_safety_tip", "Trạng thái vùng safety. Bấm để mở cấu hình (Engineer).", "Safety zone state. Click to open its set-up (Engineer).")
+_add("chip_nav_on", "Nav2 sẵn sàng", "Nav2 ready", "Nav2 준비", "Nav2 準備完了", "Nav2 就绪")
+_add("chip_nav_off", "Nav2 tắt", "Nav2 off", "Nav2 꺼짐", "Nav2 停止", "Nav2 关闭")
+_add("chip_nav_tip", "Nav2 (NavigateToPose) có sẵn sàng nhận lệnh không. Bấm để mở thẻ Navigation.",
+     "Whether Nav2 (NavigateToPose) can take goals. Click to open Navigation.")
+_add("chip_mission_idle", "Rảnh", "Idle", "대기", "待機", "空闲")
+_add("chip_mission_run", "Đang chạy {}", "Running {}", "실행 중 {}", "実行中 {}", "运行中 {}")
+_add("chip_mission_wait", "Chờ xác nhận {}", "Confirm? {}", "확인 대기 {}", "確認待ち {}", "等待确认 {}")
+_add("chip_mission_pause", "Tạm dừng {}", "Paused {}", "일시정지 {}", "一時停止 {}", "已暂停 {}")
+_add("chip_mission_stuck", "KẸT {}", "STUCK {}", "막힘 {}", "スタック {}", "卡住 {}")
+_add("chip_mission_tip", "Lộ trình đang chạy (điểm hiện tại/tổng). Bấm để xem hoặc mở Routes.",
+     "The running mission (current/total waypoint). Click to view it or open Routes.")
+_add("sub_conveyors", "Băng tải", "Conveyors", "컨베이어", "コンベア", "输送带")
+
+# ── 4.11.0: Fleet control (start the fleet and connect robots from the HMI) ──
+_add("fc_title", "🛰 Điều khiển Fleet — bật và kết nối không cần gõ lệnh", "🛰 Fleet control — start and connect without typing commands")
+_add("fc_pkg", "Gói ROS cần thiết", "Required ROS packages")
+_add("fc_pkg_check", "Kiểm tra lại", "Check again")
+_add("fc_pkg_checking", "Đang kiểm tra gói ROS...", "Checking ROS packages...")
+_add("fc_pkg_fix_build", "Chưa có hoặc bản cũ (thiếu robot_fleet_side.launch.py). Build lại:  cd ~/hiep_ros2 && colcon build --packages-select agv_fleet agv_fleet_domains && source install/setup.fish",
+     "Missing or too old (no robot_fleet_side.launch.py). Rebuild:  cd ~/hiep_ros2 && colcon build --packages-select agv_fleet agv_fleet_domains && source install/setup.fish")
+_add("fc_pkg_fix_apt", "Thiếu cầu nối domain. Cài:  sudo apt install ros-jazzy-domain-bridge", "The domain bridge is missing. Install:  sudo apt install ros-jazzy-domain-bridge")
+_add("fc_robot_box", "Robot này — Fleet Agent + cầu nối domain", "This robot — Fleet Agent + domain bridge")
+_add("fc_server_box", "Fleet Server — máy trung tâm", "Fleet Server — central computer")
+_add("fc_server_hint", "Chỉ bật trên MỘT máy (máy trung tâm). Các robot gửi trạng thái về Fleet Server qua cầu nối domain.",
+     "Start it on ONE computer only (the central one). Robots report to it through the domain bridge.")
+_add("fc_robot_id", "Mã robot", "Robot ID"); _add("fc_robot_name", "Tên hiển thị", "Display name")
+_add("fc_robot_domain", "Domain ROS của robot", "Robot ROS domain"); _add("fc_fleet_domain", "Domain Fleet", "Fleet domain")
+_add("fc_namespace", "Namespace topic robot", "Robot topic namespace"); _add("fc_publish_hz", "Gửi trạng thái (Hz)", "State rate (Hz)")
+_add("fc_snapshot_hz", "Gửi snapshot (Hz)", "Snapshot rate (Hz)"); _add("fc_warn_to", "Cảnh báo sau (s)", "Warn after (s)")
+_add("fc_off_to", "Offline sau (s)", "Offline after (s)")
+_add("fc_auto_connect", "Tự kết nối khi mở HMI", "Connect automatically when the HMI starts")
+_add("fc_auto_server", "Tự bật khi mở HMI", "Start automatically when the HMI starts")
+_add("fc_btn_connect", "🔌 Kết nối robot vào Fleet", "🔌 Connect robot to the fleet"); _add("fc_btn_disconnect", "⏏ Ngắt kết nối", "⏏ Disconnect")
+_add("fc_btn_server_on", "▶ Bật Fleet Server", "▶ Start Fleet Server"); _add("fc_btn_server_off", "■ Tắt Fleet Server", "■ Stop Fleet Server")
+_add("fc_run_on", "Đang chạy", "Running"); _add("fc_run_off", "Chưa chạy", "Not running")
+_add("fc_run_ext", "Đang chạy (từ phiên trước hoặc terminal)", "Running (from an earlier session or a terminal)")
+_add("fc_run_died", "Đã dừng bất thường (mã {}) — xem log bên dưới", "Stopped unexpectedly (code {}) — see the log below")
+_add("fc_log", "Log:", "Log:"); _add("fc_log_agent", "Agent + cầu nối", "Agent + bridge"); _add("fc_log_server", "Fleet Server", "Fleet Server")
+_add("fc_log_empty", "(chưa có log)", "(no log yet)")
+_add("fc_err_robot_id", "Mã robot phải dài 3–32 ký tự, chữ HOA/số/_/-, bắt đầu bằng chữ (ví dụ AGV001).",
+     "Robot ID: 3–32 characters, UPPERCASE letters/digits/_/-, starting with a letter (e.g. AGV001).")
+_add("fc_err_domain_range", "Domain {} phải nằm trong khoảng 0–{}.", "The {} domain must be 0–{}.")
+_add("fc_err_same_domain", "Domain robot và domain Fleet phải KHÁC nhau (cầu nối cần 2 domain).", "Robot domain and Fleet domain must DIFFER (a bridge needs two domains).")
+_add("fc_err_rate", "Tần số phải trong khoảng 0.5–20 Hz.", "Rates must be 0.5–20 Hz.")
+_add("fc_err_timeouts", "Thời gian 'offline' phải lớn hơn thời gian 'cảnh báo'.", "'Offline after' must be larger than 'Warn after'.")
+_add("fc_err_pkg", "Thiếu gói ROS: {}. Xem hướng dẫn ngay phía trên.", "Missing ROS package(s): {}. See the hint above.")
+_add("fc_dom_ok", "HMI đang ở domain {} = domain robot: nhận /fleet/snapshot qua cầu nối.", "The HMI is in domain {} = the robot domain: it receives /fleet/snapshot through the bridge.")
+_add("fc_dom_fleet", "HMI đang ở domain {} (domain Fleet): nhận /fleet/snapshot trực tiếp từ Fleet Server.", "The HMI is in domain {} (the Fleet domain): it receives /fleet/snapshot directly from the Fleet Server.")
+_add("fc_dom_mismatch", "⚠ HMI đang ở domain {}, còn domain robot là {} và domain Fleet là {}: HMI sẽ KHÔNG thấy dữ liệu Fleet. Mở HMI với ROS_DOMAIN_ID bằng một trong hai domain đó.",
+     "⚠ The HMI is in domain {} but the robot domain is {} and the Fleet domain is {}: the HMI will NOT see Fleet data. Start the HMI with ROS_DOMAIN_ID set to one of them.")
+_add("fc_st_connected", "✅ Robot {} đã kết nối Fleet — thấy {} AGV.", "✅ Robot {} is connected to the fleet — {} AGV seen.")
+_add("fc_st_my_stale", "⚠ Robot {} có trong Fleet nhưng trạng thái là '{}'.", "⚠ Robot {} is in the fleet but its state is '{}'.")
+_add("fc_st_not_listed", "⚠ Agent của {} đang chạy nhưng Fleet Server chưa thấy robot này. Kiểm tra domain, cầu nối và log.",
+     "⚠ The agent of {} is running but the Fleet Server does not see this robot. Check the domains, the bridge and the log.")
+_add("fc_st_snapshot", "✅ Đang nhận /fleet/snapshot — {} AGV.", "✅ Receiving /fleet/snapshot — {} AGV.")
+_add("fc_st_nothing", "Chưa bật gì. Bật Fleet Server (máy trung tâm) và/hoặc kết nối robot này vào Fleet.", "Nothing is running. Start the Fleet Server (central computer) and/or connect this robot to the fleet.")
+_add("fc_st_agent_waiting", "Agent đã chạy nhưng chưa nhận /fleet/snapshot — Fleet Server chưa bật hoặc cầu nối chưa thông.",
+     "The agent is running but /fleet/snapshot has not arrived — the Fleet Server is not started or the bridge is not connected yet.")
+_add("fc_st_server_no_robot", "Fleet Server đã chạy nhưng chưa có robot nào kết nối.", "The Fleet Server is running but no robot has connected yet.")
+_add("fc_st_both_waiting", "Agent và Server đã chạy, đang chờ dữ liệu đầu tiên...", "Agent and Server are running, waiting for the first data...")
+_add("fleet_waiting", "⏳ Chưa nhận /fleet/snapshot. Mở khung 'Điều khiển Fleet' ở trên để bật Fleet Server và kết nối robot.",
+     "⏳ No /fleet/snapshot yet. Use the 'Fleet control' box above to start the Fleet Server and connect the robot.")
+_add("chip_fleet_ok", "Fleet {} AGV", "Fleet {} AGV"); _add("chip_fleet_off", "Fleet tắt", "Fleet off"); _add("chip_fleet_wait", "Fleet chờ", "Fleet waiting")
+_add("chip_fleet_tip", "Trạng thái kết nối Fleet. Bấm để mở thẻ Fleet.", "Fleet connection state. Click to open Fleet.")

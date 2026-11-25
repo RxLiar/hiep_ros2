@@ -8,9 +8,14 @@
 * Points of /scan inside the SLOW rectangle limit the speed, points inside the
   STOP rectangle block motion towards them.  Returns from the robot's own body
   are ignored.
+* One merged scan (mode "merged") or TWO lidars (mode "dual": each on its own topic with its own pose; the
+  points of both are combined, and a lost lidar means "no_scan").
+* Engineer override: the HMI can switch the zones off for teleop with a short-lived, refreshed request on
+  /safety_override (it expires by itself after at most 2 s).
 * Fail safe: no /scan (when require_scan) or a stale scan => output is zero.
   If this node dies the bridge stops receiving /cmd_vel_safe and stops the robot.
-* Publishes /safety_state (JSON, 10 Hz) for the HMI and /robot_profile (latched).
+* Publishes /safety_state (JSON, 10 Hz) for the HMI, /safety_points (the points it classifies, 5 Hz) and
+  /robot_profile (latched).
 * Optionally pushes the footprint to the Nav2 costmaps (dynamic parameter).
 
 This is a SOFTWARE layer. It does not replace a safety-rated lidar / PLC e-stop.
@@ -20,6 +25,7 @@ import math
 import time
 from typing import Optional
 
+import numpy as np
 import rclpy
 from geometry_msgs.msg import Twist
 from rcl_interfaces.msg import Parameter, ParameterType, ParameterValue
@@ -31,7 +37,7 @@ from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
 
 from hiep_robot2.safety_logic import (
-    BypassManager, Debouncer, Profile, cap_speed, classify, gate, load_active_profile,
+    BypassManager, Debouncer, OverrideManager, Profile, cap_speed, classify, gate, load_active_profile,
     scan_to_base_points, state_name)
 
 COSTMAP_NODES = ("/local_costmap/local_costmap", "/global_costmap/global_costmap")
@@ -46,6 +52,8 @@ class SafetyMonitorNode(Node):
         self.declare_parameter("output_topic", "/cmd_vel_safe")
         self.declare_parameter("config_topic", "/safety_config")
         self.declare_parameter("bypass_topic", "/safety_bypass")
+        self.declare_parameter("override_topic", "/safety_override")
+        self.declare_parameter("points_topic", "/safety_points")
         self.declare_parameter("rate_hz", 30.0)
         self.declare_parameter("scan_timeout_s", 0.5)
         self.declare_parameter("cmd_timeout_s", 0.5)
@@ -84,10 +92,15 @@ class SafetyMonitorNode(Node):
         self.bypass = BypassManager()
         self._last_scan = None
         self._bypass_seen = False
+        self.override = OverrideManager()
+        self._scans = {}              # lidar index -> (time, Nx2 points in the base frame)
+        self._lidar_meta = {}         # lidar index -> {frame, source, pose}
+        self._scan_subs = {}          # lidar index -> (topic, subscription)
+        self._tf_err_by = {}
+        self._merged_topic = str(gp("scan_topic"))
 
         self._cmd = (0.0, 0.0)
         self._cmd_t = 0.0
-        self._scan_t: Optional[float] = None
         self._flags = {"stop_front": False, "stop_rear": False, "stop_side": False,
                        "slow_front": False, "slow_rear": False, "slow_side": False}
         self._nearest = None
@@ -97,17 +110,21 @@ class SafetyMonitorNode(Node):
         latched = QoSProfile(reliability=ReliabilityPolicy.RELIABLE, durability=DurabilityPolicy.TRANSIENT_LOCAL,
                              history=HistoryPolicy.KEEP_LAST, depth=1)
         sensor = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, history=HistoryPolicy.KEEP_LAST, depth=5)
-        self.create_subscription(LaserScan, str(gp("scan_topic")), self._scan_cb, sensor)
+        self._sensor_qos = sensor
+        self._sync_scan_subs()
         self.create_subscription(Twist, str(gp("input_topic")), self._cmd_cb, 10)
         self.create_subscription(String, str(gp("config_topic")), self._config_cb, latched)
         self.create_subscription(String, str(gp("bypass_topic")), self._bypass_cb, 10)
+        self.create_subscription(String, str(gp("override_topic")), self._override_cb, 10)
         self.out_pub = self.create_publisher(Twist, str(gp("output_topic")), 10)
         self.state_pub = self.create_publisher(String, "/safety_state", 10)
+        self.points_pub = self.create_publisher(String, str(gp("points_topic")), 1)
         self.profile_pub = self.create_publisher(String, "/robot_profile", latched)
-        self._clients = {n: self.create_client(SetParameters, f"{n}/set_parameters") for n in COSTMAP_NODES}
+        self._fp_clients = {n: self.create_client(SetParameters, f"{n}/set_parameters") for n in COSTMAP_NODES}
 
         self.create_timer(1.0 / max(5.0, float(gp("rate_hz"))), self._tick)
         self.create_timer(0.1, self._publish_state)
+        self.create_timer(0.2, self._publish_points)
         self.create_timer(3.0, self._apply_nav2_footprint)
         self.create_timer(1.0, self._refresh_graph)
         self._publish_profile()
@@ -128,6 +145,7 @@ class SafetyMonitorNode(Node):
             return
         self.profile = new
         self._applied_fp = {}
+        self._sync_scan_subs()
         self._publish_profile()
         self.get_logger().info(
             f"Profile updated: '{new.name}' {new.length_m:.2f}x{new.width_m:.2f} m, "
@@ -139,12 +157,48 @@ class SafetyMonitorNode(Node):
         except ValueError:
             self.get_logger().warning("Ignoring invalid /safety_bypass JSON")
 
+    def _override_cb(self, msg: String) -> None:
+        try:
+            req = json.loads(msg.data)
+        except ValueError:
+            self.get_logger().warning("Ignoring invalid /safety_override JSON")
+            return
+        was = self.override.is_active(time.monotonic())
+        self.override.update(time.monotonic(), req)
+        now_on = self.override.is_active(time.monotonic())
+        if now_on != was:
+            self.get_logger().warning("Safety zones OVERRIDDEN by the HMI (teleop)" if now_on
+                                      else "Safety zones active again (override ended)")
+
+    # -- lidar subscriptions ----------------------------------------------------
+    def _active_idx(self):
+        return sorted(self.profile.lidar_topics(self._merged_topic))
+
+    def _sync_scan_subs(self) -> None:
+        """Listen to the scan topic(s) of the current lidar mode; re-subscribe when the profile changes them."""
+        want = self.profile.lidar_topics(self._merged_topic)
+        for idx in list(self._scan_subs):
+            topic, sub = self._scan_subs[idx]
+            if want.get(idx) != topic:
+                try:
+                    self.destroy_subscription(sub)
+                except Exception:
+                    pass
+                del self._scan_subs[idx]
+                self._scans.pop(idx, None)
+                self._lidar_meta.pop(idx, None)
+        for idx, topic in want.items():
+            if idx not in self._scan_subs:
+                cb = self._scan_cb if idx == 0 else self._scan2_cb
+                self._scan_subs[idx] = (topic, self.create_subscription(LaserScan, topic, cb, self._sensor_qos))
+        self._last_scan = None
+
     @staticmethod
     def _counts_of(res) -> dict:
         return {"stop_front": res.stop_front, "stop_rear": res.stop_rear, "stop_side": res.stop_side,
                 "slow_front": res.slow_front, "slow_rear": res.slow_rear, "slow_side": res.slow_side}
 
-    def _scan_pose(self, frame: str):
+    def _scan_pose(self, frame: str, idx: int = 0):
         """(x, y, yaw_rad, source): pose of the scan frame in the base frame."""
         if self._tf_buffer is not None:
             if frame == self.base_frame:
@@ -153,12 +207,14 @@ class SafetyMonitorNode(Node):
                 tf = self._tf_buffer.lookup_transform(self.base_frame, frame, Time())
                 t, q = tf.transform.translation, tf.transform.rotation
                 yaw = math.atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z))
-                self._tf_error = None
+                self._tf_err_by[idx] = None
+                self._tf_error = next((e for e in self._tf_err_by.values() if e), None)
                 return float(t.x), float(t.y), yaw, "tf"
             except Exception as exc:
-                self._tf_error = str(exc)[:140]
-        return (self.profile.lidar_x_m, self.profile.lidar_y_m,
-                math.radians(self.profile.lidar_yaw_deg), "profile")
+                self._tf_err_by[idx] = str(exc)[:140]
+                self._tf_error = self._tf_err_by[idx]
+        x, y, yaw = self.profile.lidar_pose(idx)
+        return x, y, yaw, "profile"
 
     def _refresh_graph(self) -> None:
         """Who listens to what: is anything still driving the motors straight from /cmd_vel?"""
@@ -173,36 +229,63 @@ class SafetyMonitorNode(Node):
             self._out_subs = None
 
     def _scan_cb(self, msg: LaserScan) -> None:
+        self._on_scan(0, msg)
+
+    def _scan2_cb(self, msg: LaserScan) -> None:
+        self._on_scan(1, msg)
+
+    def _on_scan(self, idx: int, msg: LaserScan) -> None:
         now = time.monotonic()
-        self._scan_t = now
-        x, y, yaw, source = self._scan_pose(str(msg.header.frame_id))
-        self._scan_frame = str(msg.header.frame_id)
-        self._pose_info = (round(x, 3), round(y, 3), round(math.degrees(yaw), 1), source)
+        frame = str(msg.header.frame_id)
+        x, y, yaw, source = self._scan_pose(frame, idx)
         pts = scan_to_base_points(msg.ranges, msg.angle_min, msg.angle_increment,
                                   msg.range_min, msg.range_max, self.profile, pose=(x, y, yaw))
-        self._last_scan = pts
-        res = classify(pts, self.profile, ignore_rects=self.bypass.rects(now))
+        self._scans[idx] = (now, pts)
+        self._lidar_meta[idx] = {"frame": frame, "source": source,
+                                 "pose": [round(x, 3), round(y, 3), round(math.degrees(yaw), 1)]}
+        if idx == 0:
+            self._scan_frame = frame
+            self._pose_info = (round(x, 3), round(y, 3), round(math.degrees(yaw), 1), source)
+        self._rebuild_points(now)
+        res = classify(self._last_scan, self.profile, ignore_rects=self.bypass.rects(now))
         counts = self._counts_of(res)
         self._counts = counts
         self._flags = self.debounce.update(now, counts, self.profile.min_points)
         self._nearest = res
 
+    def _rebuild_points(self, now: float) -> None:
+        """Combine the points of every lidar that is still delivering scans."""
+        parts = [it[1] for idx in self._active_idx()
+                 for it in [self._scans.get(idx)] if it is not None and now - it[0] <= self.scan_timeout]
+        self._last_scan = np.concatenate(parts) if parts else None
+
     # -- output ---------------------------------------------------------------
+    def _lidar_ages(self):
+        now = time.monotonic()
+        return [float("inf") if self._scans.get(i) is None else now - self._scans[i][0] for i in self._active_idx()]
+
     def _scan_age(self) -> float:
-        return float("inf") if self._scan_t is None else time.monotonic() - self._scan_t
+        """Age of the OLDEST lidar: with two lidars, losing one counts as losing the scan."""
+        return max(self._lidar_ages())
+
+    def _scan_age_min(self) -> float:
+        return min(self._lidar_ages())
 
     def _mode(self) -> str:
         if not self.profile.safety_enabled:
             return "disabled"
+        if self.override.is_active(time.monotonic()):
+            return "override"
         if self.profile.require_scan and self._scan_age() > self.scan_timeout:
             return "no_scan"
         return state_name(self._flags)
 
     def _reclassify(self) -> None:
         """Zones depend on the bypass rectangles, which can change between scans."""
+        now = time.monotonic()
+        self._rebuild_points(now)
         if self._last_scan is None:
             return
-        now = time.monotonic()
         res = classify(self._last_scan, self.profile, ignore_rects=self.bypass.rects(now))
         counts = self._counts_of(res)
         self._counts = counts
@@ -222,8 +305,8 @@ class SafetyMonitorNode(Node):
         mode = self._mode()
         if mode == "no_scan":
             lin, ang = 0.0, 0.0
-        elif mode != "disabled":
-            flags = self._flags if self._scan_age() <= self.scan_timeout else {}
+        elif mode not in ("disabled", "override"):
+            flags = self._flags if self._scan_age_min() <= self.scan_timeout else {}
             lin, ang = gate(lin, ang, flags, self.profile, self.block_rot)
             lin, ang = cap_speed(lin, ang, self.bypass.speed_caps(time.monotonic()))
         out = Twist()
@@ -256,8 +339,37 @@ class SafetyMonitorNode(Node):
             "output_topic": self.output_topic,
             "out_subscribers": self._out_subs,
             "direct_consumers": self._direct_consumers,
+            "override": self.override.active(time.monotonic()),
+            "lidar_mode": self.profile.lidar_mode,
+            "lidars": self._lidar_report(),
         }
         self.state_pub.publish(String(data=json.dumps(state)))
+
+    def _lidar_report(self) -> list:
+        now = time.monotonic()
+        topics = self.profile.lidar_topics(self._merged_topic)
+        out = []
+        for idx in self._active_idx():
+            it, meta = self._scans.get(idx), self._lidar_meta.get(idx, {})
+            out.append({"idx": idx, "topic": topics[idx], "frame": meta.get("frame", ""),
+                        "age_s": None if it is None else round(now - it[0], 2),
+                        "pose_source": meta.get("source"), "pose": meta.get("pose")})
+        return out
+
+    def _publish_points(self) -> None:
+        """The points the node really classifies (base frame), so the HMI draws what the safety layer sees."""
+        now = time.monotonic()
+        flat, counts = [], []
+        for idx in range(2):
+            it = self._scans.get(idx) if idx in self._active_idx() else None
+            if it is None or now - it[0] > self.scan_timeout or len(it[1]) == 0:
+                counts.append(0)
+                continue
+            pts = it[1]
+            pts = pts[:: max(1, int(math.ceil(len(pts) / 700.0)))]
+            counts.append(int(len(pts)))
+            flat.extend(np.round(pts, 2).ravel().tolist())
+        self.points_pub.publish(String(data=json.dumps({"n": counts, "pts": flat})))
 
     def _publish_profile(self) -> None:
         self.profile_pub.publish(String(data=json.dumps(self.profile.to_dict())))
@@ -267,7 +379,7 @@ class SafetyMonitorNode(Node):
         if not self.apply_footprint:
             return
         fp = self.profile.nav2_footprint()
-        for name, cli in self._clients.items():
+        for name, cli in self._fp_clients.items():
             if self._applied_fp.get(name) == fp or not cli.service_is_ready():
                 continue
             req = SetParameters.Request()

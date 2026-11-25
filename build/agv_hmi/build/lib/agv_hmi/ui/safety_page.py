@@ -183,10 +183,19 @@ class SafetyEditor(QWidget):
         # base_link + lidar
         o = self._to_px(0.0, 0.0)
         pa.setPen(QPen(QColor(255, 255, 255, 220), 1.5)); pa.drawLine(QPointF(o.x() - 6, o.y()), QPointF(o.x() + 6, o.y())); pa.drawLine(QPointF(o.x(), o.y() - 6), QPointF(o.x(), o.y() + 6))
-        li = self._to_px(p["lidar_x_m"], p["lidar_y_m"])
-        pa.setBrush(QBrush(QColor(63, 185, 80))); pa.setPen(QPen(QColor(255, 255, 255), 1.2)); pa.drawEllipse(li, 6, 6)
-        f = QFont(); f.setPixelSize(11); pa.setFont(f); pa.setPen(QColor(201, 209, 217))
-        pa.drawText(QPointF(li.x() + 10, li.y() + 4), "LiDAR"); pa.drawText(QPointF(o.x() + 8, o.y() + 16), "base_link")
+        dual = p.get("lidar_mode") == "dual"
+        lidars = [(p["lidar_x_m"], p["lidar_y_m"], p["lidar_yaw_deg"], "LiDAR 1" if dual else "LiDAR", QColor(63, 185, 80))]
+        if dual:
+            lidars.append((p["lidar2_x_m"], p["lidar2_y_m"], p["lidar2_yaw_deg"], "LiDAR 2", QColor(88, 166, 255)))
+        f = QFont(); f.setPixelSize(11); pa.setFont(f)
+        for lx, ly, lyaw, name, lcol in lidars:
+            li = self._to_px(lx, ly)
+            yr = math.radians(lyaw)                                   # heading tick: where 0 deg of the scan points
+            tip = self._to_px(lx + 0.4 * math.cos(yr), ly + 0.4 * math.sin(yr))
+            pa.setPen(QPen(lcol, 2)); pa.drawLine(li, tip)
+            pa.setBrush(QBrush(lcol)); pa.setPen(QPen(QColor(255, 255, 255), 1.2)); pa.drawEllipse(li, 6, 6)
+            pa.setPen(QColor(201, 209, 217)); pa.drawText(QPointF(li.x() + 10, li.y() + 4), name)
+        pa.setPen(QColor(201, 209, 217)); pa.drawText(QPointF(o.x() + 8, o.y() + 16), "base_link")
         # handles + margin labels
         for (kind, side), pt in self._handles().items():
             col = QColor(248, 81, 73) if kind == "stop" else QColor(240, 136, 62)
@@ -226,6 +235,7 @@ class SafetyPage(QWidget):
         self._store = RP.load_store()
         self._node_state: dict | None = None
         self._node_state_t = 0.0
+        self._points_t = 0.0             # last /safety_points: the node's own view of the scan
         self._loading = False
         self._dirty = False
         self._build()
@@ -296,12 +306,28 @@ class SafetyPage(QWidget):
             ffl.addRow(self._flbl[k], w)
         v.addWidget(self._fork_box)
 
-        # lidar
-        self._lidar_box = QGroupBox(); f = QFormLayout(self._lidar_box)
+        # lidar: ONE merged scan, or TWO lidars (each with its own topic and pose)
+        self._lidar_box = QGroupBox(); lv = QVBoxLayout(self._lidar_box)
+        fm = QFormLayout(); self._lmode = QComboBox()
+        self._lmode.addItem("", "merged"); self._lmode.addItem("", "dual")
+        self._lmode.currentIndexChanged.connect(self._on_form_changed)
+        self._lmode_lbl = QLabel(); fm.addRow(self._lmode_lbl, self._lmode)
+        lv.addLayout(fm)
+        self._l1_box = QGroupBox(); f1 = QFormLayout(self._l1_box)
+        self._l2_box = QGroupBox(); f2 = QFormLayout(self._l2_box)
+        self._l1topic, self._l2topic = QLineEdit(), QLineEdit()
+        for ed in (self._l1topic, self._l2topic):
+            ed.editingFinished.connect(self._on_form_changed)       # commit on Enter / focus-out
         self._lx, self._ly, self._lyaw = self._spin(-5, 5, 0.05), self._spin(-2, 2, 0.05), self._spin(-180, 180, 1, 0)
-        self._llbl = {k: QLabel() for k in ("lx", "ly", "lyaw")}
-        for k, w in (("lx", self._lx), ("ly", self._ly), ("lyaw", self._lyaw)):
-            f.addRow(self._llbl[k], w)
+        self._l2x, self._l2y, self._l2yaw = self._spin(-5, 5, 0.05), self._spin(-2, 2, 0.05), self._spin(-180, 180, 1, 0)
+        self._llbl = {k: QLabel() for k in ("lx", "ly", "lyaw", "l2x", "l2y", "l2yaw", "t1", "t2")}
+        for k, w, form in (("t1", self._l1topic, f1), ("lx", self._lx, f1), ("ly", self._ly, f1), ("lyaw", self._lyaw, f1),
+                           ("t2", self._l2topic, f2), ("l2x", self._l2x, f2), ("l2y", self._l2y, f2), ("l2yaw", self._l2yaw, f2)):
+            form.addRow(self._llbl[k], w)
+        lv.addWidget(self._l1_box); lv.addWidget(self._l2_box)
+        self._lidar_hint = QLabel(); self._lidar_hint.setWordWrap(True)
+        self._lidar_hint.setStyleSheet("color:#8B949E;font-size:11px;")
+        lv.addWidget(self._lidar_hint)
         v.addWidget(self._lidar_box)
 
         # zones
@@ -348,6 +374,9 @@ class SafetyPage(QWidget):
             "name": self._name.text(), "length_m": self._len.value(), "width_m": self._wid.value(),
             "center_x_m": self._cx.value(), "center_y_m": self._cy.value(),
             "lidar_x_m": self._lx.value(), "lidar_y_m": self._ly.value(), "lidar_yaw_deg": self._lyaw.value(),
+            "lidar_mode": self._lmode.currentData(),
+            "lidar1_topic": self._l1topic.text(), "lidar2_topic": self._l2topic.text(),
+            "lidar2_x_m": self._l2x.value(), "lidar2_y_m": self._l2y.value(), "lidar2_yaw_deg": self._l2yaw.value(),
             "stop": {s: self._zs[("stop", s)].value() for s in RP.SIDES},
             "slow": {s: self._zs[("slow", s)].value() for s in RP.SIDES},
             "slow_linear_mps": self._slin.value(), "slow_angular_rps": self._sang.value(),
@@ -363,6 +392,9 @@ class SafetyPage(QWidget):
         self._name.setText(p["name"]); self._len.setValue(p["length_m"]); self._wid.setValue(p["width_m"])
         self._cx.setValue(p["center_x_m"]); self._cy.setValue(p["center_y_m"])
         self._lx.setValue(p["lidar_x_m"]); self._ly.setValue(p["lidar_y_m"]); self._lyaw.setValue(p["lidar_yaw_deg"])
+        self._lmode.setCurrentIndex(max(0, self._lmode.findData(p["lidar_mode"])))
+        self._l1topic.setText(p["lidar1_topic"]); self._l2topic.setText(p["lidar2_topic"])
+        self._l2x.setValue(p["lidar2_x_m"]); self._l2y.setValue(p["lidar2_y_m"]); self._l2yaw.setValue(p["lidar2_yaw_deg"])
         for kind in ("stop", "slow"):
             for s in RP.SIDES:
                 self._zs[(kind, s)].setValue(p[kind][s])
@@ -373,6 +405,7 @@ class SafetyPage(QWidget):
         self._fmax.setValue(p["max_height_mm"]); self._fahead.setValue(p["fork"]["bypass_ahead_m"]); self._fspeed.setValue(p["fork"]["insert_speed_mps"])
         self._fork_box.setVisible(p["robot_type"] == "forklift")
         self._loading = False
+        self._update_lidar_visibility(p["lidar_mode"])
         self.editor.set_profile(p); self._update_fp()
 
     def _load_active(self):
@@ -388,8 +421,18 @@ class SafetyPage(QWidget):
             return
         self.editor.set_profile(self._current())
         self._fork_box.setVisible(self._type.currentData() == "forklift")
+        self._update_lidar_visibility(self._lmode.currentData())
         self._fill_zone_spins_from_editor()
         self._update_fp(); self._set_dirty(True)
+
+    def _update_lidar_visibility(self, mode: str):
+        """merged: one scan topic (set in the node), the pose below is only a fallback when TF is missing.
+        dual: two lidars, each with its own topic and pose."""
+        dual = mode == "dual"
+        self._l2_box.setVisible(dual)
+        for w in (self._llbl["t1"], self._l1topic):
+            w.setVisible(dual)
+        self._l1_box.setTitle(tr("sf_l1_box") if dual else tr("sf_l1_single"))
 
     def _fill_zone_spins_from_editor(self):
         self._loading = True
@@ -469,7 +512,19 @@ class SafetyPage(QWidget):
         self.apply()
 
     # -- live data ---------------------------------------------------------------------
+    def feed_points(self, payload: str):
+        """Points exactly as the safety_monitor classifies them (base frame, both lidars combined)."""
+        try:
+            flat = json.loads(payload).get("pts") or []
+        except (ValueError, AttributeError):
+            return
+        flat = flat[: len(flat) // 2 * 2]
+        self._points_t = _time.monotonic()
+        self.editor.set_scan_points(np.asarray(flat, dtype=float).reshape(-1, 2) if flat else np.zeros((0, 2)))
+
     def feed_scan(self, angle_min, angle_inc, range_min, range_max, ranges):
+        if _time.monotonic() - self._points_t < 1.5:      # the node's own points are better: skip the raw /scan
+            return
         st = self.editor.state or {}
         pose = None
         if st.get("pose_source") in ("tf", "same_frame") and st.get("lidar_pose"):
@@ -518,6 +573,10 @@ class SafetyPage(QWidget):
         self._chain_box.setTitle(tr("sd_title")); self._update_active_label(); self._refresh_chain()
         self._prof_box.setTitle(tr("sf_profile")); self._robot_box.setTitle(tr("sf_robot_box"))
         self._lidar_box.setTitle(tr("sf_lidar_box")); self._zone_box.setTitle(tr("sf_zone_box")); self._beh_box.setTitle(tr("sf_beh_box"))
+        self._lmode_lbl.setText(tr("sf_lidar_mode"))
+        self._lmode.setItemText(0, tr("sf_lmode_merged")); self._lmode.setItemText(1, tr("sf_lmode_dual"))
+        self._l2_box.setTitle(tr("sf_l2_box")); self._lidar_hint.setText(tr("sf_lidar_hint"))
+        self._update_lidar_visibility(self._lmode.currentData() or "merged")
         self._b_fl.setText(tr("sf_new_forklift")); self._type_lbl.setText(tr("sf_type"))
         self._type.setItemText(0, tr("rt_agv")); self._type.setItemText(1, tr("rt_forklift")); self._fork_box.setTitle(tr("sf_fork_box"))
         for k, key in (("flen", "sf_fork_len"), ("fwid", "sf_fork_wid"), ("lwid", "sf_load_wid"), ("fmax", "sf_max_h"), ("fahead", "sf_bypass_ahead"), ("fspeed", "sf_ins_speed")):
@@ -527,7 +586,8 @@ class SafetyPage(QWidget):
             b.setText(tr(k))
         for k, key in (("name", "sf_name"), ("len", "sf_length"), ("wid", "sf_width"), ("cx", "sf_cx"), ("cy", "sf_cy")):
             self._lbl[k].setText(tr(key))
-        for k, key in (("lx", "sf_lx"), ("ly", "sf_ly"), ("lyaw", "sf_lyaw")):
+        for k, key in (("lx", "sf_lx"), ("ly", "sf_ly"), ("lyaw", "sf_lyaw"), ("l2x", "sf_lx"), ("l2y", "sf_ly"),
+                       ("l2yaw", "sf_lyaw"), ("t1", "sf_ltopic"), ("t2", "sf_ltopic")):
             self._llbl[k].setText(tr(key))
         for k, key in (("slin", "sf_slow_lin"), ("sang", "sf_slow_ang"), ("minpts", "sf_minpts")):
             self._blbl[k].setText(tr(key))

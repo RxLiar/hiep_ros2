@@ -1,2 +1,0 @@
-[console_scripts]
-hmi = agv_hmi.main:main

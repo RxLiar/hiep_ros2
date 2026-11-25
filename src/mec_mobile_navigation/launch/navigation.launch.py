@@ -47,6 +47,27 @@ def generate_launch_description():
         description='Flag to enable use_sim_time'
     )
 
+    safety_arg = DeclareLaunchArgument(
+        'safety',
+        default_value='true',
+        description='Run hiep_robot2 safety_monitor (/cmd_vel -> /cmd_vel_safe)'
+    )
+
+    safety_monitor = Node(
+        package='hiep_robot2',
+        executable='safety_monitor_node',
+        name='safety_monitor',
+        output='screen',
+        parameters=[
+            os.path.join(
+                get_package_share_directory('hiep_robot2'),
+                'config', 'safety_monitor.yaml'
+            ),
+            {'use_sim_time': LaunchConfiguration('use_sim_time')},
+        ],
+        condition=IfCondition(LaunchConfiguration('safety')),
+    )
+
     map_arg = DeclareLaunchArgument(
         'map',
         default_value=default_map_path,
@@ -143,9 +164,11 @@ def generate_launch_description():
     ld.add_action(rviz_config_arg)
     ld.add_action(sim_time_arg)
     ld.add_action(map_arg)
+    ld.add_action(safety_arg)
     ld.add_action(laser_merger)
     ld.add_action(ekf_node)
     ld.add_action(rviz_node)
     ld.add_action(localization_launch)
     ld.add_action(navigation_launch)
+    ld.add_action(safety_monitor)
     return ld

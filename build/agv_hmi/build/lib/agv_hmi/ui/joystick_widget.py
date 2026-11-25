@@ -8,13 +8,14 @@ joystick_widget.py — Virtual joystick overlay
 import math
 import weakref
 
-from PyQt6.QtWidgets import QWidget, QToolTip
+from PyQt6.QtWidgets import QWidget, QToolTip, QPushButton, QMessageBox
 from PyQt6.QtGui import QPainter, QColor, QPen, QBrush, QRadialGradient, QRegion
 from PyQt6.QtCore import Qt, QPointF, QRect, QTimer, QVariantAnimation, QEvent, pyqtSignal
 
 from agv_hmi.core import prefs
 from agv_hmi.ui import anim
 from agv_hmi.ui.i18n import tr
+from agv_hmi.ui.safety_override import OVERRIDE
 
 _INSTANCES: "weakref.WeakSet" = weakref.WeakSet()
 
@@ -32,6 +33,8 @@ class JoystickWidget(QWidget):
     KNOB_R   = 22    # bán kính núm
     MAX_LIN  = 1.0   # m/s tối đa (nhân với max_linear từ velocity panel)
     MAX_ANG  = 1.5   # rad/s tối đa
+
+    BTN_H = 26       # height of the Engineer "safety off" button above the stick
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -62,6 +65,19 @@ class JoystickWidget(QWidget):
         self._t_anim.valueChanged.connect(self._on_t)
         self._t_anim.finished.connect(self._after_t)
         _INSTANCES.add(self)
+
+        # 4.8.0: Engineer only - switch the safety zones off while teleoperating (shared by all joysticks)
+        self._engineer = False
+        self._top = 0
+        self._btn = QPushButton(self)
+        self._btn.setCheckable(True)
+        self._btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._btn.setGeometry(0, 0, 150, self.BTN_H)
+        self._btn.hide()
+        self._btn.toggled.connect(self._on_override_toggled)
+        OVERRIDE.changed.connect(self._sync_override)
+        self._style_btn(False)
+
         if prefs.get("ui_joystick_collapsed"):
             self._apply_collapsed(True, animate=False)
 
@@ -71,6 +87,52 @@ class JoystickWidget(QWidget):
         """Gọi mỗi khi user thay đổi velocity setup panel."""
         self._max_linear  = max(0.01, linear)
         self._max_angular = max(0.01, angular)
+
+    def set_engineer(self, engineer: bool):
+        """Show the 'safety off' button (Engineer role only) and make room for it above the stick."""
+        engineer = bool(engineer)
+        if engineer == self._engineer:
+            return
+        self._engineer = engineer
+        self._top = (self.BTN_H + 4) if engineer else 0
+        self.setFixedSize(150, 150 + self._top)
+        self._center = QPointF(75, 75 + self._top)
+        self._knob = QPointF(self._center)
+        self._chip_c = QPointF(17, 133 + self._top)
+        self._btn.setVisible(engineer)
+        if not engineer:
+            OVERRIDE.set(False)
+        self._after_t()
+        self.update()
+
+    def _style_btn(self, on: bool):
+        self._btn.setText(tr("joy_safety_off") if on else tr("joy_safety_on"))
+        self._btn.setToolTip(tr("joy_safety_tip"))
+        if on:
+            self._btn.setStyleSheet("QPushButton{background:#F85149;color:white;font-weight:700;border:1px solid #FFB3AE;"
+                                    "border-radius:6px;font-size:11px;}")
+        else:
+            self._btn.setStyleSheet("QPushButton{background:rgba(13,17,23,215);color:#3FB950;border:1px solid #3FB950;"
+                                    "border-radius:6px;font-size:11px;}QPushButton:hover{background:rgba(63,185,80,60);}")
+
+    def _on_override_toggled(self, checked: bool):
+        if checked and not OVERRIDE.confirmed:
+            ans = QMessageBox.warning(self.window(), tr("joy_safety_title"), tr("joy_safety_confirm"),
+                                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                      QMessageBox.StandardButton.No)
+            if ans != QMessageBox.StandardButton.Yes:
+                self._btn.blockSignals(True); self._btn.setChecked(False); self._btn.blockSignals(False)
+                return
+            OVERRIDE.confirmed = True
+        OVERRIDE.set(checked)
+
+    def _sync_override(self, on: bool):
+        """Another joystick (or MainWindow, e.g. a mission started) changed the shared switch."""
+        self._btn.blockSignals(True); self._btn.setChecked(on); self._btn.blockSignals(False)
+        self._style_btn(on)
+
+    def retranslate(self):
+        self._style_btn(OVERRIDE.is_on())
 
     def is_collapsed(self) -> bool:
         return self._collapsed
@@ -111,10 +173,13 @@ class JoystickWidget(QWidget):
         self.update()
 
     def _after_t(self):
-        if self._collapsed:   # only the chip may catch the mouse, the map below stays usable
+        if self._collapsed:   # only the chip (and the Engineer button) may catch the mouse, the map below stays usable
             r = int(self._chip_r) + 3
-            self.setMask(QRegion(QRect(int(self._chip_c.x()) - r, int(self._chip_c.y()) - r,
-                                       2 * r, 2 * r), QRegion.RegionType.Ellipse))
+            region = QRegion(QRect(int(self._chip_c.x()) - r, int(self._chip_c.y()) - r,
+                                   2 * r, 2 * r), QRegion.RegionType.Ellipse)
+            if self._engineer:
+                region = region.united(QRegion(QRect(0, 0, 150, self.BTN_H)))
+            self.setMask(region)
         else:
             self.clearMask()
         self.update()

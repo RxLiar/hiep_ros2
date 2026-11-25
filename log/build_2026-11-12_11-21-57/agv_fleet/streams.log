@@ -1,0 +1,59 @@
+[0.951s] Invoking command in '/home/hiep0247/hiep_ros2/src/agv_fleet': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet/install.log --install-scripts $base/lib/agv_fleet --single-version-externally-managed install_data
+[1.201s] running egg_info
+[1.202s] creating ../../build/agv_fleet/agv_fleet.egg-info
+[1.222s] writing ../../build/agv_fleet/agv_fleet.egg-info/PKG-INFO
+[1.222s] writing dependency_links to ../../build/agv_fleet/agv_fleet.egg-info/dependency_links.txt
+[1.222s] writing entry points to ../../build/agv_fleet/agv_fleet.egg-info/entry_points.txt
+[1.222s] writing requirements to ../../build/agv_fleet/agv_fleet.egg-info/requires.txt
+[1.222s] writing top-level names to ../../build/agv_fleet/agv_fleet.egg-info/top_level.txt
+[1.223s] writing manifest file '../../build/agv_fleet/agv_fleet.egg-info/SOURCES.txt'
+[1.264s] reading manifest file '../../build/agv_fleet/agv_fleet.egg-info/SOURCES.txt'
+[1.265s] writing manifest file '../../build/agv_fleet/agv_fleet.egg-info/SOURCES.txt'
+[1.266s] running build
+[1.266s] running build_py
+[1.266s] creating /home/hiep0247/hiep_ros2/build/agv_fleet/build
+[1.267s] creating /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib
+[1.267s] creating /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet
+[1.267s] copying agv_fleet/protocol.py -> /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet
+[1.267s] copying agv_fleet/fleet_simulator.py -> /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet
+[1.267s] copying agv_fleet/fleet_agent.py -> /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet
+[1.267s] copying agv_fleet/map_registry.py -> /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet
+[1.267s] copying agv_fleet/fleet_server.py -> /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet
+[1.267s] copying agv_fleet/__init__.py -> /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet
+[1.267s] running install
+[1.280s] running install_lib
+[1.301s] creating /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet
+[1.301s] copying /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet/protocol.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet
+[1.301s] copying /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet/fleet_simulator.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet
+[1.302s] copying /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet/fleet_agent.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet
+[1.302s] copying /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet/map_registry.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet
+[1.302s] copying /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet/fleet_server.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet
+[1.302s] copying /home/hiep0247/hiep_ros2/build/agv_fleet/build/lib/agv_fleet/__init__.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet
+[1.302s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet/protocol.py to protocol.cpython-312.pyc
+[1.305s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet/fleet_simulator.py to fleet_simulator.cpython-312.pyc
+[1.306s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet/fleet_agent.py to fleet_agent.cpython-312.pyc
+[1.309s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet/map_registry.py to map_registry.cpython-312.pyc
+[1.311s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet/fleet_server.py to fleet_server.cpython-312.pyc
+[1.311s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet/__init__.py to __init__.cpython-312.pyc
+[1.312s] running install_data
+[1.312s] creating /home/hiep0247/hiep_ros2/install/agv_fleet/share/ament_index
+[1.312s] creating /home/hiep0247/hiep_ros2/install/agv_fleet/share/ament_index/resource_index
+[1.312s] creating /home/hiep0247/hiep_ros2/install/agv_fleet/share/ament_index/resource_index/packages
+[1.312s] copying resource/agv_fleet -> /home/hiep0247/hiep_ros2/install/agv_fleet/share/ament_index/resource_index/packages
+[1.312s] copying package.xml -> /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet
+[1.312s] creating /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/launch
+[1.312s] copying launch/fleet_server.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/launch
+[1.312s] copying launch/fleet_agent.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/launch
+[1.312s] copying launch/fleet_simulator.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/launch
+[1.313s] creating /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/config
+[1.313s] copying config/pc2_agv002.yaml -> /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/config
+[1.313s] copying config/pc1_agv001.yaml -> /home/hiep0247/hiep_ros2/install/agv_fleet/share/agv_fleet/config
+[1.313s] running install_egg_info
+[1.341s] Copying ../../build/agv_fleet/agv_fleet.egg-info to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages/agv_fleet-0.1.0-py3.12.egg-info
+[1.342s] running install_scripts
+[1.511s] Installing fleet_agent script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[1.511s] Installing fleet_map_id script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[1.511s] Installing fleet_server script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[1.511s] Installing fleet_simulator script to /home/hiep0247/hiep_ros2/install/agv_fleet/lib/agv_fleet
+[1.512s] writing list of installed files to '/home/hiep0247/hiep_ros2/build/agv_fleet/install.log'
+[1.599s] Invoked command in '/home/hiep0247/hiep_ros2/src/agv_fleet' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet/install.log --install-scripts $base/lib/agv_fleet --single-version-externally-managed install_data

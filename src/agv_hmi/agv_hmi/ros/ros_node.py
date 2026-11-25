@@ -131,6 +131,7 @@ class RosInterface(QObject):
     cmd_vel_signal         = pyqtSignal(float, float)          # observed /cmd_vel
     joy_signal             = pyqtSignal(list, list)            # axes, buttons
     safety_state_signal    = pyqtSignal(str)                   # JSON from /safety_state
+    safety_points_signal   = pyqtSignal(str)                   # JSON from /safety_points (points the safety node classifies)
     scan_raw_signal        = pyqtSignal(float, float, float, float, list)  # angle_min, inc, rmin, rmax, ranges
     forklift_status_signal = pyqtSignal(str)                   # JSON from /forklift/status
 
@@ -304,6 +305,9 @@ class RosInterface(QObject):
         self._forklift_cmd_pub = self.node.create_publisher(String, "/forklift/command", 10)
         self.node.create_subscription(String, "/forklift/status", self._forklift_status_cb, 10)
         self.node.create_subscription(String, "/safety_state", self._safety_state_cb, 10)
+        self.node.create_subscription(String, "/safety_points", self._safety_points_cb, 1)
+        # Engineer teleop override: must be re-published (the node lets it expire after <= 2 s)
+        self._safety_override_pub = self.node.create_publisher(String, "/safety_override", 10)
         self._scan_raw_t = 0.0
         self.node.create_timer(1.0, self._publish_rates)
 
@@ -382,6 +386,22 @@ class RosInterface(QObject):
 
     def _safety_state_cb(self, msg: String):
         self.safety_state_signal.emit(msg.data)
+
+    def set_fleet_robot_id(self, robot_id: str):
+        """The Fleet control panel changed this robot's ID: /fleet/map_context must be addressed to the new one."""
+        rid = str(robot_id or "").strip().upper()
+        if _ROBOT_ID_RE.fullmatch(rid):
+            self._fleet_robot_id = rid
+
+    def _safety_points_cb(self, msg: String):
+        self.safety_points_signal.emit(msg.data)
+
+    def publish_safety_override(self, active: bool):
+        """Engineer teleop: switch the slow / stop zones off (True) or back on (False). Call at ~5 Hz while on."""
+        if not self._ros_context_alive():
+            return
+        payload = {"id": "hmi_teleop", "active": bool(active), "ttl": 1.0}
+        self._safe_publish(self._safety_override_pub, String(data=json.dumps(payload)))
 
     def _forklift_status_cb(self, msg: String):
         self.forklift_status_signal.emit(msg.data)

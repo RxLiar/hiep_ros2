@@ -15,7 +15,8 @@ from PyQt6.QtGui import (
     QFont,
     QPainterPath,   # FIX 1: thêm QPainterPath cho _draw_nav_path()
 )
-from PyQt6.QtCore import Qt, QPoint, QPointF, QRectF, QLineF, pyqtSignal
+from agv_hmi.core.map_editor import MapEditor, snap_angle, WALL, FREE, UNKNOWN
+from PyQt6.QtCore import Qt, QEvent, QPoint, QPointF, QRectF, QLineF, QTimer, pyqtSignal
 #                                               ^^^^^ FIX 2: thêm QRectF, bỏ inline import trong _draw_robot()
 
 
@@ -46,12 +47,21 @@ MODE_GOAL = "goal"
 MODE_POSE = "pose"
 MODE_MEASURE = "measure"
 MODE_ZONE = "zone"
+MODE_EDIT = "edit"                 # 4.9.0: manual map editing (brush / eraser / line / rectangle)
+
+EDIT_TOOLS = ("wall", "erase", "unknown", "line", "rect_clear", "rect_wall")
+_EDIT_VALUE = {"wall": WALL, "erase": FREE, "unknown": UNKNOWN}
+_EDIT_COLOR = {"wall": QColor(240, 246, 252, 230), "erase": QColor(63, 185, 80, 230),
+               "unknown": QColor(139, 148, 158, 230), "line": QColor(248, 81, 73, 230),
+               "rect_clear": QColor(63, 185, 80, 230), "rect_wall": QColor(248, 81, 73, 230)}
 
 
 class MapWidget(QWidget):
     goal_selected    = pyqtSignal(float, float)
     pose_estimate_set = pyqtSignal(float, float, float)
     zones_changed = pyqtSignal()
+    edit_state_changed = pyqtSignal(bool, bool)     # can_undo, can_redo
+    edit_ended = pyqtSignal()                       # the grid was replaced while editing: editing stopped
 
     def __init__(self):
         super().__init__()
@@ -90,6 +100,21 @@ class MapWidget(QWidget):
         self._robot_cx = 0.0
         self._safety: dict | None = None
 
+        # manual map editing (4.9.0)
+        self._editor: MapEditor | None = None
+        self._edit_tool = "wall"
+        self._edit_brush_m = 0.10
+        self._edit_snap = False
+        self._edit_drag: tuple[float, float] | None = None      # start (cell coords) of a line / rectangle
+        self._edit_cur: tuple[float, float] | None = None       # mouse position (cell coords)
+        self._edit_stroking = False
+        self._edit_last: tuple[float, float] | None = None
+        self._measure_multi = False
+        self._cursor_world: tuple[float, float] | None = None
+        self._render_timer = QTimer(self)
+        self._render_timer.setSingleShot(True)
+        self._render_timer.timeout.connect(self._do_render)
+
         self._zoom      = 1.0
         self._pan_x     = 0.0
         self._pan_y     = 0.0
@@ -108,9 +133,12 @@ class MapWidget(QWidget):
     def set_mode(self, mode: str):
         self._mode = mode
         self.setCursor(
-            Qt.CursorShape.CrossCursor if mode in (MODE_POSE, MODE_MEASURE, MODE_ZONE)
+            Qt.CursorShape.CrossCursor if mode in (MODE_POSE, MODE_MEASURE, MODE_ZONE, MODE_EDIT)
             else Qt.CursorShape.ArrowCursor
         )
+        if mode != MODE_EDIT:
+            self._edit_drag = None
+            self._edit_cur = None
         if mode != MODE_MEASURE:
             self._measure_pts = []
         if mode != MODE_ZONE:
@@ -152,7 +180,33 @@ class MapWidget(QWidget):
         self._zones = [dict(z) for z in zones]
         self.update()
 
+    def event(self, ev):
+        """The window has a global Esc shortcut (leave focus mode). While a drag or a measurement is
+        open, Esc must reach this widget first, so claim it (ShortcutOverride)."""
+        if ev.type() == QEvent.Type.ShortcutOverride and ev.key() == Qt.Key.Key_Escape:
+            if ((self._mode == MODE_EDIT and self._editor is not None and self._edit_drag is not None)
+                    or (self._mode == MODE_MEASURE and self._measure_pts)):
+                ev.accept()
+                return True
+        return super().event(ev)
+
     def keyPressEvent(self, ev):
+        if self._mode == MODE_EDIT and self._editor is not None:
+            ctrl = bool(ev.modifiers() & Qt.KeyboardModifier.ControlModifier)
+            shift = bool(ev.modifiers() & Qt.KeyboardModifier.ShiftModifier)
+            if ctrl and ev.key() == Qt.Key.Key_Z:
+                self.edit_redo() if shift else self.edit_undo()
+                return
+            if ctrl and ev.key() == Qt.Key.Key_Y:
+                self.edit_redo()
+                return
+            if ev.key() == Qt.Key.Key_Escape:
+                self._edit_drag = None
+                self.update()
+                return
+        if self._mode == MODE_MEASURE and ev.key() == Qt.Key.Key_Escape:
+            self.clear_measure()
+            return
         if ev.key() == Qt.Key.Key_Escape and self._mode == MODE_ZONE:
             self._zone_draft = []
             self.set_mode(MODE_GOAL)
@@ -216,6 +270,7 @@ class MapWidget(QWidget):
                  origin_y: float, segments=None, wall_thickness_m: float = 0.10,
                  reset_view: bool = False):
         """Show an occupancy grid (optionally with vector wall segments on top)."""
+        self._abort_edit()                 # the array being edited is replaced
         h, w = grid.shape
         first = self._pixmap is None
         self._grid = grid.astype(np.int16)
@@ -324,6 +379,7 @@ class MapWidget(QWidget):
                       segments=segs, wall_thickness_m=thick, reset_view=True)
 
     def clear_map(self):
+        self._abort_edit()
         self._pixmap     = None
         self._grid       = None
         self._segments   = []
@@ -382,10 +438,14 @@ class MapWidget(QWidget):
                 self._zone_draft.append((wx, wy))
                 self.update()
             elif self._mode == MODE_MEASURE:
-                if len(self._measure_pts) >= 2:
+                if not self._measure_multi and len(self._measure_pts) >= 2:
                     self._measure_pts = []
-                self._measure_pts.append((wx, wy))
+                if len(self._measure_pts) < 60:
+                    self._measure_pts.append((wx, wy))
                 self.update()
+            elif self._mode == MODE_EDIT and self._editor is not None:
+                self.setFocus()
+                self._edit_press(wx, wy)
             elif self._mode == MODE_POSE:
                 self._pose_drag_origin = (wx, wy)
                 self._pose_dragging    = True
@@ -399,6 +459,12 @@ class MapWidget(QWidget):
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
     def mouseMoveEvent(self, ev):
+        if self._mode in (MODE_EDIT, MODE_MEASURE) and self._pixmap is not None:
+            wx, wy = self._widget_to_world(ev.pos().x(), ev.pos().y())
+            self._cursor_world = (wx, wy)
+            if self._mode == MODE_EDIT and self._editor is not None:
+                self._edit_move(wx, wy)
+            self.update()
         if self._drag_start is not None:
             dx = ev.pos().x() - self._drag_start.x()
             dy = ev.pos().y() - self._drag_start.y()
@@ -420,6 +486,8 @@ class MapWidget(QWidget):
                 Qt.CursorShape.CrossCursor if self._mode == MODE_POSE
                 else Qt.CursorShape.ArrowCursor
             )
+        elif ev.button() == Qt.MouseButton.LeftButton and self._mode == MODE_EDIT and self._editor is not None:
+            self._edit_release()
         elif ev.button() == Qt.MouseButton.LeftButton and self._pose_dragging:
             self._pose_dragging = False
             if self._pose_est:
@@ -478,7 +546,9 @@ class MapWidget(QWidget):
         self._draw_robot(painter, bs)
 
         self._draw_measure(painter)
+        self._draw_edit_overlay(painter, bs)
         painter.restore()
+        self._draw_cursor_readout(painter)
 
         self._draw_scale_bar(painter, bs)
         if self._show_minimap:
@@ -539,15 +609,239 @@ class MapWidget(QWidget):
         r = max(2.0, 4.0 / self._zoom)
         for x, y in px:
             painter.drawEllipse(QPointF(x, y), r, r)
-        if len(px) == 2:
-            painter.drawLine(QPointF(*px[0]), QPointF(*px[1]))
-            d = math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1])
-            f = QFont()
-            f.setPixelSize(max(8, int(14 / self._zoom)))
-            f.setBold(True)
-            painter.setFont(f)
-            mx, my = (px[0][0] + px[1][0]) / 2, (px[0][1] + px[1][1]) / 2
-            painter.drawText(QPointF(mx + r * 2, my - r * 2), f"{d:.2f} m")
+        f = QFont()
+        f.setPixelSize(max(8, int(14 / self._zoom)))
+        f.setBold(True)
+        painter.setFont(f)
+        total = 0.0
+        for i in range(1, len(px)):
+            painter.drawLine(QPointF(*px[i - 1]), QPointF(*px[i]))
+            dx, dy = pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]
+            d = math.hypot(dx, dy)
+            total += d
+            txt = f"{d:.2f} m"
+            if len(pts) == 2:                       # single segment: also show the components and the angle
+                txt += f"  (Δx {dx:+.2f}, Δy {dy:+.2f}, {math.degrees(math.atan2(dy, dx)):.1f}°)"
+            mx, my = (px[i - 1][0] + px[i][0]) / 2, (px[i - 1][1] + px[i][1]) / 2
+            painter.drawText(QPointF(mx + r * 2, my - r * 2), txt)
+        if len(pts) >= 3:                           # polyline: running total at the last point
+            painter.drawText(QPointF(px[-1][0] + r * 2, px[-1][1] + r * 6), f"Σ {total:.2f} m")
+        painter.restore()
+
+    # ── Measure tool (public) ────────────────────────────────────────
+
+    def set_measure_multi(self, on: bool):
+        """True: every click adds a point (polyline with a running total). False: two points, then restart."""
+        self._measure_multi = bool(on)
+        self._measure_pts = []
+        self.update()
+
+    def clear_measure(self):
+        self._measure_pts = []
+        self.update()
+
+    def measure_total(self) -> float:
+        p = self._measure_pts
+        return sum(math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]) for i in range(1, len(p)))
+
+    # ── Manual map editing (4.9.0) ───────────────────────────────────
+
+    def is_editing(self) -> bool:
+        return self._editor is not None
+
+    def begin_edit(self) -> bool:
+        """Start editing the grid that is shown. Vector walls are dropped (they would hide the edits)."""
+        if self._grid is None or self._grid.size == 0:
+            return False
+        if self._segments:
+            self._segments = []
+            self._render_grid()
+        self._editor = MapEditor(self._grid, self._resolution)
+        self.set_mode(MODE_EDIT)
+        self.setFocus()
+        self._emit_edit_state()
+        self.update()
+        return True
+
+    def end_edit(self):
+        if self._editor is None:
+            return
+        self._edit_stroking = False
+        self._editor.end()
+        self._editor = None
+        self.set_mode(MODE_GOAL)
+        self._render_grid()
+        self.update()
+
+    def _abort_edit(self):
+        """The grid array was replaced from outside (SLAM, clean map, load): stop editing quietly."""
+        if self._editor is not None:
+            self._editor = None
+            self._edit_stroking = False
+            self._edit_drag = None
+            if self._mode == MODE_EDIT:
+                self._mode = MODE_GOAL
+                self.setCursor(Qt.CursorShape.ArrowCursor)
+            self.edit_ended.emit()
+
+    def set_edit_tool(self, tool: str):
+        if tool in EDIT_TOOLS:
+            self._edit_tool = tool
+            self._edit_drag = None
+            self.update()
+
+    def set_edit_brush_m(self, metres: float):
+        self._edit_brush_m = max(0.02, float(metres))
+        self.update()
+
+    def set_edit_snap(self, on: bool):
+        self._edit_snap = bool(on)
+
+    def edit_undo(self):
+        if self._editor is not None and self._editor.undo():
+            self._render_grid(); self._emit_edit_state(); self.update()
+
+    def edit_redo(self):
+        if self._editor is not None and self._editor.redo():
+            self._render_grid(); self._emit_edit_state(); self.update()
+
+    def edit_thicken(self, cells: int) -> int:
+        n = self._editor.thicken(cells) if self._editor is not None else 0
+        self._render_grid(); self._emit_edit_state(); self.update()
+        return n
+
+    def edit_thin(self, cells: int) -> int:
+        n = self._editor.thin(cells) if self._editor is not None else 0
+        self._render_grid(); self._emit_edit_state(); self.update()
+        return n
+
+    def edit_clear_specks(self, min_cells: int = 4) -> int:
+        n = self._editor.clear_small_blobs(min_cells) if self._editor is not None else 0
+        self._render_grid(); self._emit_edit_state(); self.update()
+        return n
+
+    def has_edits(self) -> bool:
+        return self._editor is not None and self._editor.can_undo
+
+    def _emit_edit_state(self):
+        ed = self._editor
+        self.edit_state_changed.emit(bool(ed and ed.can_undo), bool(ed and ed.can_redo))
+
+    def _do_render(self):
+        if self._grid is not None:
+            self._render_grid()
+            self.update()
+
+    def _world_to_cell(self, wx: float, wy: float) -> tuple[float, float]:
+        return (wx - self._origin_x) / self._resolution, (wy - self._origin_y) / self._resolution
+
+    def _cell_to_world(self, u: float, v: float) -> tuple[float, float]:
+        return self._origin_x + u * self._resolution, self._origin_y + v * self._resolution
+
+    def _brush_cells(self) -> float:
+        return max(1.0, self._edit_brush_m / self._resolution)
+
+    def _edit_press(self, wx: float, wy: float):
+        u, v = self._world_to_cell(wx, wy)
+        self._edit_cur = (u, v)
+        if self._edit_tool in _EDIT_VALUE:               # freehand brush
+            self._editor.begin()
+            self._edit_stroking = True
+            self._editor.line(u, v, u, v, self._brush_cells(), _EDIT_VALUE[self._edit_tool])
+            self._edit_last = (u, v)
+            if not self._render_timer.isActive():
+                self._render_timer.start(30)
+        else:                                            # line / rectangle: preview until release
+            self._edit_drag = (u, v)
+        self.update()
+
+    def _edit_move(self, wx: float, wy: float):
+        u, v = self._world_to_cell(wx, wy)
+        if self._edit_stroking and self._edit_last is not None:
+            self._editor.line(self._edit_last[0], self._edit_last[1], u, v, self._brush_cells(),
+                              _EDIT_VALUE[self._edit_tool])
+            self._edit_last = (u, v)
+            if not self._render_timer.isActive():
+                self._render_timer.start(30)
+        elif self._edit_drag is not None and self._edit_tool == "line" and self._edit_snap:
+            u, v = snap_angle(self._edit_drag[0], self._edit_drag[1], u, v, 45.0)
+        self._edit_cur = (u, v)
+
+    def _edit_release(self):
+        ed = self._editor
+        if self._edit_stroking:
+            self._edit_stroking = False
+            ed.end()
+        elif self._edit_drag is not None and self._edit_cur is not None:
+            (u0, v0), (u1, v1) = self._edit_drag, self._edit_cur
+            ed.begin()
+            if self._edit_tool == "line":
+                ed.line(u0, v0, u1, v1, self._brush_cells(), WALL)
+            elif self._edit_tool == "rect_clear":
+                ed.rect(u0, v0, u1, v1, FREE)
+            elif self._edit_tool == "rect_wall":
+                ed.rect(u0, v0, u1, v1, WALL)
+            ed.end()
+        self._edit_drag = None
+        self._render_timer.stop()
+        self._render_grid()
+        self._emit_edit_state()
+        self.update()
+
+    def _draw_edit_overlay(self, painter: QPainter, bs: float):
+        if self._mode != MODE_EDIT or self._editor is None or self._edit_cur is None:
+            return
+        tool = self._edit_tool
+        col = _EDIT_COLOR.get(tool, QColor(255, 255, 255))
+        cells = self._brush_cells()
+
+        def px(u, v):
+            return self._w2px(*self._cell_to_world(u, v))
+
+        painter.save()
+        u, v = self._edit_cur
+        if tool in ("wall", "erase", "unknown") or (tool == "line" and self._edit_drag is None):
+            cx, cy = px(u, v)
+            r = cells / 2.0 * bs
+            painter.setPen(QPen(col, max(1.0, 1.5 / self._zoom)))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawEllipse(QPointF(cx, cy), r, r)
+        elif tool == "line" and self._edit_drag is not None:
+            p0, p1 = px(*self._edit_drag), px(u, v)
+            wide = QPen(QColor(col.red(), col.green(), col.blue(), 110), cells * bs)
+            wide.setCapStyle(Qt.PenCapStyle.RoundCap)
+            painter.setPen(wide)
+            painter.drawLine(QPointF(*p0), QPointF(*p1))
+            painter.setPen(QPen(col, max(1.0, 1.5 / self._zoom)))
+            painter.drawLine(QPointF(*p0), QPointF(*p1))
+        elif tool in ("rect_clear", "rect_wall") and self._edit_drag is not None:
+            p0, p1 = px(*self._edit_drag), px(u, v)
+            painter.setPen(QPen(col, max(1.0, 1.5 / self._zoom), Qt.PenStyle.DashLine))
+            painter.setBrush(QBrush(QColor(col.red(), col.green(), col.blue(), 60)))
+            painter.drawRect(QRectF(min(p0[0], p1[0]), min(p0[1], p1[1]), abs(p0[0] - p1[0]), abs(p0[1] - p1[1])))
+        painter.restore()
+
+    def _draw_cursor_readout(self, painter: QPainter):
+        """x / y of the mouse in metres (and the cell state) while editing or measuring."""
+        if self._mode not in (MODE_EDIT, MODE_MEASURE) or self._cursor_world is None or self._grid is None:
+            return
+        wx, wy = self._cursor_world
+        u, v = self._world_to_cell(wx, wy)
+        r, c = int(math.floor(v)), int(math.floor(u))
+        h, w = self._grid.shape
+        state = "—"
+        if 0 <= r < h and 0 <= c < w:
+            val = int(self._grid[r, c])
+            state = "■" if val > 50 else ("□" if val == 0 else "?")
+        text = f"x {wx:6.2f}  y {wy:6.2f} m   {state}"
+        painter.save()
+        f = QFont(); f.setPixelSize(12); f.setBold(True); painter.setFont(f)
+        tw = painter.fontMetrics().horizontalAdvance(text) + 16
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QBrush(QColor(13, 17, 23, 215)))
+        painter.drawRoundedRect(QRectF(10, 10, tw, 24), 6, 6)
+        painter.setPen(QColor(230, 237, 243))
+        painter.drawText(QRectF(10, 10, tw, 24), Qt.AlignmentFlag.AlignCenter, text)
         painter.restore()
 
     def _draw_scale_bar(self, painter: QPainter, bs: float):

@@ -13,6 +13,11 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument(
+                "fleet_domain",
+                default_value="20",
+                description="ROS_DOMAIN_ID of the Fleet network.",
+            ),
+            DeclareLaunchArgument(
                 "snapshot_hz",
                 default_value="5.0",
             ),
@@ -25,7 +30,7 @@ def generate_launch_description():
                 default_value="3.0",
             ),
 
-            SetEnvironmentVariable("ROS_DOMAIN_ID", "20"),
+            SetEnvironmentVariable("ROS_DOMAIN_ID", LaunchConfiguration("fleet_domain")),
             SetEnvironmentVariable(
                 "ROS_AUTOMATIC_DISCOVERY_RANGE",
                 "SUBNET",

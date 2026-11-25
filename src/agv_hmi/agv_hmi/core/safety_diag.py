@@ -24,16 +24,30 @@ def diagnose(state: dict | None, local_sig: str | None, state_fresh: bool = True
         out.append((FAIL, "sd_direct", (state.get("input_topic", "/cmd_vel"), ", ".join(direct))))
     elif direct is not None:
         out.append((OK, "sd_direct_ok", (state.get("input_topic", "/cmd_vel"),)))
-    age = state.get("scan_age_s")
-    if age is None or age > 0.5:
-        out.append((FAIL, "sd_no_scan", ()))
+    if state.get("override"):
+        out.append((WARN, "sd_override", (", ".join(state["override"]),)))
+    if state.get("lidar_mode") == "dual" and state.get("lidars"):
+        # two lidars: report each one, so it is obvious which of them is missing
+        for lid in state["lidars"]:
+            n, topic, age = int(lid.get("idx", 0)) + 1, lid.get("topic", "?"), lid.get("age_s")
+            if age is None or age > 0.5:
+                out.append((FAIL, "sd_lidar_lost", (n, topic)))
+            else:
+                pose = lid.get("pose") or [0, 0, 0]
+                from_tf = lid.get("pose_source") in ("tf", "same_frame")
+                out.append((OK if from_tf else WARN, "sd_lidar_ok" if from_tf else "sd_lidar_profile",
+                            (n, topic, pose[0], pose[1], pose[2])))
     else:
-        out.append((OK, "sd_scan_ok", (state.get("scan_frame", "?"),)))
-    pose = state.get("lidar_pose") or [0, 0, 0]
-    if state.get("pose_source") in ("tf", "same_frame"):
-        out.append((OK, "sd_pose_tf", (pose[0], pose[1], pose[2], state.get("base_frame", ""))))
-    else:
-        out.append((WARN, "sd_pose_profile", (pose[0], pose[1], pose[2])))
+        age = state.get("scan_age_s")
+        if age is None or age > 0.5:
+            out.append((FAIL, "sd_no_scan", ()))
+        else:
+            out.append((OK, "sd_scan_ok", (state.get("scan_frame", "?"),)))
+        pose = state.get("lidar_pose") or [0, 0, 0]
+        if state.get("pose_source") in ("tf", "same_frame"):
+            out.append((OK, "sd_pose_tf", (pose[0], pose[1], pose[2], state.get("base_frame", ""))))
+        else:
+            out.append((WARN, "sd_pose_profile", (pose[0], pose[1], pose[2])))
     if local_sig and state.get("profile_sig") and local_sig != state.get("profile_sig"):
         out.append((FAIL, "sd_sig_bad", ()))
     elif local_sig:

@@ -28,6 +28,10 @@ DEFAULT_PROFILE = {
     "slow": {"front": 1.00, "rear": 0.60, "left": 0.40, "right": 0.40},
     "slow_linear_mps": 0.15, "slow_angular_rps": 0.30,
     "safety_enabled": True, "require_scan": True, "min_points": 3,
+    # Lidar set-up: "merged" = ONE scan topic already in the base frame (/scan from laser_merger);
+    # "dual" = TWO lidars, each with its own topic and pose (lidar 1 = lidar_x/y/yaw_deg, lidar 2 = lidar2_*).
+    "lidar_mode": "merged", "lidar1_topic": "/front_lidar/scan", "lidar2_topic": "/rear_lidar/scan",
+    "lidar2_x_m": -0.9, "lidar2_y_m": 0.0, "lidar2_yaw_deg": 180.0,
     # "agv" = conveyor AGV, "forklift" = fork lift (adds the fork block below)
     "robot_type": "agv",
     "fork_length_m": 1.10,         # fork tips back to the carriage / body
@@ -46,6 +50,7 @@ DEFAULT_PROFILE = {
 }
 
 ROBOT_TYPES = ("agv", "forklift")
+LIDAR_MODES = ("merged", "dual")
 # starting point for a new fork-lift profile (the lidar position is a guess: set yours)
 FORKLIFT_PRESET = {"robot_type": "forklift", "length_m": 2.4, "width_m": 1.0, "center_x_m": 0.0,
                    "lidar_x_m": -0.6, "lidar_y_m": 0.0,
@@ -61,6 +66,12 @@ def _num(d, key, lo, hi, default):
         return default
 
 
+def _topic(v, default: str) -> str:
+    """Same rule as the ROS node: a topic must look like /abc/def."""
+    t = str(v).strip() if v is not None else ""
+    return t if t.startswith("/") and " " not in t and 1 < len(t) <= 120 else default
+
+
 def normalize(d: dict | None) -> dict:
     """Clamp every value to a sane range (same rules as the ROS node)."""
     base = copy.deepcopy(DEFAULT_PROFILE)
@@ -71,7 +82,8 @@ def normalize(d: dict | None) -> dict:
     for key, lo, hi in (("length_m", 0.1, 10.0), ("width_m", 0.1, 5.0), ("center_x_m", -5.0, 5.0),
                         ("center_y_m", -2.0, 2.0), ("lidar_x_m", -5.0, 5.0), ("lidar_y_m", -2.0, 2.0),
                         ("lidar_yaw_deg", -180.0, 180.0), ("slow_linear_mps", 0.02, 2.0),
-                        ("slow_angular_rps", 0.05, 3.0)):
+                        ("slow_angular_rps", 0.05, 3.0), ("lidar2_x_m", -5.0, 5.0),
+                        ("lidar2_y_m", -2.0, 2.0), ("lidar2_yaw_deg", -180.0, 180.0)):
         out[key] = _num(d, key, lo, hi, base[key])
     for zone in ("stop", "slow"):
         src = d.get(zone) if isinstance(d.get(zone), dict) else {}
@@ -92,6 +104,9 @@ def normalize(d: dict | None) -> dict:
                         ("slow_zone_mm", 10, 500), ("stall_s", 0.5, 10), ("blocked_s", 1, 20),
                         ("height_step_timeout_s", 5, 300), ("drive_step_timeout_s", 5, 300)):
         out["fork"][key] = _num(fsrc, key, lo, hi, base["fork"][key])
+    out["lidar_mode"] = d.get("lidar_mode") if d.get("lidar_mode") in LIDAR_MODES else base["lidar_mode"]
+    out["lidar1_topic"] = _topic(d.get("lidar1_topic"), base["lidar1_topic"])
+    out["lidar2_topic"] = _topic(d.get("lidar2_topic"), base["lidar2_topic"])
     out["safety_enabled"] = bool(d.get("safety_enabled", base["safety_enabled"]))
     out["require_scan"] = bool(d.get("require_scan", base["require_scan"]))
     try:
@@ -196,7 +211,9 @@ def signature(p: dict) -> str:
             [r(p["stop"][k]) for k in SIDES], [r(p["slow"][k]) for k in SIDES],
             r(p["slow_linear_mps"]), r(p["slow_angular_rps"]), bool(p["safety_enabled"]),
             bool(p["require_scan"]), int(p["min_points"]),
-            r(p["lidar_x_m"]), r(p["lidar_y_m"]), r(p["lidar_yaw_deg"])]
+            r(p["lidar_x_m"]), r(p["lidar_y_m"]), r(p["lidar_yaw_deg"]),
+            str(p["lidar_mode"]), str(p["lidar1_topic"]), str(p["lidar2_topic"]),
+            r(p["lidar2_x_m"]), r(p["lidar2_y_m"]), r(p["lidar2_yaw_deg"])]
     return hashlib.sha1(json.dumps(data).encode()).hexdigest()[:8]
 
 

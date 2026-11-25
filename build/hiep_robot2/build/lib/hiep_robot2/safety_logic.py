@@ -16,6 +16,13 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 SIDES = ("front", "rear", "left", "right")
+LIDAR_MODES = ("merged", "dual")
+
+
+def _topic(v, default: str) -> str:
+    """A ROS topic name typed in the HMI: must look like /abc/def, otherwise keep the default."""
+    t = str(v).strip() if v is not None else ""
+    return t if t.startswith("/") and " " not in t and 1 < len(t) <= 120 else default
 
 
 def _margins(src, default) -> Dict[str, float]:
@@ -46,6 +53,14 @@ class Profile:
     safety_enabled: bool = True
     require_scan: bool = True
     min_points: int = 3
+    # Lidar set-up. "merged": ONE scan topic already in the base frame (e.g. /scan from laser_merger).
+    # "dual": two lidars, each on its own topic with its own pose (lidar 1 = lidar_x/y/yaw_*, lidar 2 = lidar2_*).
+    lidar_mode: str = "merged"
+    lidar1_topic: str = "/front_lidar/scan"
+    lidar2_topic: str = "/rear_lidar/scan"
+    lidar2_x_m: float = -0.9
+    lidar2_y_m: float = 0.0
+    lidar2_yaw_deg: float = 180.0
 
     @classmethod
     def from_dict(cls, d: Optional[dict]) -> "Profile":
@@ -81,6 +96,13 @@ class Profile:
             p.min_points = max(1, min(50, int(d.get("min_points", p.min_points))))
         except (TypeError, ValueError):
             pass
+        mode = str(d.get("lidar_mode", p.lidar_mode))
+        p.lidar_mode = mode if mode in LIDAR_MODES else p.lidar_mode
+        p.lidar1_topic = _topic(d.get("lidar1_topic"), p.lidar1_topic)
+        p.lidar2_topic = _topic(d.get("lidar2_topic"), p.lidar2_topic)
+        p.lidar2_x_m = num("lidar2_x_m", -5.0, 5.0, p.lidar2_x_m)
+        p.lidar2_y_m = num("lidar2_y_m", -2.0, 2.0, p.lidar2_y_m)
+        p.lidar2_yaw_deg = num("lidar2_yaw_deg", -180.0, 180.0, p.lidar2_yaw_deg)
         return p
 
     def to_dict(self) -> dict:
@@ -94,7 +116,9 @@ class Profile:
                 [r(self.stop[k]) for k in SIDES], [r(self.slow[k]) for k in SIDES],
                 r(self.slow_linear_mps), r(self.slow_angular_rps), bool(self.safety_enabled),
                 bool(self.require_scan), int(self.min_points),
-                r(self.lidar_x_m), r(self.lidar_y_m), r(self.lidar_yaw_deg)]
+                r(self.lidar_x_m), r(self.lidar_y_m), r(self.lidar_yaw_deg),
+                str(self.lidar_mode), str(self.lidar1_topic), str(self.lidar2_topic),
+                r(self.lidar2_x_m), r(self.lidar2_y_m), r(self.lidar2_yaw_deg)]
         return hashlib.sha1(json.dumps(data).encode()).hexdigest()[:8]
 
     # -- geometry -----------------------------------------------------------
@@ -106,6 +130,18 @@ class Profile:
     def footprint_polygon(self) -> List[Tuple[float, float]]:
         x0, x1, y0, y1 = self.footprint_rect()
         return [(x1, y1), (x1, y0), (x0, y0), (x0, y1)]       # front-left, front-right, rear-right, rear-left
+
+    def lidar_pose(self, idx: int = 0) -> Tuple[float, float, float]:
+        """Manual pose (x, y, yaw_rad) of lidar 0 or 1 in base_link (fallback when TF is not available)."""
+        if idx == 1:
+            return self.lidar2_x_m, self.lidar2_y_m, math.radians(self.lidar2_yaw_deg)
+        return self.lidar_x_m, self.lidar_y_m, math.radians(self.lidar_yaw_deg)
+
+    def lidar_topics(self, merged_topic: str = "/scan") -> Dict[int, str]:
+        """{lidar index: scan topic} that the node must listen to for the current mode."""
+        if self.lidar_mode == "dual":
+            return {0: self.lidar1_topic, 1: self.lidar2_topic}
+        return {0: merged_topic}
 
     def nav2_footprint(self) -> str:
         return "[" + ", ".join(f"[{x:.3f}, {y:.3f}]" for x, y in self.footprint_polygon()) + "]"
@@ -322,3 +358,38 @@ def cap_speed(lin: float, ang: float, caps) -> Tuple[float, float]:
     if caps is None:
         return lin, ang
     return (max(-caps[0], min(caps[0], lin)), max(-caps[1], min(caps[1], ang)))
+
+
+
+# -- engineer override (teleop with the zones switched off) --------------------------
+MAX_OVERRIDE_TTL_S = 2.0
+
+
+class OverrideManager:
+    """The HMI (Engineer role) can switch the slow / stop zones off while teleoperating.
+
+    A request is {"id": str, "active": bool, "ttl": s}. It must be REFRESHED (the HMI publishes it at 5 Hz) or it
+    expires after `ttl` seconds (capped at 2 s), so a crashed HMI, a lost network or a closed window puts the
+    zones back automatically. Nothing is written to the saved profile.
+    """
+
+    def __init__(self):
+        self._items: Dict[str, float] = {}
+
+    def update(self, now: float, req: dict) -> None:
+        try:
+            rid = str(req.get("id", "hmi"))[:40]
+            if not req.get("active", True):
+                self._items.pop(rid, None)
+                return
+            ttl = max(0.1, min(MAX_OVERRIDE_TTL_S, float(req.get("ttl", 1.0))))
+            self._items[rid] = now + ttl
+        except (AttributeError, TypeError, ValueError):
+            return
+
+    def active(self, now: float) -> List[str]:
+        self._items = {k: v for k, v in self._items.items() if v > now}
+        return sorted(self._items)
+
+    def is_active(self, now: float) -> bool:
+        return bool(self.active(now))

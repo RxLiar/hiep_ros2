@@ -1,0 +1,51 @@
+[0.541s] Invoking command in '/home/hiep0247/hiep_ros2/src/agv_fleet_domains': AMENT_PREFIX_PATH=/home/hiep0247/hiep_ros2/install/agv_fleet:/home/hiep0247/hiep_ros2/install/sllidar_ros2:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation:/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile:/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/ros2_ws/install/unitree_go2_sim:/home/hiep0247/ros2_ws/install/unitree_go2_description:/home/hiep0247/ros2_ws/install/sllidar_ros2:/home/hiep0247/ros2_ws/install/champ_base:/home/hiep0247/ros2_ws/install/champ_msgs:/home/hiep0247/ros2_ws/install/champ:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet_domains/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages:/home/hiep0247/ros2_ws/install/champ_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet_domains build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet_domains/install.log --install-scripts $base/lib/agv_fleet_domains --single-version-externally-managed install_data
+[0.713s] running egg_info
+[0.713s] creating ../../build/agv_fleet_domains/agv_fleet_domains.egg-info
+[0.725s] writing ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/PKG-INFO
+[0.726s] writing dependency_links to ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/dependency_links.txt
+[0.726s] writing requirements to ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/requires.txt
+[0.726s] writing top-level names to ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/top_level.txt
+[0.726s] writing manifest file '../../build/agv_fleet_domains/agv_fleet_domains.egg-info/SOURCES.txt'
+[0.751s] reading manifest file '../../build/agv_fleet_domains/agv_fleet_domains.egg-info/SOURCES.txt'
+[0.751s] writing manifest file '../../build/agv_fleet_domains/agv_fleet_domains.egg-info/SOURCES.txt'
+[0.751s] running build
+[0.751s] running build_py
+[0.751s] creating /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build
+[0.751s] creating /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib
+[0.752s] creating /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains
+[0.752s] copying agv_fleet_domains/launch_helpers.py -> /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains
+[0.752s] copying agv_fleet_domains/__init__.py -> /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains
+[0.752s] running install
+[0.756s] running install_lib
+[0.768s] creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains
+[0.768s] copying /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains/launch_helpers.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains
+[0.769s] copying /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build/lib/agv_fleet_domains/__init__.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains
+[0.769s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains/launch_helpers.py to launch_helpers.cpython-312.pyc
+[0.769s] byte-compiling /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains/__init__.py to __init__.cpython-312.pyc
+[0.770s] running install_data
+[0.770s] creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index
+[0.770s] creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index/resource_index
+[0.770s] creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index/resource_index/packages
+[0.770s] copying resource/agv_fleet_domains -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/ament_index/resource_index/packages
+[0.770s] copying package.xml -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains
+[0.770s] creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+[0.770s] copying launch/agv002_fleet_side.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+[0.770s] copying launch/agv001_bridge_only.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+[0.770s] copying launch/fleet_server_domain20.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+[0.770s] copying launch/agv001_fleet_side.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+[0.771s] copying launch/agv002_bridge_only.launch.py -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/launch
+[0.771s] creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/config
+[0.771s] copying config/agv001_fleet_bridge.yaml -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/config
+[0.771s] copying config/agv002_fleet_bridge.yaml -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/config
+[0.773s] creating /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+[0.773s] copying env/agv001_domain21.fish -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+[0.774s] copying env/agv002_domain22.fish -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+[0.775s] copying env/agv002_domain22.bash -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+[0.775s] copying env/fleet_domain20.fish -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+[0.779s] copying env/agv001_domain21.bash -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+[0.779s] copying env/fleet_domain20.bash -> /home/hiep0247/hiep_ros2/install/agv_fleet_domains/share/agv_fleet_domains/env
+[0.781s] running install_egg_info
+[0.808s] Copying ../../build/agv_fleet_domains/agv_fleet_domains.egg-info to /home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages/agv_fleet_domains-1.0.0-py3.12.egg-info
+[0.808s] running install_scripts
+[1.018s] writing list of installed files to '/home/hiep0247/hiep_ros2/build/agv_fleet_domains/install.log'
+[1.239s] Invoked command in '/home/hiep0247/hiep_ros2/src/agv_fleet_domains' returned '0': AMENT_PREFIX_PATH=/home/hiep0247/hiep_ros2/install/agv_fleet:/home/hiep0247/hiep_ros2/install/sllidar_ros2:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation:/home/hiep0247/hiep_ros2/install/mec_mobile_gazebo:/home/hiep0247/hiep_ros2/install/mec_mobile_description1:/home/hiep0247/hiep_ros2/install/mec_mobile:/home/hiep0247/hiep_ros2/install/mec_mobile_description:/home/hiep0247/hiep_ros2/install/hiep_robot2:/home/hiep0247/hiep_ros2/install/agv_hmi:/home/hiep0247/hiep_ros2/install/agv_fleet_domains:/home/hiep0247/ros2_ws/install/unitree_go2_sim:/home/hiep0247/ros2_ws/install/unitree_go2_description:/home/hiep0247/ros2_ws/install/sllidar_ros2:/home/hiep0247/ros2_ws/install/champ_base:/home/hiep0247/ros2_ws/install/champ_msgs:/home/hiep0247/ros2_ws/install/champ:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/hiep0247/hiep_ros2/build/agv_fleet_domains/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/agv_fleet/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/mec_mobile_navigation/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/hiep_robot2/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/agv_hmi/lib/python3.12/site-packages:/home/hiep0247/hiep_ros2/install/agv_fleet_domains/lib/python3.12/site-packages:/home/hiep0247/ros2_ws/install/champ_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/agv_fleet_domains build --build-base /home/hiep0247/hiep_ros2/build/agv_fleet_domains/build install --record /home/hiep0247/hiep_ros2/build/agv_fleet_domains/install.log --install-scripts $base/lib/agv_fleet_domains --single-version-externally-managed install_data

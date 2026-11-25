@@ -8,6 +8,7 @@ setup.py
 ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/top_level.txt
 ../../build/agv_fleet_domains/agv_fleet_domains.egg-info/zip-safe
 agv_fleet_domains/__init__.py
+agv_fleet_domains/bridge_config.py
 agv_fleet_domains/launch_helpers.py
 config/agv001_fleet_bridge.yaml
 config/agv002_fleet_bridge.yaml
@@ -22,4 +23,6 @@ launch/agv001_fleet_side.launch.py
 launch/agv002_bridge_only.launch.py
 launch/agv002_fleet_side.launch.py
 launch/fleet_server_domain20.launch.py
+launch/robot_fleet_side.launch.py
 resource/agv_fleet_domains
+test/test_bridge_config.py

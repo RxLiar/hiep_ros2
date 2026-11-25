@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import (
 )
 
 from agv_hmi.ui.collapsible import CollapsiblePanel, make_groups_collapsible
+from agv_hmi.ui.fleet_control import FleetControlPanel
 from agv_hmi.ui.fleet_map_widget import FleetMapWidget
 from agv_hmi.ui.i18n import tr
 
@@ -116,9 +117,11 @@ class FleetPage(QWidget):
 
         root.addLayout(header)
 
-        self._transport_status = QLabel(
-            "⏳ Waiting for /fleet/snapshot — start fleet_server and fleet_agent"
-        )
+        # 4.11.0: start the fleet and connect robots from here (no ros2 commands)
+        self._control = FleetControlPanel()
+        root.addWidget(self._control)
+
+        self._transport_status = QLabel(tr("fleet_waiting"))
         self._transport_status.setWordWrap(True)
         self._transport_status.setStyleSheet(
             "padding:7px 10px;border:1px solid #9E6A03;border-radius:6px;"
@@ -259,6 +262,7 @@ class FleetPage(QWidget):
             robot for robot in robots
             if isinstance(robot, dict)
         ]
+        self._control.set_snapshot(self._robots)
 
         # Optional Fleet Server map registry in snapshot.
         snapshot_maps = data.get("maps", [])
@@ -831,7 +835,12 @@ class FleetPage(QWidget):
     # I18N
     # ------------------------------------------------------------------
 
+    @property
+    def control(self) -> FleetControlPanel:
+        return self._control
+
     def retranslate(self) -> None:
+        self._control.retranslate()
         self._title.setText(
             tr("fleet_title")
         )

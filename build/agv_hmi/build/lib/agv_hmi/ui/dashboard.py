@@ -35,6 +35,7 @@ class DashboardWidget(QWidget):
     def __init__(self):
         super().__init__()
         self._speed = 0.0
+        self._omega = 0.0
         self._dist_m = 0.0
         self._move_s = 0.0
         self._last_t = time.monotonic()
@@ -63,6 +64,7 @@ class DashboardWidget(QWidget):
     # feeders
     def set_speed(self, linear: float, angular: float):
         self._speed = linear
+        self._omega = angular
 
     def set_battery(self, pct): self._batt = pct
     def set_safety(self, state): self._safety = state
@@ -84,7 +86,7 @@ class DashboardWidget(QWidget):
         self._cargo = sum(int(r.get("cargo_count", 0) or 0) for r in recs)
 
     def retranslate(self):
-        self._c_speed.set(tr("dash_speed"), f"{abs(self._speed):.2f} m/s")
+        self._c_speed.set(tr("dash_speed"), f"{self._speed:+.2f} m/s · {self._omega:+.2f} rad/s")
         self._c_dist.set(tr("dash_dist"), f"{self._dist_m / 1000:.2f} km" if self._dist_m >= 1000 else f"{self._dist_m:.0f} m")
         m, s = divmod(int(self._move_s), 60); h, m = divmod(m, 60)
         self._c_time.set(tr("dash_move"), f"{h:d}:{m:02d}:{s:02d}")
@@ -93,6 +95,6 @@ class DashboardWidget(QWidget):
         self._c_miss.set(tr("dash_missions"), str(self._missions))
         self._c_cargo.set(tr("dash_cargo"), str(self._cargo))
         self._c_alarm.set(tr("dash_alarms"), str(self._alarms), "#F85149" if self._alarms else None)
-        colors = {"ok": "#3FB950", "slow": "#E3B341", "stop": "#F85149", "no_scan": "#F85149"}
+        colors = {"ok": "#3FB950", "slow": "#E3B341", "stop": "#F85149", "no_scan": "#F85149", "override": "#F0883E"}
         st = self._safety
         self._c_safety.set(tr("dash_safety"), tr(f"sf_state_{st}") if st else "—", colors.get(st))

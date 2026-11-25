@@ -1,2 +1,0 @@
-[console_scripts]
-serial_reader = serial_comm.serial_reader:main

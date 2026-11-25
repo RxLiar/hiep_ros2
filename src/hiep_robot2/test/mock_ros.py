@@ -29,7 +29,8 @@ class Node:
     def __init__(self, name): self._p = {}; self.subscriptions = {}
     def declare_parameter(self, n, v): self._p[n] = v
     def get_parameter(self, n): return types.SimpleNamespace(value=self._p[n])
-    def create_subscription(self, t, topic, cb, qos): self.subscriptions[topic] = cb
+    def create_subscription(self, t, topic, cb, qos): self.subscriptions[topic] = cb; return topic
+    def destroy_subscription(self, sub): self.subscriptions.pop(sub, None)
     def create_publisher(self, *a, **k): return Pub()
     def create_timer(self, *a, **k): pass
     def create_client(self, *a, **k): return Client()

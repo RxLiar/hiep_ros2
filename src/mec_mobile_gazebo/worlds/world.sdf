@@ -21,8 +21,10 @@
       <background>0.720000029 0.74000001 0.779999971 1</background>
       <shadows>true</shadows>
     </scene>
-    <actor name='person_main_corridor'>
-      <pose>-25 1 0 0 0 0</pose>
+    <!-- 5 nguoi, moi nguoi 1 quy dao rieng (room->room qua hanh lang), toa do the gioi, da kiem tra khong cat tuong/vat can -->
+    <actor name='human_1_r1_r2'>
+      <!-- pose=0: Gazebo tinh vi tri that = <pose> cua actor x pose cua waypoint, nen waypoint duoc hieu la toa do the gioi -->
+      <pose>0 0 0 0 0 0</pose>
       <skin>
         <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
         <scale>1</scale>
@@ -33,37 +35,150 @@
       </animation>
       <script>
         <loop>true</loop>
-        <delay_start>0</delay_start>
+        <delay_start>0.000</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='walk'>
+        <!-- tension=1: actor di dung tren doan thang giua 2 waypoint, khong bi spline Catmull-Rom cat goc -->
+        <trajectory id='0' type='walk' tension='1'>
           <waypoint>
-            <time>0</time>
-            <pose>-25 1 0 0 0 0</pose>
+            <time>0.000</time>
+            <pose>-15.400 13.400 0 0 0 -1.57080</pose>
           </waypoint>
           <waypoint>
-            <time>24</time>
-            <pose>25 1 0 0 0 0</pose>
+            <time>6.000</time>
+            <pose>-15.400 13.400 0 0 0 -1.57080</pose>
           </waypoint>
           <waypoint>
-            <time>48</time>
-            <pose>-25 1 0 0 0 3.1415899999999999</pose>
+            <time>14.857</time>
+            <pose>-15.400 7.200 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>15.540</time>
+            <pose>-15.400 7.200 0 0 0 -2.39066</pose>
+          </waypoint>
+          <waypoint>
+            <time>18.472</time>
+            <pose>-16.900 5.800 0 0 0 -2.39066</pose>
+          </waypoint>
+          <waypoint>
+            <time>19.155</time>
+            <pose>-16.900 5.800 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>25.298</time>
+            <pose>-16.900 1.500 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>26.607</time>
+            <pose>-16.900 1.500 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>49.464</time>
+            <pose>-0.900 1.500 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>50.773</time>
+            <pose>-0.900 1.500 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>56.916</time>
+            <pose>-0.900 5.800 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>57.506</time>
+            <pose>-0.900 5.800 0 0 0 2.27942</pose>
+          </waypoint>
+          <waypoint>
+            <time>60.140</time>
+            <pose>-2.100 7.200 0 0 0 2.27942</pose>
+          </waypoint>
+          <waypoint>
+            <time>60.731</time>
+            <pose>-2.100 7.200 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>69.588</time>
+            <pose>-2.100 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>78.206</time>
+            <pose>-2.100 13.400 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>87.063</time>
+            <pose>-2.100 7.200 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>87.654</time>
+            <pose>-2.100 7.200 0 0 0 -0.86217</pose>
+          </waypoint>
+          <waypoint>
+            <time>90.288</time>
+            <pose>-0.900 5.800 0 0 0 -0.86217</pose>
+          </waypoint>
+          <waypoint>
+            <time>90.878</time>
+            <pose>-0.900 5.800 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>97.021</time>
+            <pose>-0.900 1.500 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>98.330</time>
+            <pose>-0.900 1.500 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>121.187</time>
+            <pose>-16.900 1.500 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>122.496</time>
+            <pose>-16.900 1.500 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>128.639</time>
+            <pose>-16.900 5.800 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>129.322</time>
+            <pose>-16.900 5.800 0 0 0 0.75093</pose>
+          </waypoint>
+          <waypoint>
+            <time>132.254</time>
+            <pose>-15.400 7.200 0 0 0 0.75093</pose>
+          </waypoint>
+          <waypoint>
+            <time>132.937</time>
+            <pose>-15.400 7.200 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>141.794</time>
+            <pose>-15.400 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>147.794</time>
+            <pose>-15.400 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>157.382</time>
+            <pose>-15.400 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>160.000</time>
+            <pose>-15.400 13.400 0 0 0 -1.57080</pose>
           </waypoint>
         </trajectory>
       </script>
       <link name='collision_body'>
-        <pose>0 0 0.90000000000000002 0 0 0</pose>
+        <pose>0 0 0.900 0 0 0</pose>
         <collision name='collision'>
-          <geometry>
-            <cylinder>
-              <radius>0.29999999999999999</radius>
-              <length>1.8</length>
-            </cylinder>
-          </geometry>
+          <geometry><cylinder><radius>0.220</radius><length>1.800</length></cylinder></geometry>
         </collision>
       </link>
     </actor>
-    <actor name='person_room_2_route'>
-      <pose>0 -1 0 0 0 1.5708</pose>
+    <actor name='human_2_r2_r3'>
+      <!-- pose=0: Gazebo tinh vi tri that = <pose> cua actor x pose cua waypoint, nen waypoint duoc hieu la toa do the gioi -->
+      <pose>0 0 0 0 0 0</pose>
       <skin>
         <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
         <scale>1</scale>
@@ -74,32 +189,686 @@
       </animation>
       <script>
         <loop>true</loop>
-        <delay_start>4</delay_start>
+        <delay_start>17.000</delay_start>
         <auto_start>true</auto_start>
-        <trajectory id='0' type='walk'>
+        <!-- tension=1: actor di dung tren doan thang giua 2 waypoint, khong bi spline Catmull-Rom cat goc -->
+        <trajectory id='0' type='walk' tension='1'>
           <waypoint>
-            <time>0</time>
-            <pose>0 -1 0 0 0 1.5708</pose>
+            <time>0.000</time>
+            <pose>2.100 13.400 0 0 0 -1.57080</pose>
           </waypoint>
           <waypoint>
-            <time>9</time>
-            <pose>0 8 0 0 0 1.5708</pose>
+            <time>6.000</time>
+            <pose>2.100 13.400 0 0 0 -1.57080</pose>
           </waypoint>
           <waypoint>
-            <time>18</time>
-            <pose>0 -1 0 0 0 -1.5708</pose>
+            <time>14.857</time>
+            <pose>2.100 7.200 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>15.412</time>
+            <pose>2.100 7.200 0 0 0 -2.23677</pose>
+          </waypoint>
+          <waypoint>
+            <time>17.956</time>
+            <pose>1.000 5.800 0 0 0 -2.23677</pose>
+          </waypoint>
+          <waypoint>
+            <time>18.511</time>
+            <pose>1.000 5.800 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>24.653</time>
+            <pose>1.000 1.500 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>25.962</time>
+            <pose>1.000 1.500 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>28.248</time>
+            <pose>2.600 1.500 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>28.881</time>
+            <pose>2.600 1.500 0 0 0 -0.75976</pose>
+          </waypoint>
+          <waypoint>
+            <time>30.852</time>
+            <pose>3.600 0.550 0 0 0 -0.75976</pose>
+          </waypoint>
+          <waypoint>
+            <time>31.485</time>
+            <pose>3.600 0.550 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>37.771</time>
+            <pose>8.000 0.550 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>38.329</time>
+            <pose>8.000 0.550 0 0 0 0.66964</pose>
+          </waypoint>
+          <waypoint>
+            <time>40.515</time>
+            <pose>9.200 1.500 0 0 0 0.66964</pose>
+          </waypoint>
+          <waypoint>
+            <time>41.073</time>
+            <pose>9.200 1.500 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>51.502</time>
+            <pose>16.500 1.500 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>52.216</time>
+            <pose>16.500 1.500 0 0 0 0.85671</pose>
+          </waypoint>
+          <waypoint>
+            <time>55.051</time>
+            <pose>17.800 3.000 0 0 0 0.85671</pose>
+          </waypoint>
+          <waypoint>
+            <time>55.646</time>
+            <pose>17.800 3.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>64.789</time>
+            <pose>17.800 9.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>65.279</time>
+            <pose>17.800 9.400 0 0 0 2.15880</pose>
+          </waypoint>
+          <waypoint>
+            <time>71.460</time>
+            <pose>15.400 13.000 0 0 0 2.15880</pose>
+          </waypoint>
+          <waypoint>
+            <time>80.078</time>
+            <pose>15.400 13.000 0 0 0 -0.98279</pose>
+          </waypoint>
+          <waypoint>
+            <time>86.259</time>
+            <pose>17.800 9.400 0 0 0 -0.98279</pose>
+          </waypoint>
+          <waypoint>
+            <time>86.749</time>
+            <pose>17.800 9.400 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>95.892</time>
+            <pose>17.800 3.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>96.487</time>
+            <pose>17.800 3.000 0 0 0 -2.28489</pose>
+          </waypoint>
+          <waypoint>
+            <time>99.323</time>
+            <pose>16.500 1.500 0 0 0 -2.28489</pose>
+          </waypoint>
+          <waypoint>
+            <time>100.037</time>
+            <pose>16.500 1.500 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>110.465</time>
+            <pose>9.200 1.500 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>111.023</time>
+            <pose>9.200 1.500 0 0 0 -2.47195</pose>
+          </waypoint>
+          <waypoint>
+            <time>113.210</time>
+            <pose>8.000 0.550 0 0 0 -2.47195</pose>
+          </waypoint>
+          <waypoint>
+            <time>113.768</time>
+            <pose>8.000 0.550 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>120.053</time>
+            <pose>3.600 0.550 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>120.686</time>
+            <pose>3.600 0.550 0 0 0 2.38183</pose>
+          </waypoint>
+          <waypoint>
+            <time>122.657</time>
+            <pose>2.600 1.500 0 0 0 2.38183</pose>
+          </waypoint>
+          <waypoint>
+            <time>123.290</time>
+            <pose>2.600 1.500 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>125.576</time>
+            <pose>1.000 1.500 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>126.885</time>
+            <pose>1.000 1.500 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>133.028</time>
+            <pose>1.000 5.800 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>133.583</time>
+            <pose>1.000 5.800 0 0 0 0.90483</pose>
+          </waypoint>
+          <waypoint>
+            <time>136.126</time>
+            <pose>2.100 7.200 0 0 0 0.90483</pose>
+          </waypoint>
+          <waypoint>
+            <time>136.681</time>
+            <pose>2.100 7.200 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>145.538</time>
+            <pose>2.100 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>151.538</time>
+            <pose>2.100 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>157.382</time>
+            <pose>2.100 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>160.000</time>
+            <pose>2.100 13.400 0 0 0 -1.57080</pose>
           </waypoint>
         </trajectory>
       </script>
       <link name='collision_body'>
-        <pose>0 0 0.90000000000000002 0 0 0</pose>
+        <pose>0 0 0.900 0 0 0</pose>
         <collision name='collision'>
-          <geometry>
-            <cylinder>
-              <radius>0.29999999999999999</radius>
-              <length>1.8</length>
-            </cylinder>
-          </geometry>
+          <geometry><cylinder><radius>0.220</radius><length>1.800</length></cylinder></geometry>
+        </collision>
+      </link>
+    </actor>
+    <actor name='human_3_r3_r5'>
+      <!-- pose=0: Gazebo tinh vi tri that = <pose> cua actor x pose cua waypoint, nen waypoint duoc hieu la toa do the gioi -->
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <scale>1</scale>
+      </skin>
+      <animation name='walk'>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>100.000</delay_start>
+        <auto_start>true</auto_start>
+        <!-- tension=1: actor di dung tren doan thang giua 2 waypoint, khong bi spline Catmull-Rom cat goc -->
+        <trajectory id='0' type='walk' tension='1'>
+          <waypoint>
+            <time>0.000</time>
+            <pose>20.600 13.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>6.000</time>
+            <pose>20.600 13.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>9.714</time>
+            <pose>20.600 10.400 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>10.487</time>
+            <pose>20.600 10.400 0 0 0 -2.49809</pose>
+          </waypoint>
+          <waypoint>
+            <time>14.058</time>
+            <pose>18.600 8.900 0 0 0 -2.49809</pose>
+          </waypoint>
+          <waypoint>
+            <time>14.831</time>
+            <pose>18.600 8.900 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>25.831</time>
+            <pose>18.600 1.200 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>26.340</time>
+            <pose>18.600 1.200 0 0 0 -2.18152</pose>
+          </waypoint>
+          <waypoint>
+            <time>29.828</time>
+            <pose>17.200 -0.800 0 0 0 -2.18152</pose>
+          </waypoint>
+          <waypoint>
+            <time>30.628</time>
+            <pose>17.200 -0.800 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>38.628</time>
+            <pose>11.600 -0.800 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>39.249</time>
+            <pose>11.600 -0.800 0 0 0 -2.39617</pose>
+          </waypoint>
+          <waypoint>
+            <time>41.776</time>
+            <pose>10.300 -2.000 0 0 0 -2.39617</pose>
+          </waypoint>
+          <waypoint>
+            <time>42.464</time>
+            <pose>10.300 -2.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>58.464</time>
+            <pose>10.300 -13.200 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>67.082</time>
+            <pose>10.300 -13.200 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>83.082</time>
+            <pose>10.300 -2.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>83.770</time>
+            <pose>10.300 -2.000 0 0 0 0.74542</pose>
+          </waypoint>
+          <waypoint>
+            <time>86.297</time>
+            <pose>11.600 -0.800 0 0 0 0.74542</pose>
+          </waypoint>
+          <waypoint>
+            <time>86.919</time>
+            <pose>11.600 -0.800 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>94.919</time>
+            <pose>17.200 -0.800 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>95.719</time>
+            <pose>17.200 -0.800 0 0 0 0.96007</pose>
+          </waypoint>
+          <waypoint>
+            <time>99.206</time>
+            <pose>18.600 1.200 0 0 0 0.96007</pose>
+          </waypoint>
+          <waypoint>
+            <time>99.715</time>
+            <pose>18.600 1.200 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>110.715</time>
+            <pose>18.600 8.900 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>111.488</time>
+            <pose>18.600 8.900 0 0 0 0.64350</pose>
+          </waypoint>
+          <waypoint>
+            <time>115.059</time>
+            <pose>20.600 10.400 0 0 0 0.64350</pose>
+          </waypoint>
+          <waypoint>
+            <time>115.832</time>
+            <pose>20.600 10.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>119.546</time>
+            <pose>20.600 13.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>125.546</time>
+            <pose>20.600 13.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>157.382</time>
+            <pose>20.600 13.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>160.000</time>
+            <pose>20.600 13.000 0 0 0 -1.57080</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+      <link name='collision_body'>
+        <pose>0 0 0.900 0 0 0</pose>
+        <collision name='collision'>
+          <geometry><cylinder><radius>0.220</radius><length>1.800</length></cylinder></geometry>
+        </collision>
+      </link>
+    </actor>
+    <actor name='human_4_r5_r4'>
+      <!-- pose=0: Gazebo tinh vi tri that = <pose> cua actor x pose cua waypoint, nen waypoint duoc hieu la toa do the gioi -->
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <scale>1</scale>
+      </skin>
+      <animation name='walk'>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>77.000</delay_start>
+        <auto_start>true</auto_start>
+        <!-- tension=1: actor di dung tren doan thang giua 2 waypoint, khong bi spline Catmull-Rom cat goc -->
+        <trajectory id='0' type='walk' tension='1'>
+          <waypoint>
+            <time>0.000</time>
+            <pose>6.900 -12.800 0 0 0 0.76318</pose>
+          </waypoint>
+          <waypoint>
+            <time>6.000</time>
+            <pose>6.900 -12.800 0 0 0 0.76318</pose>
+          </waypoint>
+          <waypoint>
+            <time>10.547</time>
+            <pose>9.200 -10.600 0 0 0 0.76318</pose>
+          </waypoint>
+          <waypoint>
+            <time>11.220</time>
+            <pose>9.200 -10.600 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>22.077</time>
+            <pose>9.200 -3.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>22.698</time>
+            <pose>9.200 -3.000 0 0 0 2.31622</pose>
+          </waypoint>
+          <waypoint>
+            <time>25.226</time>
+            <pose>8.000 -1.700 0 0 0 2.31622</pose>
+          </waypoint>
+          <waypoint>
+            <time>25.913</time>
+            <pose>8.000 -1.700 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>48.485</time>
+            <pose>-7.800 -1.700 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>49.794</time>
+            <pose>-7.800 -1.700 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>57.937</time>
+            <pose>-7.800 -7.400 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>58.709</time>
+            <pose>-7.800 -7.400 0 0 0 -2.49809</pose>
+          </waypoint>
+          <waypoint>
+            <time>61.567</time>
+            <pose>-9.400 -8.600 0 0 0 -2.49809</pose>
+          </waypoint>
+          <waypoint>
+            <time>62.264</time>
+            <pose>-9.400 -8.600 0 0 0 -1.66146</pose>
+          </waypoint>
+          <waypoint>
+            <time>68.575</time>
+            <pose>-9.800 -13.000 0 0 0 -1.66146</pose>
+          </waypoint>
+          <waypoint>
+            <time>77.193</time>
+            <pose>-9.800 -13.000 0 0 0 1.48014</pose>
+          </waypoint>
+          <waypoint>
+            <time>83.505</time>
+            <pose>-9.400 -8.600 0 0 0 1.48014</pose>
+          </waypoint>
+          <waypoint>
+            <time>84.202</time>
+            <pose>-9.400 -8.600 0 0 0 0.64350</pose>
+          </waypoint>
+          <waypoint>
+            <time>87.059</time>
+            <pose>-7.800 -7.400 0 0 0 0.64350</pose>
+          </waypoint>
+          <waypoint>
+            <time>87.832</time>
+            <pose>-7.800 -7.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>95.975</time>
+            <pose>-7.800 -1.700 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>97.284</time>
+            <pose>-7.800 -1.700 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>119.855</time>
+            <pose>8.000 -1.700 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>120.543</time>
+            <pose>8.000 -1.700 0 0 0 -0.82538</pose>
+          </waypoint>
+          <waypoint>
+            <time>123.071</time>
+            <pose>9.200 -3.000 0 0 0 -0.82538</pose>
+          </waypoint>
+          <waypoint>
+            <time>123.692</time>
+            <pose>9.200 -3.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>134.549</time>
+            <pose>9.200 -10.600 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>135.222</time>
+            <pose>9.200 -10.600 0 0 0 -2.37841</pose>
+          </waypoint>
+          <waypoint>
+            <time>139.769</time>
+            <pose>6.900 -12.800 0 0 0 -2.37841</pose>
+          </waypoint>
+          <waypoint>
+            <time>145.769</time>
+            <pose>6.900 -12.800 0 0 0 -2.37841</pose>
+          </waypoint>
+          <waypoint>
+            <time>157.382</time>
+            <pose>6.900 -12.800 0 0 0 -2.37841</pose>
+          </waypoint>
+          <waypoint>
+            <time>160.000</time>
+            <pose>6.900 -12.800 0 0 0 0.76318</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+      <link name='collision_body'>
+        <pose>0 0 0.900 0 0 0</pose>
+        <collision name='collision'>
+          <geometry><cylinder><radius>0.220</radius><length>1.800</length></cylinder></geometry>
+        </collision>
+      </link>
+    </actor>
+    <actor name='human_5_r4_r1'>
+      <!-- pose=0: Gazebo tinh vi tri that = <pose> cua actor x pose cua waypoint, nen waypoint duoc hieu la toa do the gioi -->
+      <pose>0 0 0 0 0 0</pose>
+      <skin>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <scale>1</scale>
+      </skin>
+      <animation name='walk'>
+        <filename>/home/hiep0247/gazebo_models/gazebo_models/person_walking/meshes/walking.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>19.000</delay_start>
+        <auto_start>true</auto_start>
+        <!-- tension=1: actor di dung tren doan thang giua 2 waypoint, khong bi spline Catmull-Rom cat goc -->
+        <trajectory id='0' type='walk' tension='1'>
+          <waypoint>
+            <time>0.000</time>
+            <pose>-2.850 -13.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>6.000</time>
+            <pose>-2.850 -13.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>13.143</time>
+            <pose>-2.850 -8.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>13.742</time>
+            <pose>-2.850 -8.000 0 0 0 2.28963</pose>
+          </waypoint>
+          <waypoint>
+            <time>17.538</time>
+            <pose>-4.600 -6.000 0 0 0 2.28963</pose>
+          </waypoint>
+          <waypoint>
+            <time>17.949</time>
+            <pose>-4.600 -6.000 0 0 0 2.78282</pose>
+          </waypoint>
+          <waypoint>
+            <time>22.832</time>
+            <pose>-7.800 -4.800 0 0 0 2.78282</pose>
+          </waypoint>
+          <waypoint>
+            <time>23.842</time>
+            <pose>-7.800 -4.800 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>29.270</time>
+            <pose>-7.800 -1.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>30.579</time>
+            <pose>-7.800 -1.000 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>46.579</time>
+            <pose>-19.000 -1.000 0 0 0 3.14159</pose>
+          </waypoint>
+          <waypoint>
+            <time>47.888</time>
+            <pose>-19.000 -1.000 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>56.174</time>
+            <pose>-19.000 4.800 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>56.729</time>
+            <pose>-19.000 4.800 0 0 0 0.90483</pose>
+          </waypoint>
+          <waypoint>
+            <time>59.272</time>
+            <pose>-17.900 6.200 0 0 0 0.90483</pose>
+          </waypoint>
+          <waypoint>
+            <time>59.827</time>
+            <pose>-17.900 6.200 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>70.113</time>
+            <pose>-17.900 13.400 0 0 0 1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>78.731</time>
+            <pose>-17.900 13.400 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>89.017</time>
+            <pose>-17.900 6.200 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>89.572</time>
+            <pose>-17.900 6.200 0 0 0 -2.23677</pose>
+          </waypoint>
+          <waypoint>
+            <time>92.115</time>
+            <pose>-19.000 4.800 0 0 0 -2.23677</pose>
+          </waypoint>
+          <waypoint>
+            <time>92.670</time>
+            <pose>-19.000 4.800 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>100.956</time>
+            <pose>-19.000 -1.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>102.265</time>
+            <pose>-19.000 -1.000 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>118.265</time>
+            <pose>-7.800 -1.000 0 0 0 0.00000</pose>
+          </waypoint>
+          <waypoint>
+            <time>119.574</time>
+            <pose>-7.800 -1.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>125.003</time>
+            <pose>-7.800 -4.800 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>126.013</time>
+            <pose>-7.800 -4.800 0 0 0 -0.35877</pose>
+          </waypoint>
+          <waypoint>
+            <time>130.895</time>
+            <pose>-4.600 -6.000 0 0 0 -0.35877</pose>
+          </waypoint>
+          <waypoint>
+            <time>131.306</time>
+            <pose>-4.600 -6.000 0 0 0 -0.85197</pose>
+          </waypoint>
+          <waypoint>
+            <time>135.102</time>
+            <pose>-2.850 -8.000 0 0 0 -0.85197</pose>
+          </waypoint>
+          <waypoint>
+            <time>135.701</time>
+            <pose>-2.850 -8.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>142.844</time>
+            <pose>-2.850 -13.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>148.844</time>
+            <pose>-2.850 -13.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>157.382</time>
+            <pose>-2.850 -13.000 0 0 0 -1.57080</pose>
+          </waypoint>
+          <waypoint>
+            <time>160.000</time>
+            <pose>-2.850 -13.000 0 0 0 1.57080</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+      <link name='collision_body'>
+        <pose>0 0 0.900 0 0 0</pose>
+        <collision name='collision'>
+          <geometry><cylinder><radius>0.220</radius><length>1.800</length></cylinder></geometry>
         </collision>
       </link>
     </actor>
